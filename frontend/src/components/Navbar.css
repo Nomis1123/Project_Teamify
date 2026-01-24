@@ -1,3 +1,4 @@
+/* rendering for the whole navbar and its direct children */
 .navbar{
     display: flex;
     justify-content: space-between;
@@ -22,15 +23,10 @@
     font-size: 22px;
 }
 
-/* rendering all links at center of header */
+/* rendering for all <Link> except login*/
 .nav-center{
     display: flex;
     gap: 40px;
-}
-
-.nav-center-right{
-    display: flex;
-    gap: 80px;
 }
 
 /* rendering for each <Link> in the center */
@@ -42,6 +38,12 @@
     background-color: #433354;
     color: white;
     border-radius: 10px;
+}
+
+/* rendering for all <Link> including login */
+.nav-center-right{
+    display: flex;
+    gap: 80px; 
 }
 
 /* rendering for login */

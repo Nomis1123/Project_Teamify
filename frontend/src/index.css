@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+/* Default React template base for index.css */
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
