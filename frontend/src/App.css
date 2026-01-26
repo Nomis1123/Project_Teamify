@@ -1,0 +1,12 @@
+.body{
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(
+    to bottom right,
+    #111827,
+    #5b2e8c,
+    #1e40af
+  );
+  color: white;
+}

@@ -1,0 +1,59 @@
+/* rendering for the whole navbar and its direct children */
+.navbar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(0,0,0,0.3);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(139, 92, 246, 0.3);
+    padding: 12px 180px;
+
+    position: sticky; /* fix header to stay in place when scroll*/
+    top: 0;
+    width: 100%;
+    
+    /* box shadow from tailwindcss shadow-lg */
+    box-shadow: 
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* rendering for Teamify name */
+.nav-left{
+    font-size: 22px;
+}
+
+/* rendering for all <Link> except login*/
+.nav-center{
+    display: flex;
+    gap: 40px;
+}
+
+/* rendering for each <Link> in the center */
+.nav-center a{
+    padding: 6px 15px;
+}
+
+.nav-center a:hover {
+    background-color: #433354;
+    color: white;
+    border-radius: 10px;
+}
+
+/* rendering for all <Link> including login */
+.nav-center-right{
+    display: flex;
+    gap: 80px; 
+}
+
+/* rendering for login */
+.nav-right a{
+    display: flex;
+    background: linear-gradient(
+    to right,
+    #436de2,
+    #7f40c2
+  );
+  padding: 6px 15px;
+  border-radius: 10px;
+}
