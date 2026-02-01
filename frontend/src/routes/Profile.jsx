@@ -81,9 +81,68 @@ const Profile = () => {
                         : user.description}
                     </p>
                 </div>
-
+                Games:
                 <div className="profile-game-bar">
-                    User games here!
+                    <div className='profile-game-image-text-container'>
+                        <img
+                            className="profile-game-image"
+                            src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
+                            alt="Profile"
+                        />
+                        Game 1
+                    </div>
+                    <div className='profile-game-image-text-container'>
+                        <img
+                            className="profile-game-image"
+                            src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
+                            alt="Profile"
+                        />
+                        Game 2
+                    </div>
+                    <div className='profile-game-image-text-container'>
+                        <img
+                            className="profile-game-image"
+                            src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
+                            alt="Profile"
+                        />
+                        Game 3
+                    </div>
+                    <div className='profile-game-image-text-container'>
+                        <img
+                            className="profile-game-image"
+                            src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
+                            alt="Profile"
+                        />
+                        Game 4
+                    </div>
+                    <div className='profile-game-image-text-container'>
+                        <img
+                            className="profile-game-image"
+                            src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
+                            alt="Profile"
+                        />
+                        Game 5
+                    </div>
+                    <div className='profile-game-image-text-container'>
+                        <img
+                            className="profile-game-image"
+                            src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
+                            alt="Profile"
+                        />
+                        Game 6
+                    </div>
+                    <div className='profile-game-image-text-container'>
+                        <img
+                            className="profile-game-image"
+                            src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
+                            alt="Profile"
+                        />
+                        Game 7
+                    </div>
+                </div>
+                Game schedule:
+                <div className='profile-game-schedule'>
+
                 </div>
             </div>
             
