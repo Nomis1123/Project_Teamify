@@ -1,0 +1,88 @@
+/* padding and display for positioning the login box on the webpage */
+.Login-layout{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16vh 5vw; /* scaling off viewport h/w instead of px for different monitor sizes */ 
+} 
+
+/* colour and padding for inside the box */
+.Login-box{
+    width: 100%;
+    max-width: 500px;
+    padding: 30px;
+    border-radius: 30px;
+    background-color: #562A86;
+    border: 0.5px solid #B659D0;
+
+    /* box shadow from getcssscan.com */
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 7px 29px 0px;
+}
+
+.Login-box h2{
+    font-size: 31px;
+    font-weight: bold;
+    text-align: center;
+    background: linear-gradient(to right,
+    #60a5fa,
+    #c084fc,
+    #f472b6 );
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.top-text{
+    padding: 0px 0px 20px 0px;
+    color: #BBB9B9;
+    font-size: 16px;
+    text-align: center;
+}
+
+.register{
+    color: #D297FF;
+}
+
+.Login-box form {
+  text-align: left;
+  margin: 0px 10px;
+}
+
+.Login-box label {
+    font-size: 15px;
+}
+
+.Login-box input {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background-color: #2F1B4B;
+  border-radius: 10px;
+  border: 0.2px solid #8545A5;
+  padding: 7px 12px;
+  margin-bottom: 15px;
+}
+
+.login-button{
+    display: block;
+    background: linear-gradient(to right, #668AFF, #823FF4, #B555FF);
+    width: 35%;
+    margin: 5px auto 0;
+    border: none; /* DO NOT remove this, else linear gradient will glitch out */
+    border-radius: 15px;
+    font-size: 16px;
+}
+
+.login-button:hover {
+    background: linear-gradient(to right, #5566FF, #6A33E8, #9A33FF);
+    transform: scale(1.03); /* on hover, scale the button larger */
+}
+
+.register{
+    display: block;
+    text-align: center;
+}
+
+.error-msg{
+    color: rgb(255, 0, 0);
+    font-size: 14px;
+}

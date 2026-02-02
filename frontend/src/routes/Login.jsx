@@ -9,6 +9,7 @@ const Login = () => {
     const [password, setPassword] = useState("")
     const [emailError, setEmailError] = useState("")
     const [pwdError, setPwdError] = useState("")
+    const [loginMsg, setloginMsg] = useState("")
     const navigate = useNavigate()
 
     // If user modifies email or password, empty error msg
@@ -17,7 +18,7 @@ const Login = () => {
         setPwdError('')
     }, [email, password])
 
-    // If user modifies email or password, empty error msg
+    // validates the form components and output error msg if needed. 
     const validateForm = async (e) => {
         e.preventDefault() //Prevents default behaviour from reloading the page 
 
@@ -35,12 +36,11 @@ const Login = () => {
             valid = false
         }
         
-        // This regex for a valid password is found online 
-        // output error if password does not have 
-        // at least one letter, at least one number, and 8 or more length
+        // This regex for a valid password is found online
+        // output error if the password does not have at least one letter, at least one number, and 8 or more length
         const passRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/
         if (password == "" || !passRegex.test(password)) {
-            setPwdError("Password empty or incorrect format")
+            setPwdError("Password need at least one letter, one number, and 8 letters")
             valid = false
         }
 
@@ -60,47 +60,46 @@ const Login = () => {
     // function used to fetch and get response from database to check if user exists
     // Return true if user exists, and false otherwise
     const checkCredentials = async (email, password) => {
+        // TODO: to be implemented
         return true
     } 
 
     return (
-        <div className="LoginLayout"> {/* For login box layout */}
-            <div className="Login-box"> {/* For login box rendering */}
-                <h2>Welcome Back</h2>
-                <p className="top=text">Sign in to continue your journey</p>
+        <div className="Login-layout"> {/* For login box layout */}
+            <section className="Login-box"> {/* For login box rendering */}
+                    <h2 className="title">Welcome Back</h2>
+                    <p className="top-text">Sign in to continue your journey</p>
 
                 {/* form calls validateForm on submit, and sets email, password variables with user entered value
-                * Outputs error msg upon form submission if any field is invalid 
-                */}
-                <form onSubmit={validateForm}> 
-                    <label htmlFor="Email">Email</label>
+                * Outputs error msg upon form submission if any field is invalid */}
+                <form onSubmit={validateForm} className="login-form"> 
+                    <label htmlFor="Email">Email</label><br/>
                     <input type="email" 
-                    id="Email" 
-                    placeholder="Enter your email"
-                    onChange={ (e) => setEmail(e.target.value)}
-                    value={email}
-                    required
+                        id="Email" 
+                        placeholder="Enter your email"
+                        onChange={ (e) => setEmail(e.target.value)}
+                        value={email}
+                        required
                     />
                     {emailError && <div className="error-msg">{emailError}</div>}
-                    <br />
 
-                    <label htmlFor="Password">Password</label>
+                    <label htmlFor="Password">Password</label><br/>
                     <input type="password" 
-                    id="password" 
-                    placeholder="Enter your password"
-                    onChange={ (e) => setPassword(e.target.value)}
-                    value={password}
-                    required
+                        id="password" 
+                        placeholder="Enter your password"
+                        onChange={ (e) => setPassword(e.target.value)}
+                        value={password}
+                        required
                     />
                     {pwdError && <div className="error-msg">{pwdError}</div>}
                     <br />
 
-                    <button type="submit">Login</button><br />
+                    <button type="submit" className="login-button">Login</button><br />
                     <Link to="/register" className="register"> 
                         Don't have an account? Sign up {/* Links to register page on click*/}
                     </Link>
                 </form>
-            </div>
+            </section>
         </div>
     )
 }
