@@ -2,11 +2,19 @@ import React from 'react'
 import { useEffect, useState } from "react";
 import "./Profile.css";
 import { useNavigate } from "react-router-dom";
+import "../components/GameScheduleBar.css"
+import GameScheduleBar from "../components/GameScheduleBar";
 
 
 const Profile = () => {
     const navigate = useNavigate();
-    const [user, setUser] = useState(null);     // { id, username }
+    const [user, setUser] = useState({
+        uid: "",
+        username: "",
+        profileImageUrl: "",
+        games: [],
+        schedule: Array(3).fill(false),
+    });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
@@ -24,9 +32,17 @@ const Profile = () => {
                 });
 
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
                 const data = await res.json();
-                setUser(data);
+                const normalized = {
+                    uid: data.uid ?? "",
+                    username: data.username ?? "",
+                    profileImageUrl: data.profileImageUrl ?? "",
+                    games: Array.isArray(data.games) ? data.games : [],
+                    schedule: Array.isArray(data.schedule) && data.schedule.length === 48
+                    ? data.schedule : Array(48).fill(false),
+                };
+                
+                setUser(normalized);
             } catch (e) {
                 setError("Failed to load profile info.");
             } finally {
@@ -44,27 +60,14 @@ const Profile = () => {
             <div className="profile-info-layout">
                 <img
                     className="profile-image"
-                    src="https://th.bing.com/th/id/OIP.BXIufrwgTFhg49ux6NTkiQHaQD?w=236"
+                    // This image link is temporary. Replace it when we figure out a default profile image.
+                    src={user.profileImageUrl || "https://th.bing.com/th/id/OIP.BXIufrwgTFhg49ux6NTkiQHaQD?w=236"}
                     alt="Profile"
                 />
 
                 <div className='username'>
-                    {loading ? (
-                        <>
-                            <h1>Loading...</h1>
-                            <p> </p>
-                        </>
-                    ) : error ? (
-                        <>
-                            <h1>Error</h1>
-                            <p>{error}</p>
-                        </>
-                    ) : (
-                        <>
-                            <h1>{user.username}</h1>
-                            <p>User ID: {user.id}</p>
-                        </>
-                    )}
+                    <h1>{loading ? "Loading..." : user.username || "Unknown User"}</h1>
+                    <p>User ID: {user.userId || "-"}</p>
                 </div>
                 
                 <button className="profile-edit-btn" onClick={() => navigate("/profile_editing")}>
@@ -82,67 +85,72 @@ const Profile = () => {
                     </p>
                 </div>
                 Games:
-                <div className="profile-game-bar">
-                    <div className='profile-game-image-text-container'>
-                        <img
-                            className="profile-game-image"
-                            src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
-                            alt="Profile"
-                        />
-                        Game 1
-                    </div>
-                    <div className='profile-game-image-text-container'>
-                        <img
-                            className="profile-game-image"
-                            src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
-                            alt="Profile"
-                        />
-                        Game 2
-                    </div>
-                    <div className='profile-game-image-text-container'>
-                        <img
-                            className="profile-game-image"
-                            src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
-                            alt="Profile"
-                        />
-                        Game 3
-                    </div>
-                    <div className='profile-game-image-text-container'>
-                        <img
-                            className="profile-game-image"
-                            src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
-                            alt="Profile"
-                        />
-                        Game 4
-                    </div>
-                    <div className='profile-game-image-text-container'>
-                        <img
-                            className="profile-game-image"
-                            src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
-                            alt="Profile"
-                        />
-                        Game 5
-                    </div>
-                    <div className='profile-game-image-text-container'>
-                        <img
-                            className="profile-game-image"
-                            src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
-                            alt="Profile"
-                        />
-                        Game 6
-                    </div>
-                    <div className='profile-game-image-text-container'>
-                        <img
-                            className="profile-game-image"
-                            src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
-                            alt="Profile"
-                        />
-                        Game 7
+                <div className='profile-game-section'>
+                    <div className="profile-game-bar">
+                        {/* The image sources are temporary. Replace with game icons and name after.
+                            I still have to modify this so that it accept game image and name from db. */}
+                        <div className='profile-game-image-text-container'>
+                            <img
+                                className="profile-game-image"
+                                src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
+                                alt="Profile"
+                            />
+                            Game 1
+                        </div>
+                        <div className='profile-game-image-text-container'>
+                            <img
+                                className="profile-game-image"
+                                src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
+                                alt="Profile"
+                            />
+                            Game 2
+                        </div>
+                        <div className='profile-game-image-text-container'>
+                            <img
+                                className="profile-game-image"
+                                src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
+                                alt="Profile"
+                            />
+                            Game 3
+                        </div>
+                        <div className='profile-game-image-text-container'>
+                            <img
+                                className="profile-game-image"
+                                src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
+                                alt="Profile"
+                            />
+                            Game 4
+                        </div>
+                        <div className='profile-game-image-text-container'>
+                            <img
+                                className="profile-game-image"
+                                src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
+                                alt="Profile"
+                            />
+                            Game 5
+                        </div>
+                        <div className='profile-game-image-text-container'>
+                            <img
+                                className="profile-game-image"
+                                src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
+                                alt="Profile"
+                            />
+                            Game 6
+                        </div>
+                        <div className='profile-game-image-text-container'>
+                            <img
+                                className="profile-game-image"
+                                src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
+                                alt="Profile"
+                            />
+                            Game 7
+                        </div>
                     </div>
                 </div>
+                
                 Game schedule:
                 <div className='profile-game-schedule'>
-
+                    <GameScheduleBar schedule={user.schedule} />
                 </div>
             </div>
             
