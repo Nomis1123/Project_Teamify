@@ -1,24 +1,49 @@
-.schedule-bar-day {
-  border-radius: 10px;
-  border: 2px solid;
-  border-color: rgb(188, 178, 178);
+.weekly-schedule {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.daily-schedule {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.day-label {
+  font-weight: 700;
+  padding-top: 6px;
+}
+
+.schedule-right {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.time-sections {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  overflow: hidden;
-  height: 30px;
-  width: 100%;
+  font-size: 12px;
+  opacity: 0.9;
+  text-align: center;
 }
 
-.schedule-slot {
-  border-left: 1px solid;
-  border-right: 1px solid;
-  border-color: rgb(188, 178, 178);
+.bar-sections {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  height: 26px;
 }
 
-.schedule-slot.free {
-  background: #22c55e;
+.schedule-cell {
+  border-radius: 5px;
+  height: 100%;
+  border: 1px solid rgba(255,255,255,0.3);
+  box-sizing: border-box;
 }
 
-.schedule-slot.busy {
-  background: #ef4444;
-}
+.schedule-cell.free { background: #22c55e; }
+.schedule-cell.busy { background: #ef4444; }
+

@@ -1,36 +1,38 @@
-const SLOTS = 48;
+import React from "react";
+import "./GameScheduleBar.css"
 
-// This function generates a time interval for the schedule bar
-// function slotLabel(i) {
-//     const start = i * 30;
-//     const end = start + 30;
-
-//     const hh1 = String(Math.floor(start / 60)).padStart(2, "0");
-//     const mm1 = String(start % 60).padStart(2, "0");
-//     const hh2 = String(Math.floor(end / 60)).padStart(2, "0");
-//     const mm2 = String(end % 60).padStart(2, "0");
-
-//     return `${hh1}:${mm1} - ${hh2}:${mm2}`;
-// }
-
+const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const time = ["morning", "afternoon", "night"];
+    
 export default function GameScheduleBar({ schedule }) {
-    // Ensure we always have exactly 48 booleans
-    const slots = Array.isArray(schedule) && schedule.length === SLOTS
-        ? schedule : Array(SLOTS).fill(false);
-
     return (
-        <div>
-            Monday:
-            <div className="schedule-bar-day">
-                {slots.map((isFree, i) => (
-                <div
-                    key={i}
-                    className={`schedule-slot ${isFree ? "free" : "busy"}`}
-                    // title={slotLabel(i)}
-                />
-                ))}
-            </div>
+        <div className="weekly-schedule">
+            {days.map((day) => {const d = schedule?.[day] ?? { morning: false, afternoon: false, night: false };
+
+            return (
+                <div className="daily-schedule" key={day}>
+                    <div className="day-label">{day}:</div>
+
+                    <div className="schedule-right">
+                        <div className="time-sections">
+                            <div>Morning</div>
+                            <div>Afternoon</div>
+                            <div>Night</div>
+                        </div>
+
+                        <div className="bar-sections">
+                        {time.map((p) => (
+                            <div
+                            key={p}
+                            className={`schedule-cell ${d[p] ? "free" : "busy"}`}
+                            title={`${day} ${p}`}
+                            />
+                        ))}
+                        </div>
+                    </div>
+                </div>
+            );
+            })}
         </div>
-        
     );
 }

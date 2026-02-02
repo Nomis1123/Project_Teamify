@@ -8,15 +8,26 @@ import GameScheduleBar from "../components/GameScheduleBar";
 
 const Profile = () => {
     const navigate = useNavigate();
+    const defaultDailySchedule = { morning: false, afternoon: false, night: false };
+    const defaultWeeklySchedule = {
+            Monday: { ...defaultDailySchedule },
+            Tuesday: { ...defaultDailySchedule },
+            Wednesday: { ...defaultDailySchedule },
+            Thursday: { ...defaultDailySchedule },
+            Friday: { ...defaultDailySchedule },
+            Saturday: { ...defaultDailySchedule },
+            Sunday: { ...defaultDailySchedule },
+    };
     const [user, setUser] = useState({
         uid: "",
         username: "",
+        description: "",
         profileImageUrl: "",
         games: [],
-        schedule: Array(3).fill(false),
+        schedule: defaultWeeklySchedule,
     });
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    // const [error, setError] = useState("");
 
     useEffect(() => {
         const loadMe = async () => {
@@ -38,8 +49,15 @@ const Profile = () => {
                     username: data.username ?? "",
                     profileImageUrl: data.profileImageUrl ?? "",
                     games: Array.isArray(data.games) ? data.games : [],
-                    schedule: Array.isArray(data.schedule) && data.schedule.length === 48
-                    ? data.schedule : Array(48).fill(false),
+                    schedule: days.reduce((acc, day) => {
+                        const d = data.schedule?.[day] ?? defaultDailySchedule;
+                        acc[day] = {
+                            morning: Boolean(d.morning),
+                            afternoon: Boolean(d.afternoon),
+                            night: Boolean(d.night),
+                        };
+                        return acc;
+                    }, {}),
                 };
                 
                 setUser(normalized);
@@ -52,6 +70,26 @@ const Profile = () => {
 
         loadMe();
     }, []);
+    
+    // Test:
+    // useEffect(() => {
+    //     setUser({
+    //         uid: "user123",
+    //         username: "TestUser",
+    //         description: "Hello I am a new user",
+    //         profileImageUrl: "",
+    //         games: [],
+    //         schedule: {
+    //         Monday: { morning: true, afternoon: false, night: true },
+    //         Tuesday: { morning: false, afternoon: false, night: false },
+    //         Wednesday: { morning: false, afternoon: true, night: false },
+    //         Thursday: { morning: true, afternoon: true, night: true },
+    //         Friday: { morning: false, afternoon: true, night: true },
+    //         Saturday: { morning: true, afternoon: false, night: false },
+    //         Sunday: { morning: false, afternoon: false, night: true },
+    //         },
+    //     });
+    // }, []);
 
     return (
     <div className="profile-page">
@@ -67,7 +105,7 @@ const Profile = () => {
 
                 <div className='username'>
                     <h1>{loading ? "Loading..." : user.username || "Unknown User"}</h1>
-                    <p>User ID: {user.userId || "-"}</p>
+                    <p>User ID: {user.uid || "-"}</p>
                 </div>
                 
                 <button className="profile-edit-btn" onClick={() => navigate("/profile_editing")}>
@@ -76,7 +114,7 @@ const Profile = () => {
             </div>
             
             <div className='profile-scroll'>
-                Description:
+                <h2>Description:</h2>
                 <div className="profile-description">
                     <p>
                         {!user?.description?.trim()
@@ -84,7 +122,8 @@ const Profile = () => {
                         : user.description}
                     </p>
                 </div>
-                Games:
+
+                <h2>Games:</h2>
                 <div className='profile-game-section'>
                     <div className="profile-game-bar">
                         {/* The image sources are temporary. Replace with game icons and name after.
@@ -147,8 +186,8 @@ const Profile = () => {
                         </div>
                     </div>
                 </div>
-                
-                Game schedule:
+            
+                <h2>Game Schedule:</h2>
                 <div className='profile-game-schedule'>
                     <GameScheduleBar schedule={user.schedule} />
                 </div>

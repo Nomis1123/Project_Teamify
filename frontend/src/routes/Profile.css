@@ -4,6 +4,11 @@
   padding-bottom: 24px;
 }
 
+h2 {
+  font-size: large;
+  font-weight: 500;
+}
+
 /* Profile Layout */
 .profile-card {
   background: #441E6D;
