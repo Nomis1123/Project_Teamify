@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useNavigate } from "react-router-dom";
 
-const Login = () => {
+const Login = ( { setUser }) => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [emailError, setEmailError] = useState("")
@@ -37,10 +37,10 @@ const Login = () => {
         }
         
         // This regex for a valid password is found online
-        // output error if the password does not have at least one letter, at least one number, and 8 or more length
+        // output error if the password does not have at least one letter, at least one number, and minimum 8 letters
         const passRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/
         if (password == "" || !passRegex.test(password)) {
-            setPwdError("Password need at least one letter, one number, and 8 letters")
+            setPwdError("Password need at least one letter, one number, and minimum 8 letters")
             valid = false
         }
 
@@ -53,6 +53,7 @@ const Login = () => {
             console.log("login success!")
             navigate("/profile") // redirect to profile page for now, until matchmaking gets implemented
         }else {
+            setloginMsg("Invalid username or password")
             console.log("login failed!")
         }
     }
@@ -60,12 +61,16 @@ const Login = () => {
     // function used to fetch and get response from database to check if user exists
     // Return true if user exists, and false otherwise
     const checkCredentials = async (email, password) => {
-        // TODO: to be implemented
+        // TODO: call database with email and password
+        // set the username with the data received from the database
+
+        setUser("user") // placeholder
         return true
     } 
 
     return (
         <div className="Login-layout"> {/* For login box layout */}
+            {loginMsg && <div className="login-msg">{loginMsg}</div>}
             <section className="Login-box"> {/* For login box rendering */}
                     <h2 className="title">Welcome Back</h2>
                     <p className="top-text">Sign in to continue your journey</p>
