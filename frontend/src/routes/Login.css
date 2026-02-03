@@ -3,8 +3,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 16vh 5vw; /* scaling off viewport h/w instead of px for different monitor sizes */ 
+    padding: 23vh 5vw; /* scaling off viewport h/w instead of px for different monitor sizes */
 } 
+
+/* if padding goes over 900px on smaller screens, change padding to 15vh 5vw. Prevents scrollbar on laptops*/
+@media (max-height: 900px) {
+    .Login-layout {
+        padding: 15vh 5vw;
+    } 
+}
 
 /* colour and padding for inside the box */
 .Login-box{
