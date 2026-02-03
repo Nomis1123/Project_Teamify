@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import './Navbar.css'
 
-const Navbar = () => {
+const Navbar = ( {user} ) => {
     return (
         <nav className="navbar">
             <Link to="/"> 
