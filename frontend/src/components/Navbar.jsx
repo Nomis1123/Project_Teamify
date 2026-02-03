@@ -28,9 +28,12 @@ const Navbar = ( {user} ) => {
                 </div>
 
                 <div className="nav-right">
+                    {/* if user is logged in, display username, else Login link */}
+                    { user ? <a> { user } </a> :
                     <Link to="/login" className="login">
                         Login
                     </Link>
+                    }   
                 </div>
             </div>
         </nav>

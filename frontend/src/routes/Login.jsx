@@ -78,7 +78,7 @@ const Login = ( { setUser }) => {
 
                 {/* form calls validateForm on submit, and sets email, password variables with user entered value
                 * Outputs error msg upon form submission if any field is invalid */}
-                <form OnSubmit={validateForm} className="login-form"> 
+                <form onSubmit={validateForm} className="login-form"> 
                     <label htmlFor="Email">Email</label><br/>
                     <input type="email" 
                         id="Email" 
