@@ -38,9 +38,10 @@ const Login = ( { setUser }) => {
         
         // This regex for a valid password is found online
         // output error if the password does not have at least one letter, at least one number, and minimum 8 letters
+        // ^ which is the password requirement for a user to register
         const passRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/
         if (password == "" || !passRegex.test(password)) {
-            setPwdError("Password need at least one letter, one number, and minimum 8 letters")
+            setPwdError("Invalid password")
             valid = false
         }
 
