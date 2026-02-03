@@ -64,6 +64,7 @@ bool verify_jwt(const std::string& token, const std::string& secret) {
     int idx = 0;
     std::stringstream ss(token);
     std::string segment;
+    int idx_check = 1;
 
     while (std::getline(ss, segment, '.') && idx < 3)
         parts[idx++] = segment;
