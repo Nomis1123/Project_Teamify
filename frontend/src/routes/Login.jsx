@@ -1,6 +1,16 @@
 import React from 'react'
+import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 
-const Login = () => {
+const Login = ( { setUser }) => {
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [emailError, setEmailError] = useState("")
+    const [pwdError, setPwdError] = useState("")
+    const [loginMsg, setloginMsg] = useState("")
+    const navigate = useNavigate()
+
     return (
         <div className="Login-layout"> {/* For login box layout */}
             {loginMsg && <div className="login-msg">{loginMsg}</div>}
@@ -10,7 +20,7 @@ const Login = () => {
 
                 {/* form calls validateForm on submit, and sets email, password variables with user entered value
                 * Outputs error msg upon form submission if any field is invalid */}
-                <form onSubmit={validateForm} className="login-form"> 
+                <form className="login-form"> 
                     <label htmlFor="Email">Email</label><br/>
                     <input type="email" 
                         id="Email" 
