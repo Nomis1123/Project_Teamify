@@ -131,6 +131,7 @@ h2 {
   grid-area: profile_game_image;
   width: 140px;
   height: 180px;
+  min-width: 140px;
   border-radius: 10%;
   object-fit: cover;
   border: 2px solid rgba(255,255,255,0.2);
