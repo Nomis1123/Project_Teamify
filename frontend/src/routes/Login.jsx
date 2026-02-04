@@ -18,17 +18,18 @@ const Login = ( { setUser }) => {
         setPwdError('')
     }, [email, password])
 
-    // validates the form components and output error msg if needed
+    // validates the form components and output error msg if needed. 
     const validateForm = async (e) => {
         e.preventDefault() //Prevents default behaviour from reloading the page 
 
+        console.log(email, password)
         let valid = true
 
         setEmailError("")
         setPwdError("")
 
         // This regex for a valid email is found online
-        // output error if email is empty or does not fit the email format
+        // output error for email if email does not fit the email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (email === "" || !emailRegex.test(email)) {
             setEmailError("Email empty or incorrect format")
@@ -36,7 +37,8 @@ const Login = ( { setUser }) => {
         }
         
         // This regex for a valid password is found online
-        // output error if the password is empty or does not have at least one letter, one number, and min 8 letters
+        // output error if the password does not have at least one letter, at least one number, and minimum 8 letters
+        // ^ which is the password requirement for a user to register
         const passRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/
         if (password == "" || !passRegex.test(password)) {
             setPwdError("Invalid password")
@@ -45,8 +47,8 @@ const Login = ( { setUser }) => {
 
         if (!valid) return
 
-        // call backend api to check if user exists
-        let success = await onLoginSubmit(email, password)
+        // if login format is valid, call backend api to check if user exists
+        let success = await checkCredentials(email, password)
 
         if (success) {
             console.log("login success!")
@@ -59,7 +61,7 @@ const Login = ( { setUser }) => {
 
     // function used to fetch and get response from database to check if user exists
     // Return true if user exists, and false otherwise
-    const onLoginSubmit = async (email, password) => {
+    const checkCredentials = async (email, password) => {
         // TODO: call database with email and password
         // set the username with the data received from the database
 
