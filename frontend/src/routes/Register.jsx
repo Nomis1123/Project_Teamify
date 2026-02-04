@@ -81,7 +81,7 @@ const Register = ( ) => {
     return (
         <div className="Login-layout"> {/* For login box layout */}
             {registerMsg && <div className="login-msg">{registerMsg}</div>}
-            <section className="Login-box"> {/* For login box rendering */}
+            <section className="Login-box"> {/* For login box rendering*/}
                     <h2 className="title">Join the Family</h2>
                     <p className="top-text">Register to meet your gaming crew</p>
 
