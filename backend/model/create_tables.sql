@@ -1,4 +1,8 @@
+-- is_verified is set to false by default when create a new user account
+-- An email will be sent to the user; User should click the link to verify
 
+
+DROP TABLE IF EXISTS users;
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
@@ -21,7 +25,7 @@ CREATE TABLE users (
 
 
 -- class for games
-
+DROP TABLE IF EXISTS parties;
 CREATE TABLE parties (
     id SERIAL PRIMARY KEY,
     leader_id INT REFERENCES users(id) ON DELETE CASCADE,
@@ -30,7 +34,7 @@ CREATE TABLE parties (
     region VARCHAR(50) NOT NULL,
     current_players INT DEFAULT 1,
     max_players INT NOT NULL,
-    CONSTRAINT player_limit CHECK (current_players <= max_players)
+    CONSTRAINT player_limit CHECK (current_players <= max_players),
     CONSTRAINT min_players CHECK (max_players > 0)
 );
 
