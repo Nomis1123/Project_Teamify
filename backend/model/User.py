@@ -34,11 +34,12 @@ class User:
     def find_by_email(email):
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute("SELECT id, username, password_hash, is_verified FROM users WHERE email = %s;", (email,))
-        user1 = cur.fetchone()
-        cur.close()
-        conn.close()
-        return user1 
+        try:
+            cur.execute("SELECT id, username, email, password_hash, my_games_list, profile_picture_url, description, sub_class, is_verified, verification_token, availability FROM users WHERE email = %s;", (email,))
+            return cur.fetchone()
+        finally:
+            cur.close()
+            conn.close()
     
 
     @staticmethod
@@ -51,5 +52,32 @@ class User:
         cur.close()
         conn.close()
         return updated_user
+    
+
+    @staticmethod
+    def update_profile(email, username=None, description=None):
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        updates = []
+        params = []
+
+        if username:
+            updates.append("username = %s")
+            params.append(username)
+        if description:
+            updates.append("description = %s")
+            params.append(description)
+        if not updates:
+            return 
+        params.append(email)
+        
+        sql = f"UPDATE users SET {', '.join(updates)} WHERE email = %s"
+        
+        cur.execute(sql, tuple(params))
+        conn.commit()
+        
+        cur.close()
+        conn.close()
 
 
