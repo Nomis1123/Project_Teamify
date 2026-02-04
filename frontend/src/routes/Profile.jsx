@@ -8,6 +8,7 @@ import GameScheduleBar from "../components/GameScheduleBar";
 
 const Profile = () => {
     const navigate = useNavigate();
+    const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
     const defaultDailySchedule = { morning: false, afternoon: false, night: false };
     const defaultWeeklySchedule = {
             Monday: { ...defaultDailySchedule },
@@ -19,8 +20,9 @@ const Profile = () => {
             Sunday: { ...defaultDailySchedule },
     };
     const [user, setUser] = useState({
-        uid: "",
+        id: "abc",
         username: "",
+        email: "",
         description: "",
         profileImageUrl: "",
         games: [],
@@ -33,23 +35,25 @@ const Profile = () => {
         const loadMe = async () => {
             try {
                 setLoading(true);
-                setError("");
 
-                const res = await fetch("/api/me", {
+                const res = await fetch("http://localhost:8000/api/user/me", {
                     method: "GET",
                     // If your backend uses cookies/sessions, uncomment:
                     // credentials: "include",
                     headers: { "Content-Type": "application/json" },
                 });
-
+                // console.log("fetch returned:", res.status, res.url);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
+                // console.log("response data:", data);
                 const normalized = {
-                    uid: data.uid ?? "",
+                    id: data.id ?? "",
                     username: data.username ?? "",
+                    email: data.email ?? "",
                     profileImageUrl: data.profileImageUrl ?? "",
                     games: Array.isArray(data.games) ? data.games : [],
                     schedule: days.reduce((acc, day) => {
+                        // console.log("schedule:", day, data.schedule[day]);
                         const d = data.schedule?.[day] ?? defaultDailySchedule;
                         acc[day] = {
                             morning: Boolean(d.morning),
@@ -59,10 +63,10 @@ const Profile = () => {
                         return acc;
                     }, {}),
                 };
-                
+                console.log("setting user to:", normalized);
                 setUser(normalized);
             } catch (e) {
-                setError("Failed to load profile info.");
+                console.log("error:", e);
             } finally {
                 setLoading(false);
             }
@@ -70,12 +74,16 @@ const Profile = () => {
 
         loadMe();
     }, []);
-    
+
+    useEffect(() => {
+        console.log("user state updated:", user.id);
+    }, [user]);
     // Test:
     // useEffect(() => {
     //     setUser({
     //         uid: "user123",
     //         username: "TestUser",
+    //         email: "testingemail@123.com"
     //         description: "Hello I am a new user",
     //         profileImageUrl: "",
     //         games: [],
@@ -105,7 +113,7 @@ const Profile = () => {
 
                 <div className='username'>
                     <h1>{loading ? "Loading..." : user.username || "Unknown User"}</h1>
-                    <p>User ID: {user.uid || "-"}</p>
+                    <p>User ID: {user.id || "-"}</p>
                 </div>
                 
                 <button className="profile-edit-btn" onClick={() => navigate("/profile_editing")}>
