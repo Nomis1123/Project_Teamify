@@ -1,4 +1,6 @@
 DB_HOST=localhost
 DB_NAME=teamify_db
 DB_USER=postgres
-DB_PASS=
+DB_PASSWORD=
+DB_PORT=5432
+JWT_SECRET_KEY=
