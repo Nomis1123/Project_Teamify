@@ -163,6 +163,8 @@ def update_me():
         User.update_profile(curr_user_email, new_username, new_description)
 
         user = User.find_by_email(curr_user_email)
+        if not user:
+            return jsonify({"status": "User not found"}), 404
         
         user_id, username, email, _, _, img, desc, _, _, _, avail = user
         
