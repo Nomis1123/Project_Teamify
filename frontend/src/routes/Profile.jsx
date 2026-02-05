@@ -4,10 +4,11 @@ import "./Profile.css";
 import { useNavigate } from "react-router-dom";
 import "../components/GameScheduleBar.css"
 import GameScheduleBar from "../components/GameScheduleBar";
-
+import GamePicker from "../components/GamePicker";
 
 const Profile = () => {
     const navigate = useNavigate();
+    const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
     const defaultDailySchedule = { morning: false, afternoon: false, night: false };
     const defaultWeeklySchedule = {
             Monday: { ...defaultDailySchedule },
@@ -19,8 +20,9 @@ const Profile = () => {
             Sunday: { ...defaultDailySchedule },
     };
     const [user, setUser] = useState({
-        uid: "",
+        id: "",
         username: "",
+        email: "",
         description: "",
         profileImageUrl: "",
         games: [],
@@ -33,23 +35,26 @@ const Profile = () => {
         const loadMe = async () => {
             try {
                 setLoading(true);
-                setError("");
 
-                const res = await fetch("/api/me", {
+                const res = await fetch("http://localhost:8000/api/user/me", {
                     method: "GET",
                     // If your backend uses cookies/sessions, uncomment:
                     // credentials: "include",
                     headers: { "Content-Type": "application/json" },
                 });
-
+                // console.log("fetch returned:", res.status, res.url);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
+                // console.log("response data:", data);
                 const normalized = {
-                    uid: data.uid ?? "",
+                    id: data.id ?? "",
                     username: data.username ?? "",
+                    email: data.email ?? "",
+                    description: data.description ?? "",
                     profileImageUrl: data.profileImageUrl ?? "",
                     games: Array.isArray(data.games) ? data.games : [],
                     schedule: days.reduce((acc, day) => {
+                        // console.log("schedule:", day, data.schedule[day]);
                         const d = data.schedule?.[day] ?? defaultDailySchedule;
                         acc[day] = {
                             morning: Boolean(d.morning),
@@ -59,10 +64,10 @@ const Profile = () => {
                         return acc;
                     }, {}),
                 };
-                
+                console.log("setting user to:", normalized);
                 setUser(normalized);
             } catch (e) {
-                setError("Failed to load profile info.");
+                console.log("error:", e);
             } finally {
                 setLoading(false);
             }
@@ -70,12 +75,16 @@ const Profile = () => {
 
         loadMe();
     }, []);
-    
+
+    useEffect(() => {
+        console.log("user state updated:", user.id);
+    }, [user]);
     // Test:
     // useEffect(() => {
     //     setUser({
     //         uid: "user123",
     //         username: "TestUser",
+    //         email: "testingemail@123.com"
     //         description: "Hello I am a new user",
     //         profileImageUrl: "",
     //         games: [],
@@ -105,7 +114,7 @@ const Profile = () => {
 
                 <div className='username'>
                     <h1>{loading ? "Loading..." : user.username || "Unknown User"}</h1>
-                    <p>User ID: {user.uid || "-"}</p>
+                    <p>User ID: {user.id || "-"}</p>
                 </div>
                 
                 <button className="profile-edit-btn" onClick={() => navigate("/profile_editing")}>
@@ -128,62 +137,46 @@ const Profile = () => {
                     <div className="profile-game-bar">
                         {/* The image sources are temporary. Replace with game icons and name after.
                             I still have to modify this so that it accept game image and name from db. */}
-                        <div className='profile-game-image-text-container'>
-                            <img
-                                className="profile-game-image"
-                                src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
-                                alt="Profile"
-                            />
-                            Game 1
-                        </div>
-                        <div className='profile-game-image-text-container'>
-                            <img
-                                className="profile-game-image"
-                                src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
-                                alt="Profile"
-                            />
-                            Game 2
-                        </div>
-                        <div className='profile-game-image-text-container'>
-                            <img
-                                className="profile-game-image"
-                                src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
-                                alt="Profile"
-                            />
-                            Game 3
-                        </div>
-                        <div className='profile-game-image-text-container'>
-                            <img
-                                className="profile-game-image"
-                                src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
-                                alt="Profile"
-                            />
-                            Game 4
-                        </div>
-                        <div className='profile-game-image-text-container'>
-                            <img
-                                className="profile-game-image"
-                                src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
-                                alt="Profile"
-                            />
-                            Game 5
-                        </div>
-                        <div className='profile-game-image-text-container'>
-                            <img
-                                className="profile-game-image"
-                                src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
-                                alt="Profile"
-                            />
-                            Game 6
-                        </div>
-                        <div className='profile-game-image-text-container'>
-                            <img
-                                className="profile-game-image"
-                                src="https://png.pngtree.com/thumb_back/fw800/background/20231008/pngtree-white-low-poly-wall-texture-background-3d-rendered-abstract-design-image_13582488.png"
-                                alt="Profile"
-                            />
-                            Game 7
-                        </div>
+                        <GamePicker games={[
+                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
+                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
+                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
+                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
+                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
+                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                        ]} />
+                        <GamePicker games={[
+                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
+                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
+                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
+                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
+                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
+                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                        ]} />
+                        <GamePicker games={[
+                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
+                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
+                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
+                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
+                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
+                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                        ]} />
+                        <GamePicker games={[
+                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
+                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
+                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
+                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
+                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
+                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                        ]} />
+                        <GamePicker games={[
+                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
+                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
+                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
+                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
+                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
+                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                        ]} />
                     </div>
                 </div>
             

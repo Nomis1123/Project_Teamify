@@ -1,0 +1,54 @@
+.game-picker-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.game-picker-panel {
+  width: 600px;
+  max-width: 90vw;
+  background: #441E6D;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.game-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.game-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.game-item {
+  display: flex;
+  width: 200px;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 2px solid #ddd;
+  background: rgba(255, 255, 255, 0.10);
+  cursor: pointer;
+  text-align: left;
+}
+
+.game-item.selected {
+  border: 3px solid #111;
+}
+
+.game-item img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
