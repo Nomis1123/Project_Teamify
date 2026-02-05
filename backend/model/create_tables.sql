@@ -3,7 +3,7 @@
 -- After the button in the email is clicked
 
 
-DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE users (
 
 
 -- class for games
-DROP TABLE IF EXISTS parties;
+DROP TABLE IF EXISTS parties CASCADE;
 CREATE TABLE parties (
     id SERIAL PRIMARY KEY,
     leader_id INT REFERENCES users(id) ON DELETE CASCADE,

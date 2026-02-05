@@ -1,16 +1,16 @@
 from flask import Flask, request, jsonify;
 from flask_bcrypt import Bcrypt
 from flask_bcrypt import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies
 from flask_jwt_extended import JWTManager
 import psycopg2
 import secrets
 import os 
 from model.User import User
 from flask_jwt_extended import jwt_required, get_jwt_identity
-app = Flask(__name__)
+from flask_jwt_extended import unset_jwt_cookies
 
-
+bcrypt = Bcrypt() # Initialize it 
 
 
 """
@@ -38,7 +38,6 @@ Logic: The code looks at the URL, grabs the token part and checks the database f
 
 """
 
-curr_user_email = None
 
 def register():
     data = request.json
@@ -46,41 +45,51 @@ def register():
     username = data.get('username')
     email = data.get('email').lower()
     password = data.get('password')
-    hashed_password = generate_password_hash(password).decode('utf-8')
+    if not email or not password:
+        return jsonify({"status": "Missing email or password"}), 400
+    hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     token = secrets.token_urlsafe(32)
     user = User.find_by_email(email)
+
+    
+
     # Check if the user already exist
     if user:
         return jsonify({"status": "This email is in use."}), 409
     
     try:
         user_id = User.create1(username, email, hashed_password, token)
+        # this method tell the library to include the user_id to the token
         access_token = create_access_token(identity=str(user_id))
         refresh_token = create_refresh_token(identity=str(user_id))
-        return jsonify({
-                                "user": {
-                                    "id": user_id,
-                                    "username": username,
-                                    "email": email,
-                                    "description": None, 
-                                    "profile_picture": None,
-                                    "availability": None
-                                },
-                                "access_token": access_token, 
-                                "refresh_token": refresh_token
-                            }), 200
+        response = jsonify({
+                "user": {
+                    "id": user_id,
+                    "username": username,
+                    "email": email,
+                    "description": None, 
+                    "profile_picture": None,
+                    "availability": None
+                },
+                "access_token": access_token, 
+                "refresh_token": refresh_token
+            })
+        set_access_cookies(response, access_token)
+        return response, 200
     except Exception as e:
         return jsonify({"status": str(e)}), 500
     
 
 def login():
-    global curr_user_email
     data = request.json
     email = data.get('email').lower()
     password = data.get('password')
     
     user = User.find_by_email(email)
+
+    if not email or not password:
+        return jsonify({"status": "Missing email or password"}), 400
     if user:
         user_id, username, email , stored_hash, my_games_list, profile_picture_url, description, sub_class, is_verified, verification_token, availability   = user 
         if check_password_hash(stored_hash, password):
@@ -88,7 +97,6 @@ def login():
             is_verified = True
             if is_verified:
                 # After the user login, set the curr_user to user
-                curr_user_email = email
                 # Create token using the user's ID as the identity
                 # usually, do not store those 2 token in the table
                 # The fontend should store them in Local storage or cookies
@@ -96,7 +104,7 @@ def login():
                 # create those 2 tokens based on JWT_SECRET_KEY
                 access_token = create_access_token(identity=str(user_id))
                 refresh_token = create_refresh_token(identity=str(user_id))
-                return jsonify({
+                response= jsonify({
                                 "user": {
                                     "id": user_id,
                                     "username": username,
@@ -107,7 +115,9 @@ def login():
                                 },
                                 "access_token": access_token, 
                                 "refresh_token": refresh_token
-                            }), 200
+                            })
+                set_access_cookies(response, access_token)
+                return response, 200
             return jsonify({"status": "Please verify email"}), 401
         return jsonify({"status": "Invalid password"}), 401
     return jsonify({"status": "User not found"}), 404
@@ -123,62 +133,55 @@ def get_user_info(email):
     if not user:
         return jsonify({"status": "User not found"}), 404
     user_id, username, email , stored_hash, my_games_list, profile_picture_url, description, sub_class, is_verified, verification_token, availability   = user 
-    return jsonify({"message": "The information of the current user", "user": {"id": user_id, "username": username, "email":email, "description":description, "profile_picture":profile_picture_url, "availability":availability}}), 200
+    return jsonify({"status": "The information of the current user", "user": {"id": user_id, "username": username, "email":email, "description":description, "profile_picture":profile_picture_url, "availability":availability}}), 200
 
+@jwt_required()
 def get_me():
-    if not curr_user_email:
-        return jsonify({"status": "Not logged in"}), 401
-    return get_user_info(curr_user_email)
+    # Ask the token to get the id (The identity we set in login)
+    user_id = get_jwt_identity() 
+    
+    user = User.find_by_id(user_id) 
+    
+    if not user:
+        return jsonify({"status": "User not found"}), 404
+        
+    user_id, username, email, _, _, img, desc, _, _, _, avail = user 
+    
+    return jsonify({
+        "user": {
+            "id": user_id,
+            "username": username,
+            "email": email,
+            "description": desc,
+            "profile_picture": img,
+            "availability": avail
+        }
+    }), 200
 
 
-def logout():
-    """
-    Handles the logout request. 
-    Clears the global tracking variable and tells the frontend to clear the token.
-    """
-    global curr_user_email
-    curr_user_email = None
-    return jsonify({}), 200
 
-from flask_jwt_extended import jwt_required, get_jwt_identity
 
 @jwt_required()
 def update_me():
-    """
-    PUT /api/user/me
-    Updates the logged-in user's profile information.
-    """
-    global curr_user_email
+    user_id = get_jwt_identity() # Get the user id from the token
     data = request.json
     
-    # Validation: Ensure we have a session
-    if not curr_user_email:
-        return jsonify({"status": "Not logged in"}), 401
-
-    # Extract data from request
     new_username = data.get('username')
     new_description = data.get('description')
 
     try:
-        User.update_profile(curr_user_email, new_username, new_description)
-
-        user = User.find_by_email(curr_user_email)
-        if not user:
-            return jsonify({"status": "User not found"}), 404
+        User.update_profile_by_id(user_id, new_username, new_description)
+        user = User.find_by_id(user_id)
         
         user_id, username, email, _, _, img, desc, _, _, _, avail = user
-        
-        return jsonify({
-            "user": {
-                "id": user_id,
-                "username": username,
-                "email": email,
-                "description": desc,
-                "profile_picture": img,
-                "availability": avail
-            }
-        }), 200
-
+        return jsonify({"user": {"id": user_id, "username": username, "email": email, "description": desc, "profile_picture": img, "availability": avail}}), 200
     except Exception as e:
         return jsonify({"status": f"Update failed: {str(e)}"}), 500
-            
+
+@jwt_required()
+def logout():
+    # login successfully
+    response = jsonify({"msg": "logout successful"})
+    # If the frontend use the cookie, this line actually delete the token from the cookie
+    unset_jwt_cookies(response)
+    return response, 200
