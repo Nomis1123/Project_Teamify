@@ -65,7 +65,6 @@ const Register = ( ) => {
             console.log("Register success!")
             navigate("/login") //redirect to login page
         }else {
-            setRegisterMsg("Register failed, please try again.")
             console.log("Registration failed!")
         }
     }
@@ -73,8 +72,8 @@ const Register = ( ) => {
     // send registeration data and get response from db to check if registeration is successful
     // Return true if user registration succeeded, else false
     const onRegisterSubmit = async (username, email, password) => {
-        try {
-            const response = await fetch("http://localhost:8000/api/auth/register", {
+       try {
+            const response = await fetch("api/auth/register", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
                 body: JSON.stringify({username, email, password})
@@ -82,7 +81,7 @@ const Register = ( ) => {
 
             const data = await response.json();
             if (!response.ok) {
-                console.error(data.status);
+                setRegisterMsg(data.status);
                 return false;
             }
 
@@ -90,7 +89,7 @@ const Register = ( ) => {
             localStorage.setItem("refresh_token", data.refresh_token);
             return true;
         } catch (err) {
-            console.error("Registration error:", err);
+            setRegisterMsg("Registration error:", err);
             return false;
         }
     };
