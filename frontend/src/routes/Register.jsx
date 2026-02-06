@@ -65,7 +65,6 @@ const Register = ( ) => {
             console.log("Register success!")
             navigate("/login") //redirect to login page
         }else {
-            setRegisterMsg("Register failed, please try again.")
             console.log("Registration failed!")
         }
     }
@@ -73,10 +72,27 @@ const Register = ( ) => {
     // send registeration data and get response from db to check if registeration is successful
     // Return true if user registration succeeded, else false
     const onRegisterSubmit = async (username, email, password) => {
-        // TODO: send username, email and password to database
+       try {
+            const response = await fetch("api/auth/register", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({username, email, password})
+            });
 
-        return true
-    } 
+            const data = await response.json();
+            if (!response.ok) {
+                setRegisterMsg(data.status);
+                return false;
+            }
+
+            localStorage.setItem("access_token", data.access_token);
+            localStorage.setItem("refresh_token", data.refresh_token);
+            return true;
+        } catch (err) {
+            setRegisterMsg("Registration error:", err);
+            return false;
+        }
+    };
 
     return (
         <div className="Login-layout"> {/* For login box layout */}
