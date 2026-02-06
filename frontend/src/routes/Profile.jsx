@@ -52,17 +52,17 @@ const Profile = () => {
                     email: data.user.email ?? "",
                     description: data.user.description ?? "",
                     profile_picture: data.user.profile_picture ?? "",
-                    games: Array.isArray(data.user.games) ? data.games : [],
-                    schedule: days.reduce((acc, day) => {
-                        // console.log("schedule:", day, data.schedule[day]);
-                        const d = data.user.schedule?.[day] ?? defaultDailySchedule;
-                        acc[day] = {
-                            morning: Boolean(d.morning),
-                            afternoon: Boolean(d.afternoon),
-                            night: Boolean(d.night),
-                        };
-                        return acc;
-                    }, {}),
+                    // games: Array.isArray(data.user.games) ? data.games : [],
+                    // schedule: days.reduce((acc, day) => {
+                    //     // console.log("schedule:", day, data.schedule[day]);
+                    //     const d = data.user.schedule?.[day] ?? defaultDailySchedule;
+                    //     acc[day] = {
+                    //         morning: Boolean(d.morning),
+                    //         afternoon: Boolean(d.afternoon),
+                    //         night: Boolean(d.night),
+                    //     };
+                    //     return acc;
+                    // }, {}),
                 };
                 console.log("setting user to:", normalized);
                 setUser(normalized);
