@@ -74,7 +74,7 @@ const Login = ( { setUser }) => {
                 return false;
             }
 
-            setUser(data.user);
+            setUser(data.user.username);
             localStorage.setItem("access_token", data.access_token);
             localStorage.setItem("refresh_token", data.refresh_token);
             return true;
