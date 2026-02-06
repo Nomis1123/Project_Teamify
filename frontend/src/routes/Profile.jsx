@@ -36,7 +36,7 @@ const Profile = () => {
             try {
                 setLoading(true);
 
-                const res = await fetch("http://localhost:8000/api/user/me", {
+                const res = await fetch("/api/user/me", {
                     method: "GET",
                     // If your backend uses cookies/sessions, uncomment:
                     // credentials: "include",
@@ -47,15 +47,15 @@ const Profile = () => {
                 const data = await res.json();
                 // console.log("response data:", data);
                 const normalized = {
-                    id: data.id ?? "",
-                    username: data.username ?? "",
-                    email: data.email ?? "",
-                    description: data.description ?? "",
-                    profileImageUrl: data.profileImageUrl ?? "",
-                    games: Array.isArray(data.games) ? data.games : [],
+                    id: data.user.id ?? "",
+                    username: data.user.username ?? "",
+                    email: data.user.email ?? "",
+                    description: data.user.description ?? "",
+                    profile_picture: data.user.profile_picture ?? "",
+                    games: Array.isArray(data.user.games) ? data.games : [],
                     schedule: days.reduce((acc, day) => {
                         // console.log("schedule:", day, data.schedule[day]);
-                        const d = data.schedule?.[day] ?? defaultDailySchedule;
+                        const d = data.user.schedule?.[day] ?? defaultDailySchedule;
                         acc[day] = {
                             morning: Boolean(d.morning),
                             afternoon: Boolean(d.afternoon),
@@ -108,7 +108,7 @@ const Profile = () => {
                 <img
                     className="profile-image"
                     // This image link is temporary. Replace it when we figure out a default profile image.
-                    src={user.profileImageUrl || "https://th.bing.com/th/id/OIP.BXIufrwgTFhg49ux6NTkiQHaQD?w=236"}
+                    src={user.profile_picture || "https://th.bing.com/th/id/OIP.BXIufrwgTFhg49ux6NTkiQHaQD?w=236"}
                     alt="Profile"
                 />
 
