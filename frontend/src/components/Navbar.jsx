@@ -2,7 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import './Navbar.css'
 
-const Navbar = () => {
+const Navbar = ( {user} ) => {
     return (
         <nav className="navbar">
             <Link to="/"> 
@@ -28,9 +28,12 @@ const Navbar = () => {
                 </div>
 
                 <div className="nav-right">
+                    {/* if user is logged in, display username, else Login link */}
+                    { user ? <a> { user } </a> :
                     <Link to="/login" className="login">
                         Login
                     </Link>
+                    }   
                 </div>
             </div>
         </nav>
