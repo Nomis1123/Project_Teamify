@@ -5,13 +5,39 @@ import Login from "./routes/Login"
 import Profile from "./routes/Profile"
 import ProfileEdit from './routes/ProfileEdit.jsx'
 import Register from './routes/Register.jsx'
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 // npm run dev http://localhost:5173/ 
 
 function App() {
 
   const [user, setUser] = useState("")
+
+  // keeps the user logged in even if the website refreshes. Temporary solution without using JWT
+  useEffect(() => {
+    const restoreUser = async () => {
+        const token = localStorage.getItem("access_token");
+        if (!token) return;
+
+        try {
+            const res = await fetch("/api/user/me", { // fetch user data from backend
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!res.ok) throw new Error("Invalid token");
+
+            const data = await res.json();
+            setUser(data.user.username); 
+        } catch (err) { // remove the user from their login state if user does not exist in backend
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            setUser(null);
+        }
+    };
+    restoreUser();
+}, []);
 
   return (
     <>
