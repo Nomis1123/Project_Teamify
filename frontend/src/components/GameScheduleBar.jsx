@@ -26,6 +26,7 @@ export default function GameScheduleBar({ schedule, onClick }) {
                             key={timeSlot}
                             className={`schedule-cell ${d[timeSlot] ? "free" : "busy"}`}
                             title={`${day} ${timeSlot}`}
+                            onClick={() => onClick(day, timeSlot)}
                             />
                         ))}
                         </div>
