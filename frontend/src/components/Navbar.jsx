@@ -1,8 +1,29 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import './Navbar.css'
+import { useNavigate } from "react-router-dom";
 
-const Navbar = ( {user} ) => {
+const Navbar = ( {user, setUser} ) => {
+
+    const navigate = useNavigate();
+
+    // set the website to an unlogged state and redirect to login
+    const logout = async () => {
+        try {
+            await fetch("/api/auth/logout", {
+            method: "POST",
+            credentials: "include", // includes cookies when sending request
+            })
+        }catch (err) {
+            console.log(err)
+        }
+        // remove token and user from local storage 
+        localStorage.removeItem("access_token")
+        localStorage.removeItem("refresh_token")
+        navigate("/login") 
+        setUser(null)
+    }
+
     return (
         <nav className="navbar">
             <Link to="/"> 
@@ -28,8 +49,8 @@ const Navbar = ( {user} ) => {
                 </div>
 
                 <div className="nav-right">
-                    {/* if user is logged in, display username, else Login link */}
-                    { user ? <a> { user } </a> :
+                    {/* if user is logged in, display logout button, else Login link */}
+                    { user ? <a onClick={logout}> Logout </a> :
                     <Link to="/login" className="login">
                         Login
                     </Link>
