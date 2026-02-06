@@ -86,7 +86,6 @@ const Login = ( { setUser }) => {
 
     return (
         <div className="Login-layout"> {/* For login box layout */}
-            {loginMsg && <div className="login-msg">{loginMsg}</div>}
             <section className="Login-box"> {/* For login box rendering */}
                     <h2 className="title">Welcome Back</h2>
                     <p className="top-text">Sign in to continue your journey</p>
@@ -114,7 +113,7 @@ const Login = ( { setUser }) => {
                     />
                     {pwdError && <div className="error-msg">{pwdError}</div>}
                     <br />
-
+                    {loginMsg && <div className="error-msg">{loginMsg}</div>}
                     <button type="submit" className="login-button">Login</button><br />
                     <Link to="/register" className="register"> 
                         Don't have an account? Sign up {/* Links to register page on click*/}

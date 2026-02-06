@@ -96,7 +96,6 @@ const Register = ( ) => {
 
     return (
         <div className="Login-layout"> {/* For login box layout */}
-            {registerMsg && <div className="login-msg">{registerMsg}</div>}
             <section className="Login-box"> {/* For login box rendering*/}
                     <h2 className="title">Join the Family</h2>
                     <p className="top-text">Register to meet your gaming crew</p>
@@ -134,7 +133,7 @@ const Register = ( ) => {
                     />
                     {pwdError && <div className="error-msg">{pwdError}</div>}
                     <br />
-
+                    {registerMsg && <div className="error-msg">{registerMsg}</div>}
                     <button type="submit" className="login-button">Join</button><br />
                     <Link to="/login" className="register"> {/* className kept as register for Login.css */}
                         Already have an account? Sign in {/* Links to login page on click */}
