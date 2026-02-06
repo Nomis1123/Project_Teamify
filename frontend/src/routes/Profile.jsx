@@ -76,6 +76,23 @@ const Profile = () => {
         loadMe();
     }, []);
 
+    const handleScheduleToggle = (day, timeSlot) => {
+        
+        setUser((prevUser) => {
+            const updatedSchedule = { ...prevUser.schedule };
+            const updatedDay = { ...(updatedSchedule[day] || defaultDailySchedule) };
+
+            updatedDay[timeSlot] = !updatedDay[timeSlot];
+            updatedSchedule[day] = updatedDay;
+
+            return {
+                ...prevUser,
+                schedule: updatedSchedule,
+                
+            };
+        });
+    };
+
     useEffect(() => {
         console.log("user state updated:", user.id);
     }, [user]);
@@ -182,7 +199,10 @@ const Profile = () => {
             
                 <h2>Game Schedule:</h2>
                 <div className='profile-game-schedule'>
-                    <GameScheduleBar schedule={user.schedule} />
+                    <GameScheduleBar 
+                    schedule={user.schedule} 
+                    onClick={handleScheduleToggle}
+                    />
                 </div>
             </div>
             
