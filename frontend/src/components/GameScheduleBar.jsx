@@ -4,7 +4,7 @@ import "./GameScheduleBar.css"
 const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const time = ["morning", "afternoon", "night"];
     
-export default function GameScheduleBar({ schedule }) {
+export default function GameScheduleBar({ schedule, onClick }) {
     return (
         <div className="weekly-schedule">
             {days.map((day) => {const d = schedule?.[day] ?? { morning: false, afternoon: false, night: false };
@@ -21,11 +21,11 @@ export default function GameScheduleBar({ schedule }) {
                         </div>
 
                         <div className="bar-sections">
-                        {time.map((p) => (
+                        {time.map((timeSlot) => (
                             <div
-                            key={p}
-                            className={`schedule-cell ${d[p] ? "free" : "busy"}`}
-                            title={`${day} ${p}`}
+                            key={timeSlot}
+                            className={`schedule-cell ${d[timeSlot] ? "free" : "busy"}`}
+                            title={`${day} ${timeSlot}`}
                             />
                         ))}
                         </div>
