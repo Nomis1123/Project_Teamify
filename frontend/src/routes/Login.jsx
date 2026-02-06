@@ -48,26 +48,41 @@ const Login = ( { setUser }) => {
         if (!valid) return
 
         // if login format is valid, call backend api to check if user exists
-        let success = await checkCredentials(email, password)
+        let success = await onLoginSubmit(email, password)
 
         if (success) {
             console.log("login success!")
             navigate("/profile") // redirect to profile page for now, until matchmaking gets implemented
         }else {
-            setloginMsg("Invalid username or password")
             console.log("login failed!")
         }
     }
 
     // function used to fetch and get response from database to check if user exists
     // Return true if user exists, and false otherwise
-    const checkCredentials = async (email, password) => {
-        // TODO: call database with email and password
-        // set the username with the data received from the database
+    const onLoginSubmit = async (email, password) => {
+        try {
+            const response = await fetch("api/auth/login", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({email, password}),
+            });
 
-        setUser("user") // placeholder
-        return true
-    } 
+            const data = await response.json();
+            if (!response.ok) {
+                setloginMsg(data.status);
+                return false;
+            }
+
+            setUser(data.user);
+            localStorage.setItem("access_token", data.access_token);
+            localStorage.setItem("refresh_token", data.refresh_token);
+            return true;
+        } catch (err) {
+            setloginMsg("Login failed:", err);
+            return false;
+        }
+    };
 
     return (
         <div className="Login-layout"> {/* For login box layout */}
