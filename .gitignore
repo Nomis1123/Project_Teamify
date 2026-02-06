@@ -15,3 +15,11 @@ ENV/
 # Database-specific
 *.sqlite
 *.db
+
+
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
