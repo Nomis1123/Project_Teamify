@@ -72,7 +72,7 @@ const Register = ( ) => {
     // send registeration data and get response from db to check if registeration is successful
     // Return true if user registration succeeded, else false
     const onRegisterSubmit = async (username, email, password) => {
-       try {
+        try {
             const response = await fetch("api/auth/register", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
@@ -89,7 +89,7 @@ const Register = ( ) => {
             localStorage.setItem("refresh_token", data.refresh_token);
             return true;
         } catch (err) {
-            setRegisterMsg("Registration error:", err);
+            setRegisterMsg("Registration failed:", err);
             return false;
         }
     };

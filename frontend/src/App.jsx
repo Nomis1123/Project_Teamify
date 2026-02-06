@@ -5,7 +5,7 @@ import Login from "./routes/Login"
 import Profile from "./routes/Profile"
 import ProfileEdit from './routes/ProfileEdit.jsx'
 import Register from './routes/Register.jsx'
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 // npm run dev http://localhost:5173/ 
 
