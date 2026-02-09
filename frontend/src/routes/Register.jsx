@@ -4,32 +4,44 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
-const Login = ( { setUser }) => {
+const Register = ( ) => {
+    const [username, setUsername] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [usernameError, setUsernameError] = useState("")
     const [emailError, setEmailError] = useState("")
     const [pwdError, setPwdError] = useState("")
-    const [loginMsg, setloginMsg] = useState("")
+    const [registerMsg, setRegisterMsg] = useState("")
     const navigate = useNavigate()
 
     // If user modifies email or password, empty error msg
     useEffect(() => {
+        setUsernameError('')
         setEmailError('')
         setPwdError('')
-    }, [email, password])
+    }, [username, email, password])
 
-    // validates the form components and output error msg if needed. 
+    // validates the form components and output error msg if needed 
     const validateForm = async (e) => {
         e.preventDefault() //Prevents default behaviour from reloading the page 
 
-        console.log(email, password)
         let valid = true
 
         setEmailError("")
         setPwdError("")
 
+        // TODO: check if email already exists
+
+        // This regex for a valid username is found online
+        // output error if username is empty, includes spaces, special characters, <3 letters, or >20 letters
+        const usernameRegex = /^[A-Za-z0-9]{3,20}$/
+        if (username === "" || !usernameRegex.test(username)) {
+            setUsernameError("Username cannot include spaces, special characters, and must be 3-20 letters")
+            valid = false
+        }
+
         // This regex for a valid email is found online
-        // output error for email if email does not fit the email format
+        // output error if email is empty, or does not fit the email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (email === "" || !emailRegex.test(email)) {
             setEmailError("Email empty or incorrect format")
@@ -37,62 +49,70 @@ const Login = ( { setUser }) => {
         }
         
         // This regex for a valid password is found online
-        // output error if the password does not have at least one letter, at least one number, and minimum 8 letters
-        // ^ which is the password requirement for a user to register
+        // output error if the password is empty, does not have at least one letter, at least one number, and min 8 letters
         const passRegex = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/
         if (password == "" || !passRegex.test(password)) {
-            setPwdError("Invalid password")
+            setPwdError("Password must include at least one letter, one number, and minimum 8 letters")
             valid = false
         }
 
         if (!valid) return
 
-        // if login format is valid, call backend api to check if user exists
-        let success = await onLoginSubmit(email, password)
+        // call backend api to check if registeration successful
+        let success = await onRegisterSubmit(username, email, password)
 
         if (success) {
-            console.log("login success!")
-            navigate("/profile") // redirect to profile page for now, until matchmaking gets implemented
+            console.log("Register success!")
+            navigate("/login") //redirect to login page
         }else {
-            console.log("login failed!")
+            console.log("Registration failed!")
         }
     }
 
-    // function used to fetch and get response from database to check if user exists
-    // Return true if user exists, and false otherwise
-    const onLoginSubmit = async (email, password) => {
+    // send registeration data and get response from db to check if registeration is successful
+    // Return true if user registration succeeded, else false
+    const onRegisterSubmit = async (username, email, password) => {
         try {
-            const response = await fetch("api/auth/login", {
+            const response = await fetch("api/auth/register", {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({email, password}),
+                body: JSON.stringify({username, email, password})
             });
 
             const data = await response.json();
             if (!response.ok) {
-                setloginMsg(data.status);
+                setRegisterMsg(data.status);
                 return false;
             }
 
-            setUser(data.user.username);
             localStorage.setItem("access_token", data.access_token);
             localStorage.setItem("refresh_token", data.refresh_token);
             return true;
         } catch (err) {
-            setloginMsg("Login failed:", err);
+            setRegisterMsg("Registration failed:", err);
             return false;
         }
     };
 
     return (
         <div className="Login-layout"> {/* For login box layout */}
-            <section className="Login-box"> {/* For login box rendering */}
-                    <h2 className="title">Welcome Back</h2>
-                    <p className="top-text">Sign in to continue your journey</p>
+            <section className="Login-box"> {/* For login box rendering*/}
+                    <h2 className="title">Join the Family</h2>
+                    <p className="top-text">Register to meet your gaming crew</p>
 
                 {/* form calls validateForm on submit, and sets email, password variables with user entered value
                 * Outputs error msg upon form submission if any field is invalid */}
                 <form onSubmit={validateForm} className="login-form"> 
+                    <label htmlFor="Username">Username</label><br/>
+                    <input type="text" 
+                        id="Username" 
+                        placeholder="Enter an username"
+                        onChange={ (e) => setUsername(e.target.value)}
+                        value={username}
+                        required
+                    />
+                    {usernameError && <div className="error-msg">{usernameError}</div>}
+                    
                     <label htmlFor="Email">Email</label><br/>
                     <input type="email" 
                         id="Email" 
@@ -113,10 +133,10 @@ const Login = ( { setUser }) => {
                     />
                     {pwdError && <div className="error-msg">{pwdError}</div>}
                     <br />
-                    {loginMsg && <div className="error-msg">{loginMsg}</div>}
-                    <button type="submit" className="login-button">Login</button><br />
-                    <Link to="/register" className="register"> 
-                        Don't have an account? Sign up {/* Links to register page on click*/}
+                    {registerMsg && <div className="error-msg">{registerMsg}</div>}
+                    <button type="submit" className="login-button">Join</button><br />
+                    <Link to="/login" className="register"> {/* className kept as register for Login.css */}
+                        Already have an account? Sign in {/* Links to login page on click */}
                     </Link>
                 </form>
             </section>
@@ -124,4 +144,4 @@ const Login = ( { setUser }) => {
     )
 }
 
-export default Login
+export default Register

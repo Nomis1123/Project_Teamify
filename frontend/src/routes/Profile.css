@@ -1,0 +1,143 @@
+.profile-page {
+  padding: 24px;
+  padding-top: 24px; 
+  padding-bottom: 24px;
+}
+
+h2 {
+  font-size: large;
+  font-weight: 500;
+}
+
+/* Profile Layout */
+.profile-card {
+  background: #441E6D;
+  border-radius: 10px;
+  padding: 24px;
+  box-shadow: 0 12px 30px rgba(53, 53, 53, 0.35);
+  min-width: 600px;
+  max-width: 900px;
+  min-height: 400px;
+  height: calc(100vh - 48px - 64px);
+  margin: 0 auto;
+  overflow: hidden; 
+  box-sizing: border-box;
+}
+
+.profile-layout {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "info"
+    "scroll";
+  gap: 16px;
+  min-height: 0;
+}
+
+/* Profile info layout; 1st element of profile layout */
+.profile-info-layout {
+  grid-area: info;
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  grid-template-areas:
+    "profile_image username profile_edit";
+  gap: 16px;
+  justify-content: center;  /* horizontal center */
+  align-items: center; 
+}
+
+.profile-image {
+  grid-area: profile_image;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.2);
+}
+
+.username {
+  grid-area: username;
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.profile-edit-btn {
+  background-color: #B279F2;
+  width: 120px;
+  height: 50px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px; 
+}
+
+.profile-info {
+  grid-area: info;
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  grid-template-areas:
+    "profile_image username profile_edit";
+  gap: 16px;
+  justify-content: center;  /* horizontal center */
+  align-items: center; 
+}
+
+/* scrollable panel containing description, games and schedule etc.; the second element of profile layout */
+.profile-scroll {
+  grid-area: scroll;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-color: rgba(255,255,255,0.45) rgba(255,255,255,0.10);
+  padding-right: 10px;
+}
+
+.profile-scroll > * {
+  margin-bottom: 16px;
+}
+
+.profile-description,
+.profile-game-section,
+.profile-game-schedule {
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.profile-description { grid-area: description; }
+
+.profile-game-section {
+  padding: 12px; 
+}
+
+.profile-game-bar { 
+  grid-area: game-bar; 
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: 16px;
+  padding-bottom: 10px;
+  scrollbar-color: rgba(255,255,255,0.45) rgba(255,255,255,0.10);
+  scrollbar-width: thin;
+}
+
+.profile-game-image-text-container {
+  flex: 0 0 auto;
+  text-align: center;
+}
+
+.profile-game-image {
+  grid-area: profile_game_image;
+  width: 140px;
+  height: 180px;
+  min-width: 140px;
+  border-radius: 10%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.2);
+}
+
+.profile-game-schedule { grid-area: schedule; }
+
+
+

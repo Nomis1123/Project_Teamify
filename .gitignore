@@ -3,3 +3,23 @@ frontend/node_modules/*
 .DS_Store
 
 .env
+.env.local
+.env.example
+
+# Python Virtual Environment
+.venv/
+venv/
+env/
+ENV/
+
+# Database-specific
+*.sqlite
+*.db
+
+
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd

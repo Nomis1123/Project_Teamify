@@ -1,0 +1,2 @@
+DROP DATABASE IF EXISTS teamify_db;
+CREATE DATABASE teamify_db;
