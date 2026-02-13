@@ -86,41 +86,45 @@ def login():
     email = data.get('email').lower()
     password = data.get('password')
     
-    user = User.find_by_email(email)
 
     if not email or not password:
         return jsonify({"status": "Missing email or password"}), 400
-    if user:
-        user_id, username, email , stored_hash, my_games_list, profile_picture_url, description, sub_class, is_verified, verification_token, availability   = user 
-        if check_password_hash(stored_hash, password):
-            # For testing purpose
-            is_verified = True
-            if is_verified:
-                # After the user login, set the curr_user to user
-                # Create token using the user's ID as the identity
-                # usually, do not store those 2 token in the table
-                # The fontend should store them in Local storage or cookies
-                # When logout: Since we don't store them in the DB, "logging out" usually means telling the frontend to delete the token
-                # create those 2 tokens based on JWT_SECRET_KEY
-                access_token = create_access_token(identity=str(user_id))
-                refresh_token = create_refresh_token(identity=str(user_id))
-                response= jsonify({
-                                "user": {
-                                    "id": user_id,
-                                    "username": username,
-                                    "email": email,
-                                    "description": description, 
-                                    "profile_picture": profile_picture_url,
-                                    "availability": availability
-                                },
-                                "access_token": access_token, 
-                                "refresh_token": refresh_token
-                            })
-                set_access_cookies(response, access_token)
-                return response, 200
-            return jsonify({"status": "Please verify email"}), 401
-        return jsonify({"status": "Invalid password"}), 401
-    return jsonify({"status": "User not found"}), 404
+    
+    user = User.find_by_email(email)
+    if not user:
+        return jsonify({"status": "User not found"}), 404
+    
+    if check_password_hash(user['password_hash'], password):
+        # For testing purpose
+        # remove by user.get('is_verified') after the email verification
+        # part is done
+        is_verified = True
+        if is_verified:
+            # After the user login, set the curr_user to user
+            # Create token using the user's ID as the identity
+            # usually, do not store those 2 token in the table
+            # The fontend should store them in Local storage or cookies
+            # When logout: Since we don't store them in the DB, "logging out" usually means telling the frontend to delete the token
+            # create those 2 tokens based on JWT_SECRET_KEY
+            access_token = create_access_token(identity=str(user['id']))
+            refresh_token = create_refresh_token(identity=str(user['id']))
+            response = jsonify({
+            "user": {
+                "id": user['id'],
+                "username": user['username'],
+                "email": user['email'],
+                "description": user['description'], 
+                "profile_picture": user['profile_picture_url'],
+                "availability": user['availability']
+            },
+            "access_token": access_token, 
+            "refresh_token": refresh_token
+        })
+            set_access_cookies(response, access_token)
+            return response, 200
+        return jsonify({"status": "Please verify email"}), 401
+    return jsonify({"status": "Invalid password"}), 401
+    
 
 def auth_verify(token):
     result = User.verify1(token)
@@ -132,8 +136,9 @@ def get_user_info(email):
     user = User.find_by_email(email)
     if not user:
         return jsonify({"status": "User not found"}), 404
-    user_id, username, email , stored_hash, my_games_list, profile_picture_url, description, sub_class, is_verified, verification_token, availability   = user 
-    return jsonify({"status": "The information of the current user", "user": {"id": user_id, "username": username, "email":email, "description":description, "profile_picture":profile_picture_url, "availability":availability}}), 200
+    # Don't send the password to the frontend
+    user.pop('password_hash', None)
+    return jsonify({"status": "The information of the current user", "user": user}), 200
 
 @jwt_required()
 def get_me():
@@ -145,18 +150,7 @@ def get_me():
     if not user:
         return jsonify({"status": "User not found"}), 404
         
-    user_id, username, email, _, _, img, desc, _, _, _, avail = user 
-    
-    return jsonify({
-        "user": {
-            "id": user_id,
-            "username": username,
-            "email": email,
-            "description": desc,
-            "profile_picture": img,
-            "availability": avail
-        }
-    }), 200
+    return jsonify({"user": user}), 200
 
 
 
@@ -170,11 +164,10 @@ def update_me():
     new_description = data.get('description')
 
     try:
-        User.update_profile_by_id(user_id, new_username, new_description)
-        user = User.find_by_id(user_id)
+        User.update_profile_by_id(user_id, **data)
         
-        user_id, username, email, _, _, img, desc, _, _, _, avail = user
-        return jsonify({"user": {"id": user_id, "username": username, "email": email, "description": desc, "profile_picture": img, "availability": avail}}), 200
+        updated_user = User.find_by_id(user_id)
+        return jsonify({"user": updated_user}), 200
     except Exception as e:
         return jsonify({"status": f"Update failed: {str(e)}"}), 500
 
