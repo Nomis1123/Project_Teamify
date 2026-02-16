@@ -8,7 +8,7 @@ import GameScheduleBar from "../components/GameScheduleBar";
 import GamePicker from "../components/GamePicker";
 import PUStarter from '../components/PopupStarter';
 
-const Profile = () => {
+const ProfileEdit = () => {
     const navigate = useNavigate();
     const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
     const defaultDailySchedule = { morning: false, afternoon: false, night: false };
@@ -220,4 +220,4 @@ const Profile = () => {
   );
 };
 
-export default Profile;
+export default ProfileEdit;
