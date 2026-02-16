@@ -28,7 +28,7 @@ export default function Popup({ open, onClose, title = "Popup" , children }) {
         <div className="popup-header">
           <h2 className="popup-title">{title}</h2>
           <button className="popup-close" onClick={onClose} aria-label="Close">
-            ×
+            Cancel
           </button>
         </div>
 
@@ -37,9 +37,7 @@ export default function Popup({ open, onClose, title = "Popup" , children }) {
         </div>
 
         <div className="popup-footer">
-          <button className="btn btn-secondary" onClick={onClose}>
-            Close
-          </button>
+            {/* Error message Here */}
         </div>
       </div>
     </div>
