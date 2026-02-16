@@ -6,7 +6,6 @@ import "../components/GameScheduleBar.css";
 import "../components/PopupStarter.css";
 import GameScheduleBar from "../components/GameScheduleBar";
 import GamePicker from "../components/GamePicker";
-import PUStarter from '../components/PopupStarter';
 import PUUsername from '../components/PopupUsername';
 import PUEmail from '../components/PopupEmail';
 import PUPassword from '../components/PopupPassword';
