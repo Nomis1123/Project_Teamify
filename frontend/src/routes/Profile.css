@@ -72,6 +72,12 @@ h2 {
   font-size: 15px; 
 }
 
+.profile-edit-btn:hover {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid;
+  border-color: rgb(255, 255, 255);
+}
+
 .profile-info {
   grid-area: info;
   display: grid;

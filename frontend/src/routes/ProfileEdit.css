@@ -63,13 +63,19 @@ h2 {
   justify-content: center;
 }
 
-.profile-btn {
+.profile-return-btn {
   background-color: #B279F2;
-  width: 120px;
+  width: 200px;
   height: 50px;
   border-radius: 12px;
   font-weight: 600;
   font-size: 15px; 
+}
+
+.profile-return-btn:hover {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid;
+  border-color: rgb(255, 255, 255);
 }
 
 .profile-info {

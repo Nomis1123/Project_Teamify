@@ -138,8 +138,8 @@ const ProfileEdit = () => {
                     <p>User ID: {user.id || "-"}</p>
                 </div>
                 
-                <button className="profile-btn" onClick={() => navigate("/profile")}>
-                    Profile
+                <button className="profile-return-btn" onClick={() => navigate("/profile")}>
+                    Return to Profile
                 </button>
             </div>
             
