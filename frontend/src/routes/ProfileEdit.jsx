@@ -6,7 +6,9 @@ import "../components/GameScheduleBar.css";
 import "../components/PopupStarter.css";
 import GameScheduleBar from "../components/GameScheduleBar";
 import GamePicker from "../components/GamePicker";
-import PUStarter from '../components/PopupStarter';
+import PUUsername from '../components/PopupUsername';
+import PUEmail from '../components/PopupEmail';
+import PUPassword from '../components/PopupPassword';
 
 const ProfileEdit = () => {
     const navigate = useNavigate();
@@ -142,13 +144,15 @@ const ProfileEdit = () => {
             </div>
             
             <div className='profile-scroll'>
-                Place Holder
-                <PUStarter />
-                <PUStarter />
-                <PUStarter />
-                <PUStarter />
-                <PUStarter />
-                <PUStarter />
+                <div>
+                    <PUUsername />
+                </div>
+                <div>
+                    <PUEmail />
+                </div>
+                <div>
+                    <PUPassword />
+                </div>
                 <h2>Description:</h2>
                 <div className="profile-description">
                     <p>

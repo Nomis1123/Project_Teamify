@@ -31,20 +31,25 @@
 }
 
 .popup-close {
-  border: none;
-  background: transparent;
-  font-size: 22px;
+  background-color: rgb(255, 255, 255, 0.2);
+  font-size: 15px;
   line-height: 1;
   cursor: pointer;
-  padding: 6px 10px;
   border-radius: 10px;
 }
+
 .popup-close:hover {
-  background: rgba(0, 0, 0, 0.06);
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid;
+  border-color: rgb(255, 255, 255);
 }
 
 .popup-body {
   padding: 18px;
+}
+
+.popup-body > * {
+    margin-bottom: 5px;
 }
 
 .popup-footer {
