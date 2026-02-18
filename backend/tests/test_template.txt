@@ -1,0 +1,20 @@
+Register:
+create <username> <email> <password> <expected status code>
+
+Login:
+login <email> <password> <expected status code>
+
+Logout:
+logout <Daniel said skip therefore I shall skip>
+
+Validate:
+validate <something something, the backend api documentation doesnt say anything yet so Daniel says>
+
+Profile:
+profile <UID> <expected status code>
+
+Update:
+update username <username> <expected status code>
+update email <email> <expected status code>
+update password <old password> <new password> <expected status code>
+
