@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import "./Popup.css";
 
-export default function Popup({ open, onClose, title = "Popup" , children }) {
+export default function Popup({ open, onClose, title = "Popup" , children, fail_msg }) {
   // Close on esc
   useEffect(() => {
     if (!open) return;
@@ -37,7 +37,7 @@ export default function Popup({ open, onClose, title = "Popup" , children }) {
         </div>
 
         <div className="popup-footer">
-            {/* Error message Here */}
+          {fail_msg ? <p className="error-msg">{fail_msg}</p> : ""}
         </div>
       </div>
     </div>
