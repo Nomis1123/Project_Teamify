@@ -58,7 +58,7 @@ export default function PUUsername() {
       </button>
 
       <Popup open={open} onClose={handleClose} title="Change Username" fail_msg={usernameFail}>
-        <h2>Enter your new Username</h2>
+        <h2>Enter your new username</h2>
         <div style={{ display: "flex", gap: 8 }}>
           <input
             className="input-username"

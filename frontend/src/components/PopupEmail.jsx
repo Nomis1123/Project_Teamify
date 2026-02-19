@@ -4,6 +4,68 @@ import Popup from "./Popup"
 
 export default function PUEmail() {
   const [open, setOpen] = useState(false);
+  const [oldEmail, setOldEmail] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [oldEmailError, setOldEmailError] = useState("");
+  const [newEmailError, setNewEmailError] = useState("");
+  const [emailFail, setFail] = useState("");
+  async function handleSave() {
+    setFail("");
+    let isValid = true;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (oldEmail === "" || !emailRegex.test(oldEmail)) {
+      setOldEmailError("Email empty or incorrect format");
+      isValid = false;
+    } else {
+      setOldEmailError("");
+    }
+    if (newEmail === "" || !emailRegex.test(newEmail)) {
+      setNewEmailError("Email empty or incorrect format");
+      isValid = false;
+    } else {
+      setNewEmailError("");
+    }
+    if (!isValid) {
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const res = await fetch("/api/user/me", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ old_email: oldEmail, new_email: newEmail }),
+      });
+
+      if (!res.ok) {
+        // backend might return JSON error { message: "..." }
+        setFail(`Save failed. Please try again later. (${res.status})`);
+        try {
+          const data = await res.json();
+          if (data?.message) msg = data.message;
+        } catch {}
+        throw new Error(msg);
+      }
+
+      handleClose();
+    } catch (e) {
+      // setFail(e instanceof Error ? e.message : "Save failed.");
+      setFail(`Save failed. Please try again later. (${e.message})`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+  function handleClose() {
+    setOldEmail("");
+    setNewEmail("");
+    setIsSaving(false);
+    setOpen(false);
+    setOldEmailError("");
+    setNewEmailError("");
+    setFail("");
+  };
 
   return (
     <div className="element-email">
@@ -11,12 +73,51 @@ export default function PUEmail() {
         Change Email
       </button>
 
-      <Popup open={open} onClose={() => setOpen(false)} title="Change Email">
-        <h2>Enter your new Email Address</h2>
+      <Popup open={open} onClose={handleClose} title="Change Email" fail_msg={emailFail}>
         <div style={{ display: "flex", gap: 8 }}>
-          <input className="input-email" placeholder="Type here..." />
-          <button className="btn-email btn-email-save">Save</button>
+          <div className="email-input-container">
+            <div className="single-input-block"><h2>Enter your old email</h2>
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  className="input-email"
+                  placeholder="Type here..."
+                  value={oldEmail}
+                  onChange={(e) => setOldEmail(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleSave();
+                  }}
+                />
+              </div>
+              {oldEmailError ? <p className="error-msg">{oldEmailError}</p> : ""}
+            </div>
+
+            <div className="single-input-block"><h2>Enter your new email</h2>
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  className="input-email"
+                  placeholder="Type here..."
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleSave();
+                  }}
+                />
+              </div>
+              {newEmailError ? <p className="error-msg">{newEmailError}</p> : ""}
+            </div>
+          </div>
+          <div className="email-save-container">
+            <button
+              className="btn-email btn-email-save"
+              onClick={handleSave}
+              disabled={isSaving}
+              type="button"
+            >
+              {isSaving ? "Saving..." : "Save"}
+            </button>
+          </div>
         </div>
+        
       </Popup>
     </div>
   );
