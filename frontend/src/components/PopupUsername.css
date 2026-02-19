@@ -24,6 +24,7 @@
 
 .btn-username-save {
   background: rgb(255, 255, 255, 0.2);
+  width: 100px;
   color: white;
 }
 
@@ -45,4 +46,12 @@
 .input-username:focus {
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.error-msg {
+  color: rgb(255, 0, 0);
+}
+
+.popup-body {
+  height: 130px;
 }

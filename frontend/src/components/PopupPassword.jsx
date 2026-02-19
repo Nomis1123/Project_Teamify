@@ -15,15 +15,15 @@ export default function PUPassword() {
         <h2>Enter your old password</h2>
     
         <div style={{ display: "flex" }}>
-            <input className="input" placeholder="Type here..." />
+            <input className="input-pwd" placeholder="Type here..." />
         </div>
         <h2>Enter your new password</h2>
         <div style={{ display: "flex" }}>
-            <input className="input" placeholder="Type here..." />
+            <input className="input-pwd" placeholder="Type here..." />
         </div>
         <h2>Confirm your new password</h2>
         <div style={{ display: "flex" }}>
-            <input className="input" placeholder="Type here..." />
+            <input className="input-pwd" placeholder="Type here..." />
         </div>
         <div style={{ display: "flex" }}>
             <button className="btn-pwd btn-pwd-save">Save</button>
