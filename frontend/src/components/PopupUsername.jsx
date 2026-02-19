@@ -36,9 +36,7 @@ export default function PUUsername() {
         throw new Error(msg);
       }
 
-      setUsername("");
-      setIsSaving(false);
-      setOpen(false);
+      handleClose();
     } catch (e) {
       // setFail(e instanceof Error ? e.message : "Save failed.");
       setFail(`Save failed. Please try again later. (${e.message})`);
