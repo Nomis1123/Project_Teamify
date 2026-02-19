@@ -1,6 +1,7 @@
 import psycopg2
 from dotenv import load_dotenv
 import os
+import json 
 
 load_dotenv()
 
@@ -132,7 +133,7 @@ class User:
             params.append(profile_picture_url)
         if availability:
             updates.append("availability = %s")
-            params.append(availability)
+            params.append(json.dumps(availability))
         
         if not updates:
             return 
@@ -144,4 +145,28 @@ class User:
                 cur.execute(sql, tuple(params))
                 conn.commit()
 
+
+    @staticmethod
+    def get_availability(user_id):
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT availability FROM users WHERE id = %s", (user_id,))
+                result = cur.fetchone()
+
+                if result and result[0]:
+                    availability = result[0]
+                    return availability
+                return None
+
+    @staticmethod
+    def find_matches_by_availability(day, time_slot):
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                sql = """
+                    SELECT id, username FROM users 
+                    WHERE availability -> %s ->> %s = 'true' 
+                    AND is_verified = TRUE
+                """
+                cur.execute(sql, (day, time_slot))
+                return cur.fetchall()
 
