@@ -10,7 +10,7 @@
 }
 
 .popup {
-  width: min(560px, 100%);
+  min-width: 550px;
   background: #441E6D;
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
@@ -54,8 +54,11 @@
 
 .popup-footer {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
   padding: 14px 18px;
+  height: 50px;
   border-top: 1px solid #eee;
+}
+
+.error-msg {
+  color: rgb(255, 0, 0);
 }
