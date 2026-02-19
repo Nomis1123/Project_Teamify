@@ -30,8 +30,6 @@ const Register = ( ) => {
         setEmailError("")
         setPwdError("")
 
-        // TODO: check if email already exists
-
         // This regex for a valid username is found online
         // output error if username is empty, includes spaces, special characters, <3 letters, or >20 letters
         const usernameRegex = /^[A-Za-z0-9]{3,20}$/
