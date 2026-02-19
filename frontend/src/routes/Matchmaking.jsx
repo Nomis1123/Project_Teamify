@@ -31,6 +31,14 @@ const placeboUsers = [
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=3",
     description: "I play mostly at night",
   },
+  {
+    id: 4,
+    username: "HSRenjoyer",
+    rank: "Platinum",
+    region: "ASIA",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=3",
+    description: "I just need the last constellation...",
+  },
 ];
 
 const Matchmaking = () => {
@@ -50,7 +58,7 @@ const Matchmaking = () => {
         Thursday: { morning: false, afternoon: false, evening: false },
         Friday: { morning: false, afternoon: false, evening: false },
         Saturday: { morning: false, afternoon: false, evening: false },
-        Sunday: { morning: false, afternoon: false, evening: false }}
+        Sunday: { morning: false, afternoon: false, evening: false },}
     );
 
     // set availability selections by creating a temp copy of availability to prevent direct modifications
@@ -136,6 +144,8 @@ const Matchmaking = () => {
                             <p className="description">{user.description}</p>
                             <span>{user.region}</span>
                         </div>
+
+                        <button className="connect-button">Connect</button>
                     </div>
                 ))} 
             </div>
