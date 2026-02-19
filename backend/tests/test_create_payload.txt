@@ -1,0 +1,9 @@
+create dupTest duptest@gmail.com 1234abcd 200
+create dupTest duptest@gmail.com 1234abcd 409
+create invalidEmail wazzapMail 1234abcd 400
+create shortpassword shortpass@gmail.com abc 400
+create noAlpha onlyNumPas@gmail.com 123456789 400
+create noNums onlyAlphaPass@gmail.com abcdefghij 400
+create emptyEmail   emailisempty123 400
+create emptyPass emptyPass@gmail.com   400
+create   emptyUserName@gmail.com user15empty 400

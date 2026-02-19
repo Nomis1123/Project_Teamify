@@ -12,8 +12,8 @@ ENDPOINT = "http://localhost:5173"
 HOST = "localhost"
 PORT = 5173
 
-# Responses: 200 OK         400 Bad Request     404 DNE
-#            201 Created    401 Unauthorized    409 Duplicate
+# Responses: 200 OK                                  400 Bad Request     404 DNE
+#            201 Created we dont use this for now    401 Unauthorized    409 Duplicate
 
 
 # Mac cannot install pywinty cuz its useless, the equivalent is just pipwin:
@@ -56,9 +56,7 @@ def parse_create(parts):
         }
 
         response = requests.post(ENDPOINT + "/api/auth/register", json=payload)
-        data = response.json
-        print(data)
-        if response.status_code == status_code:
+        if response.status_code == int(status_code):
             return True
         else:
             print("Response: ", response.status_code, "Expected: ", status_code)
@@ -72,7 +70,7 @@ def parse_login(parts):
         "password": password
     }
     response = requests.post(ENDPOINT + "/api/auth/login", json=payload)
-    if response.status_code == status_code:
+    if response.status_code == int(status_code):
         return True
     else:
         print("Response: ", response.status_code, "Expected: ", status_code)
@@ -80,13 +78,12 @@ def parse_login(parts):
 
 
 def parse_profile(parts):
-    profile <UID> <expected status code>
     _, UID, status_code = parts
     payload = {
         UID
     }
     response = requests.get(ENDPOINT + "/api/user/me", json=payload)
-    if response.status_code == status_code:
+    if response.status_code == int(status_code):
         return True
     else:
         print("Response: ", response.status_code, "Expected: ", status_code)
@@ -108,7 +105,7 @@ def parse_update(parts):
                     "confirm new password": new_pass
                 }
                 response = requests.put(ENDPOINT + "/api/user/me", json=payload)
-                if response.status_code == status_code:
+                if response.status_code == int(status_code):
                     return True
                 else:
                     print("Response: ", response.status_code, "Expected: ", status_code)
@@ -118,7 +115,7 @@ def parse_update(parts):
                 return False
         else:
             if len(parts) == 4:
-                _, _, new_target, status_code = parse_create
+                _, _, new_target, status_code = parts
                 if target == "username":
                     payload = {
                         "username": target
@@ -128,7 +125,7 @@ def parse_update(parts):
                         "email": target
                     }
                 response = requests.put(ENDPOINT + "/api/user/me", json=payload)
-                if response.status_code == status_code:
+                if response.status_code == int(status_code):
                     return True
                 else:
                     print("Response: ", response.status_code, "Expected: ", status_code)
@@ -218,8 +215,8 @@ def parse_line(line):
 # status_code = response.status_code
 # print("status code: ", status_code)
 
-
-if __name__ == '__main__':
+def main():
+    line_num = 0
     total_passed = 0
     if len(sys.argv) != 2:
         print("Usage: python test_BackendApi.py payload_file.txt")
@@ -231,9 +228,12 @@ if __name__ == '__main__':
         for line in file:
             if parse_line(line):
                 total_passed += 1
-                print("passed")
-            else:
-                print("failed")
-
+                line_num += 1
+                print("line: ", line_num, " passed")
+                
     print("total passed tests: ", total_passed)
 
+
+if __name__ == '__main__':
+    main()
+    print("Finished running tests")
