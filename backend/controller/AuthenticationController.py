@@ -178,3 +178,30 @@ def logout():
     # If the frontend use the cookie, this line actually delete the token from the cookie
     unset_jwt_cookies(response)
     return response, 200
+
+
+"""
+This method handles both get and update users' availabilities
+"""
+@jwt_required()
+def getOrUpdate_availability():
+    user_id = get_jwt_identity()
+
+    if request.method=="PUT":
+        data = request.json.get("availability")
+        if not data:
+            return jsonify({"status": "No availability data provided"}), 400
+        
+        try:
+            User.update_profile_by_id(user_id, availability=data)
+            return jsonify({"status": "Availability updated", "availability": data}), 200
+        
+        except Exception as e:
+            return jsonify({"status": f"Update failed: {str(e)}"}), 500
+        
+    
+    availability = User.get_availability(user_id)
+    if availability is None:
+        return jsonify({"status": "Availability not found"}), 404
+    
+    return jsonify({"availability": availability}), 200

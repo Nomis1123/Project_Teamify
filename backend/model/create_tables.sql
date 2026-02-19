@@ -14,7 +14,15 @@ CREATE TABLE users (
     sub_class VARCHAR(50),
     is_verified BOOLEAN DEFAULT FALSE,
     verification_token VARCHAR(255),
-    availability JSONB DEFAULT '{}'
+    availability JSONB DEFAULT '{
+  "Monday": {"Morning": false, "Noon": false, "Evening": false},
+  "Tuesday": {"Morning": false, "Noon": false, "Evening": false},
+  "Wednesday": {"Morning": false, "Noon": false, "Evening": false},
+  "Thursday": {"Morning": false, "Noon": false, "Evening": false},
+  "Friday": {"Morning": false, "Noon": false, "Evening": false},
+  "Saturday": {"Morning": false, "Noon": false, "Evening": false},
+  "Sunday": {"Morning": false, "Noon": false, "Evening": false}
+}'::JSONB
 );
 
 -- Master list of available games
