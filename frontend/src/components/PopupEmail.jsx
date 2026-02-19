@@ -29,6 +29,13 @@ export default function PUEmail() {
     if (!isValid) {
       return;
     }
+    
+    if (oldEmail === newEmail) {
+      setNewEmailError("New email must be different from your current email.");
+      return;
+    } else {
+      setNewEmailError("");
+    }
 
     setIsSaving(true);
 
