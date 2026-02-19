@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import "./Popup.css";
 
-export default function Popup({ open, onClose, title = "Popup" , children, fail_msg }) {
+export default function Popup({ open, onClose, title = "Popup" , children, fail_msg, className }) {
   // Close on esc
   useEffect(() => {
     if (!open) return;
@@ -32,7 +32,7 @@ export default function Popup({ open, onClose, title = "Popup" , children, fail_
           </button>
         </div>
 
-        <div className="popup-body">
+        <div className={`popup-body ${className}`}>
           {children}
         </div>
 
