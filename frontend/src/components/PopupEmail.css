@@ -23,6 +23,8 @@
 }
 
 .btn-email-save {
+  height: 50px;
+  width: 100px;
   background: rgb(255, 255, 255, 0.2);
   color: white;
 }
@@ -45,4 +47,24 @@
 .input-email:focus {
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.popup-email {
+  height: 220px;
+}
+
+.single-input-block {
+  height: 100px;
+}
+
+.email-input-container {
+  flex: 1;
+  width: 300px;
+}
+
+.email-save-container {
+  flex: 0 0 auto;
+  height: 200px;
+  display: flex;  
+  align-items: center;  
 }
