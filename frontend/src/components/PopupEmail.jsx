@@ -42,6 +42,7 @@ export default function PUEmail() {
       if (!res.ok) {
         // backend might return JSON error { message: "..." }
         setFail(`Save failed. Please try again later. (${res.status})`);
+        let msg = "";
         try {
           const data = await res.json();
           if (data?.message) msg = data.message;
@@ -73,7 +74,7 @@ export default function PUEmail() {
         Change Email
       </button>
 
-      <Popup open={open} onClose={handleClose} title="Change Email" fail_msg={emailFail}>
+      <Popup open={open} onClose={handleClose} title="Change Email" fail_msg={emailFail} className="popup-email">
         <div style={{ display: "flex", gap: 8 }}>
           <div className="email-input-container">
             <div className="single-input-block"><h2>Enter your current email</h2>

@@ -29,6 +29,7 @@ export default function PUUsername() {
       if (!res.ok) {
         // backend might return JSON error { message: "..." }
         setFail(`Save failed. Please try again later. (${res.status})`);
+        let msg = "";
         try {
           const data = await res.json();
           if (data?.message) msg = data.message;
@@ -57,7 +58,7 @@ export default function PUUsername() {
         Change Username
       </button>
 
-      <Popup open={open} onClose={handleClose} title="Change Username" fail_msg={usernameFail}>
+      <Popup open={open} onClose={handleClose} title="Change Username" fail_msg={usernameFail} className="popup-username">
         <h2>Enter your new username</h2>
         <div style={{ display: "flex", gap: 8 }}>
           <input
