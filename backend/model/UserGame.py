@@ -19,8 +19,14 @@ def get_db_connection():
 
 class UserGame:
     @staticmethod
-    def get_filtered_users(current_user_id, game_title=None, apply_availability_filter=False):
-    
+    def get_filtered_users(current_user_id, filters=None, offset=0):
+        filters = filters or {}
+        game_title = filters.get('game')
+        rank = filters.get('rank')
+        region = filters.get('region')
+        apply_availability_filter = filters.get('availability') is not None
+
+        
         # The code measured the availability scores
         params = []
         sql = """
@@ -45,39 +51,44 @@ class UserGame:
         else:
             sql += ", 0 as harmony_score " # Default score of 0 if not filtering
 
-
+        sql += """
+            , ug.current_rank, g.title 
+            FROM users u
+            LEFT JOIN user_games ug ON u.id = ug.user_id 
+            LEFT JOIN games g ON ug.game_id = g.id 
+            WHERE u.id != %s AND u.is_verified = TRUE
+        """
+        params.append(current_user_id)
 
         if game_title:
-            # Join the table and filter by the same game
-            sql += ", ug.current_rank, g.title FROM users u "
-            sql += "JOIN user_games ug ON u.id = ug.user_id JOIN games g ON ug.game_id = g.id "
-            sql += "WHERE u.id != %s AND u.is_verified = TRUE AND g.title = %s "
-            params.extend([current_user_id, game_title])
+            sql += " AND g.title ILIKE %s " # ILIKE for case-insensitivity
+            params.append(f"%{game_title}%")
         
-        else: 
-            # If no filter, we select general info
-            sql += ", 'Unranked' as current_rank, 'Multiple' as title FROM users u "
-            sql += "WHERE u.id != %s AND u.is_verified = TRUE "
-            params.append(current_user_id)
+        if rank:
+            sql += " AND ug.current_rank ILIKE %s " 
+            params.append(f"%{rank}%")
         
         if apply_availability_filter:
-            sql += " ORDER BY harmony_score DESC LIMIT 10;"
+            sql += " ORDER BY harmony_score DESC "
         else:
-            sql += " ORDER BY RANDOM() LIMIT 10;"
+            sql += " ORDER BY u.id ASC "
+
+        sql += " LIMIT 10;"
+        
 
         with get_db_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(sql, tuple(params))
                 rows = cur.fetchall()
                 return [
-                    {
-                        "id": r[0],
-                        "username": r[1],
-                        "rank": r[5], # current_rank
-                        "region": "NA", # Hardcoded for now or fetch from user table
-                        "avatar": r[2] or f"https://api.dicebear.com/7.x/avataaars/svg?seed={r[1]}",
-                        "description": r[3],
-                        "game": r[6], # game title
-                        "match_percentage": f"{round((r[4] / 21) * 100)}%" if r[4] > 0 else "0%"
-                    } for r in rows
-                ]
+                {
+                    "id": r[0],
+                    "username": r[1],
+                    "rank": r[5] or "Unranked",
+                    "region": "NA", # Static for now
+                    "avatar": r[2] or f"https://api.dicebear.com/7.x/avataaars/svg?seed={r[1]}",
+                    "description": r[3],
+                    "game": r[6] or "No Game Selected",
+                    "match_percentage": f"{round((r[4] / 21) * 100)}%" if r[4] > 0 else "0%"
+                } for r in rows
+            ]
