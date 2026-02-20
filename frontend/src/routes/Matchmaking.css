@@ -63,7 +63,7 @@
     width: 85%;
     max-width: 1500px;
     display: flex;
-    align-items: stretch;
+    align-items: center;
     overflow: hidden;
     border: 1px solid #8933da;
     border-radius: 18px;
@@ -73,8 +73,25 @@
     padding: 20px 30px;
 }
 
+.bg-gradient-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, transparent, transparent, rgba(70,0,120,0.5), #562A86);
+    pointer-events: none;    /* prevents blocking clicks */
+}
+
+.bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
 .avatar {
-    border-color: black;
+    border: 2px solid white;
     width: 8%;
     height: auto;
     object-fit: cover;
@@ -89,7 +106,7 @@
 }
 
 .username {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 600;
 }
 
@@ -117,23 +134,6 @@
 
 .connect-button:hover {
     background: linear-gradient(to right, #2563eb, #7c3aed);
-}
-
-.bg-gradient-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to right, transparent, transparent, rgba(70,0,120,0.5), #562A86);
-    pointer-events: none;    /* prevents blocking clicks */
-}
-
-.bg-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 25%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
 }
 
 /* sets all user contents above the bg game image */

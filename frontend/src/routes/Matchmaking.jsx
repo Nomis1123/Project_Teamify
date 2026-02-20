@@ -32,7 +32,7 @@ const placeboUsers = [
   {
     id: 3,
     username: "NightOwl",
-    rank: "Platinum",
+    rank: "Pro",
     region: "ASIA",
     avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=3",
     description: "I play mostly at night",
@@ -190,6 +190,7 @@ const Matchmaking = () => {
                     </div>
                 ))} 
             </div>
+            {/* Add no player/party found later */}
         </div>
     )
 }
