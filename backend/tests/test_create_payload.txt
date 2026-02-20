@@ -1,4 +1,4 @@
-create dupTest duptest@gmail.com 1234abcd 200
+create dupTest duptest@gmail.com 1234abcd 201
 create dupTest duptest@gmail.com 1234abcd 409
 create invalidEmail wazzapMail 1234abcd 400
 create shortpassword shortpass@gmail.com abc 400
