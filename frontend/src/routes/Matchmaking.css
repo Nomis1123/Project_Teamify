@@ -21,8 +21,8 @@
     width: 85%; 
     max-width: 1500px;
     margin: 0 auto;           
-    background: #562A86;
-    border: 0.5px solid #89439d;
+    background: linear-gradient(to right, #562A86, #4A3194); 
+    border: 1px solid #8933da;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 
@@ -39,8 +39,8 @@
 
 .filters select,
 .filters button {
-    border-radius: 5px;
-    border: 1px solid #aaa;
+    border-radius: 10px;
+    border: 0.5px solid #8933da;
     background-color: #39245D;
     min-width: 230px;
     -webkit-appearance: none;
@@ -59,12 +59,13 @@
 }
 
 .user-banners {
+    position: relative;
     width: 85%;
     max-width: 1500px;
     display: flex;
-    align-items: center;
+    align-items: stretch;
     overflow: hidden;
-    border: 0.5px solid #89439d;
+    border: 1px solid #8933da;
     border-radius: 18px;
     background: linear-gradient(to right, #562A86, #4A3194); 
     color: white;
@@ -81,6 +82,26 @@
     border-radius: 100%;
 }
 
+.user-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.username {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.rank {
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(6px);
+}
+
 .connect-button {
     width: 110px;
     height: 45px;
@@ -95,7 +116,30 @@
 }
 
 .connect-button:hover {
-  background: linear-gradient(to right, #2563eb, #7c3aed);
+    background: linear-gradient(to right, #2563eb, #7c3aed);
+}
+
+.bg-gradient-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, transparent, transparent, rgba(70,0,120,0.5), #562A86);
+    pointer-events: none;    /* prevents blocking clicks */
+}
+
+.bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 25%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+/* sets all user contents above the bg game image */
+.user-banners > *:not(.bg-image) {
+    position: relative;
+    z-index: 1;
 }
 
 
