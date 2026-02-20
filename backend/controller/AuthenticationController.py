@@ -6,6 +6,7 @@ from flask_jwt_extended import JWTManager
 import psycopg2
 import secrets
 import os 
+import re
 from model.User import User
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_jwt_extended import unset_jwt_cookies
@@ -43,8 +44,21 @@ def register():
     data = request.json
     # get the information from the request
     username = data.get('username')
+    # check if valid username
+    username_regex = r"^[A-Za-z0-9]{3,20}$"
+    if re.match(username_regex, username):
+        return jsonify({"status": "Invalid username"}), 404
     email = data.get('email').lower()
+    # check if valid email
+    email_regex = r"^[^\s@]+@[^\s@]+\.[^\s@]+$"
+    if re.match(email_regex, email):
+        return jsonify({"status": "Invalid email"}), 404
     password = data.get('password')
+    # check if valid password
+    password_regex = r"^(?=.*[A-Za-z])(?=.*\d).{8,}$"
+    if re.match(password_regex, password):
+        return jsonify({"status": "Invalid password"}), 404
+    # check if empty email or password
     if not email or not password:
         return jsonify({"status": "Missing email or password"}), 400
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
