@@ -5,8 +5,7 @@ from flask_jwt_extended import JWTManager
 import os 
 from dotenv import load_dotenv
 from controller.AuthenticationController import bcrypt
-
-
+from controller.MatchmakingController import  get_matches
 # Load the .env first
 load_dotenv()
 
@@ -48,6 +47,8 @@ app.add_url_rule('/api/user/me', view_func=update_me,  methods=['PUT'])
 
 # 5. Availability
 app.add_url_rule('/api/user/availability', view_func=getOrUpdate_availability, methods=['GET','PUT'])
+
+app.add_url_rule('/api/user/filters', view_func=get_matches, methods=["POST"])
 
 if __name__ == '__main__':
     # Start a local web server on Port 8000
