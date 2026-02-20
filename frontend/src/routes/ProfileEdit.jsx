@@ -9,6 +9,7 @@ import GamePicker from "../components/GamePicker";
 import PUUsername from '../components/PopupUsername';
 import PUEmail from '../components/PopupEmail';
 import PUPassword from '../components/PopupPassword';
+import PUDescription from '../components/PopupDescription';
 
 const ProfileEdit = () => {
     const navigate = useNavigate();
@@ -32,6 +33,7 @@ const ProfileEdit = () => {
         games: [],
         schedule: defaultWeeklySchedule,
     });
+    const [description, setDescription] = useState("");
     const [loading, setLoading] = useState(true);
     // const [error, setError] = useState("");
 
@@ -70,6 +72,7 @@ const ProfileEdit = () => {
                 };
                 console.log("setting user to:", normalized);
                 setUser(normalized);
+                setDescription(normalized.description);
             } catch (e) {
                 console.log("error:", e);
             } finally {
@@ -153,12 +156,15 @@ const ProfileEdit = () => {
                 <div>
                     <PUPassword />
                 </div>
-                <h2>Description:</h2>
+                <div className='profile-description-header'>
+                    <h2 className='profile-description-text'>Description:</h2>
+                    <div>
+                        <PUDescription description={description} descriptionModifier={setDescription}/>
+                    </div>
+                </div>
                 <div className="profile-description">
                     <p>
-                        {!user?.description?.trim()
-                        ? "You have not set a description yet."
-                        : user.description}
+                        {description ? description: "You have not set a description yet."}
                     </p>
                 </div>
 
