@@ -2,6 +2,7 @@
 import requests
 import sys
 import http.client
+import re
 
 # from flask import Flask, request, jsonify
 # from flask_bcrypt import Bcrypt
@@ -9,8 +10,8 @@ import http.client
 
 
 ENDPOINT = "http://localhost:5173"
-HOST = "localhost"
-PORT = 5173
+# HOST = "localhost"
+# PORT = 5173
 
 # Responses: 200 OK                                  400 Bad Request     404 DNE
 #            201 Created we dont use this for now    401 Unauthorized    409 Duplicate
@@ -46,6 +47,7 @@ PORT = 5173
 
 def parse_create(parts):
     if len(parts) != 5:
+        print("Insufficient arguments to register")
         return False
     else:
         _, username, email, password, status_code = parts
@@ -157,38 +159,6 @@ def parse_line(line):
         return False
 
 
-# def test_create_user():
-#     payload = {
-#         "email":"bob123@gmail.com",
-#         "password":"123",
-#         "username":"bob"
-#     }
-#     response = requests.post(ENDPOINT + "/api/auth/register", json=payload)
-#     data = response.json
-#     assert response.status_code == 201
-#     pass
-
-# def test_dup_user():
-#     payload = {
-#         "email":"bob123@gmail.com",
-#         "password":"123",
-#         "username":"bob"
-#     }
-#     response = requests.post(ENDPOINT + "/api/auth/register", json=payload)
-#     data = response.json
-#     assert response.status_code == 409
-#     pass
-
-# def test_logout_user():
-#     assert == 200
-#     pass
-
-# def test_login_user():
-#     assert == 200
-#     pass
-
-
-
 # # --- Routes ---
 
 # # 1. Auth Operations
@@ -212,9 +182,6 @@ def parse_line(line):
 # data = response.json
 # print("data: ", data)
 
-# status_code = response.status_code
-# print("status code: ", status_code)
-
 def main():
     line_num = 0
     total_passed = 0
@@ -226,12 +193,12 @@ def main():
 
     with open(payload_file, "r") as file:
         for line in file:
+            line_num += 1
             if parse_line(line):
                 total_passed += 1
-                line_num += 1
                 print("line: ", line_num, " passed")
                 
-    print("total passed tests: ", total_passed)
+    print("total passed tests: ", total_passed, " out of: ", line_num)
 
 
 if __name__ == '__main__':

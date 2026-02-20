@@ -8,7 +8,7 @@ Logout:
 logout <Daniel said skip therefore I shall skip>
 
 Validate:
-validate <something something, the backend api documentation doesnt say anything yet so Daniel says>
+validate <something something, the backend api documentation doesnt say anything yet so Daniel says skip>
 
 Profile:
 profile <UID> <expected status code>
