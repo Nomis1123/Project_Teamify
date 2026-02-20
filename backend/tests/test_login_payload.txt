@@ -3,3 +3,7 @@ login jeff@gmail.com passwordDoesNotMatch 401
 login IdontExist@gmail.com 1234567a 404
 login invalidemail 1234abcd 404
 login jeff@gmail.com invalidPass 401
+login emptyPass@gmail.com   404
+login   empty3mail 404
+login      
+login

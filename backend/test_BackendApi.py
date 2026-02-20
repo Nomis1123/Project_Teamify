@@ -3,6 +3,7 @@ import requests
 import sys
 import http.client
 import re
+from flask import Flask, request
 
 # from flask import Flask, request, jsonify
 # from flask_bcrypt import Bcrypt
@@ -66,33 +67,44 @@ def parse_create(parts):
 
 
 def parse_login(parts):
-    _, email, password, status_code = parts
-    payload = {
-        "email": email,
-        "password": password
-    }
-    response = requests.post(ENDPOINT + "/api/auth/login", json=payload)
-    if response.status_code == int(status_code):
-        return True
-    else:
-        print("Response:", response.status_code, "Expected:", status_code)
+    if len(parts) != 4:
+        print("Insufficient arguments to login")
         return False
+    else:
+        _, email, password, status_code = parts
+        payload = {
+            "email": email,
+            "password": password
+        }
+        response = requests.post(ENDPOINT + "/api/auth/login", json=payload)
+        if response.status_code == int(status_code):
+            return True
+        else:
+            print("Response:", response.status_code, "Expected:", status_code)
+            return False
 
 
 def parse_profile(parts):
-    _, UID, status_code = parts
-    payload = {
-        UID
-    }
-    response = requests.get(ENDPOINT + "/api/user/me", json=payload)
-    if response.status_code == int(status_code):
-        return True
-    else:
-        print("Response:", response.status_code, "Expected:", status_code)
+    # Currently, not functional
+    if len(parts) != 2:
+        print("Insufficient arguments to get profile")
         return False
+    else:
+        _, status_code = parts
+        # header = {
+        #     "Authorization": f"Bearer {token}"
+        # }
+        # print(header)
+        response = requests.get(ENDPOINT + "/api/user/me")
+        if response.status_code == int(status_code):
+            return True
+        else:
+            print("Response:", response.status_code, "Expected:", status_code)
+            return False
 
 
 def parse_update(parts):
+    # Currently, not functional
     if len(parts) < 2:
         print("Insufficient arguments for update")
         return False
@@ -138,6 +150,9 @@ def parse_update(parts):
                 return False
 
 
+def parse_validate(parts):
+    # Currently, not functional
+    return
 
 def parse_line(line):
     parts = line.strip().split()
