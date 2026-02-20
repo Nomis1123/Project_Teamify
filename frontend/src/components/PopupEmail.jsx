@@ -84,7 +84,7 @@ export default function PUEmail() {
       <Popup open={open} onClose={handleClose} title="Change Email" fail_msg={emailFail} className="popup-email">
         <div style={{ display: "flex", gap: 8 }}>
           <div className="email-input-container">
-            <div className="single-input-block"><h2>Enter your current email</h2>
+            <div className="single-input-block-email"><h2>Enter your current email</h2>
               <div style={{ display: "flex", gap: 8 }}>
                 <input
                   className="input-email"
@@ -99,7 +99,7 @@ export default function PUEmail() {
               {oldEmailError ? <p className="error-msg">{oldEmailError}</p> : ""}
             </div>
 
-            <div className="single-input-block"><h2>Enter your new email</h2>
+            <div className="single-input-block-email"><h2>Enter your new email</h2>
               <div style={{ display: "flex", gap: 8 }}>
                 <input
                   className="input-email"
