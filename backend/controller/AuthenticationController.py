@@ -47,17 +47,17 @@ def register():
     # check if valid username
     username_regex = r"^[A-Za-z0-9]{3,20}$"
     if re.match(username_regex, username):
-        return jsonify({"status": "Invalid username"}), 404
+        return jsonify({"status": "Invalid username"}), 400
     email = data.get('email').lower()
     # check if valid email
     email_regex = r"^[^\s@]+@[^\s@]+\.[^\s@]+$"
     if re.match(email_regex, email):
-        return jsonify({"status": "Invalid email"}), 404
+        return jsonify({"status": "Invalid email"}), 400
     password = data.get('password')
     # check if valid password
     password_regex = r"^(?=.*[A-Za-z])(?=.*\d).{8,}$"
     if re.match(password_regex, password):
-        return jsonify({"status": "Invalid password"}), 404
+        return jsonify({"status": "Invalid password"}), 400
     # check if empty email or password
     if not email or not password:
         return jsonify({"status": "Missing email or password"}), 400
