@@ -76,7 +76,7 @@ def register():
                 "refresh_token": refresh_token
             })
         set_access_cookies(response, access_token)
-        return response, 200
+        return response, 201
     except Exception as e:
         return jsonify({"status": str(e)}), 500
     
