@@ -34,13 +34,18 @@ const ProfileEdit = () => {
         schedule: defaultWeeklySchedule,
     });
     const [description, setDescription] = useState("");
-    const [loading, setLoading] = useState(true);
+    const [username, setUsername] = useState("");
+    // const [loading, setLoading] = useState(true);
     // const [error, setError] = useState("");
 
     useEffect(() => {
         const loadMe = async () => {
             try {
-                setLoading(true);
+                // setLoading(true);
+                
+                // This is for testing only
+                // setUsername("TestUser");
+                // setDescription("TestDesc");
 
                 const res = await fetch("/api/user/me", {
                     method: "GET",
@@ -72,11 +77,12 @@ const ProfileEdit = () => {
                 };
                 console.log("setting user to:", normalized);
                 setUser(normalized);
+                setUsername(normalized.username);
                 setDescription(normalized.description);
             } catch (e) {
                 console.log("error:", e);
             } finally {
-                setLoading(false);
+                // setLoading(false);
             }
         };
 
@@ -137,8 +143,12 @@ const ProfileEdit = () => {
                 />
 
                 <div className='username'>
-                    <h1>{loading ? "Loading..." : user.username || "Unknown User"}</h1>
-                    <p>User ID: {user.id || "-"}</p>
+                    <h1>
+                        {username ? username : "Unknown User"}
+                    </h1>
+                    <p>
+                        User ID: {user.id || "-"}
+                    </p>
                 </div>
                 
                 <button className="profile-return-btn" onClick={() => navigate("/profile")}>
@@ -148,7 +158,7 @@ const ProfileEdit = () => {
             
             <div className='profile-scroll'>
                 <div>
-                    <PUUsername />
+                    <PUUsername username={username} usernameModifier={setUsername}/>
                 </div>
                 <div>
                     <PUEmail />
@@ -164,7 +174,7 @@ const ProfileEdit = () => {
                 </div>
                 <div className="profile-description">
                     <p>
-                        {description ? description: "You have not set a description yet."}
+                        {description ? description : "You have not set a description yet."}
                     </p>
                 </div>
 

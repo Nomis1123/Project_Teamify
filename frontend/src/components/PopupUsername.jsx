@@ -2,28 +2,31 @@ import { useState } from "react";
 import "./PopupUsername.css";
 import Popup from "./Popup"
 
-export default function PUUsername() {
+export default function PUUsername({username, usernameModifier}) {
   const [open, setOpen] = useState(false);
-  const [username, setUsername] = useState("")
+  const [name, setName] = useState("")
   const [isSaving, setIsSaving] = useState(false);
   const [usernameError, setUsernameError] = useState("");
   const [usernameFail, setFail] = useState("");
+
   async function handleSave() {
     setFail("");
     const usernameRegex = /^[A-Za-z0-9]{3,20}$/
-    if (username === "" || !usernameRegex.test(username)) {
+    if (name === "" || !usernameRegex.test(name)) {
         setUsernameError("Username cannot include spaces, special characters, and must be 3-20 letters")
         return;
     }
 
     setIsSaving(true);
     setUsernameError("");
+    // This is for test only
+    // usernameModifier(name);
 
     try {
       const res = await fetch("/api/user/me", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: username }),
+        body: JSON.stringify({ username: name }),
       });
 
       if (!res.ok) {
@@ -38,6 +41,7 @@ export default function PUUsername() {
       }
 
       handleClose();
+      usernameModifier(name);
     } catch (e) {
       // setFail(e instanceof Error ? e.message : "Save failed.");
       setFail(`Save failed. Please try again later. (${e.message})`);
@@ -46,7 +50,7 @@ export default function PUUsername() {
     }
   };
   function handleClose() {
-    setUsername("");
+    setName("");
     setIsSaving(false);
     setOpen(false);
     setUsernameError("");
@@ -54,7 +58,7 @@ export default function PUUsername() {
   };
   return (
     <div className="element-username">
-      <button className="btn-username btn-username-change" onClick={() => setOpen(true)}>
+      <button className="btn-username btn-username-change" onClick={() => {setOpen(true); setName(username);}}>
         Change Username
       </button>
 
@@ -64,8 +68,8 @@ export default function PUUsername() {
           <input
             className="input-username"
             placeholder="Type here..."
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSave();
             }}
