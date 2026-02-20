@@ -13,8 +13,8 @@ ENDPOINT = "http://localhost:5173"
 # HOST = "localhost"
 # PORT = 5173
 
-# Responses: 200 OK                                  400 Bad Request     404 DNE
-#            201 Created we dont use this for now    401 Unauthorized    409 Duplicate
+# Responses: 200 OK         400 Bad Request     404 DNE
+#            201 Created    401 Unauthorized    409 Duplicate
 
 
 # Mac cannot install pywinty cuz its useless, the equivalent is just pipwin:
@@ -61,7 +61,7 @@ def parse_create(parts):
         if response.status_code == int(status_code):
             return True
         else:
-            print("Response: ", response.status_code, "Expected: ", status_code)
+            print("Response:", response.status_code, "Expected:", status_code)
             return False
 
 
@@ -75,7 +75,7 @@ def parse_login(parts):
     if response.status_code == int(status_code):
         return True
     else:
-        print("Response: ", response.status_code, "Expected: ", status_code)
+        print("Response:", response.status_code, "Expected:", status_code)
         return False
 
 
@@ -88,7 +88,7 @@ def parse_profile(parts):
     if response.status_code == int(status_code):
         return True
     else:
-        print("Response: ", response.status_code, "Expected: ", status_code)
+        print("Response:", response.status_code, "Expected:", status_code)
         return False
 
 
@@ -110,7 +110,7 @@ def parse_update(parts):
                 if response.status_code == int(status_code):
                     return True
                 else:
-                    print("Response: ", response.status_code, "Expected: ", status_code)
+                    print("Response:", response.status_code, "Expected:", status_code)
                     return False
             else:
                 print("Insufficient arguments for updating password")
@@ -130,7 +130,7 @@ def parse_update(parts):
                 if response.status_code == int(status_code):
                     return True
                 else:
-                    print("Response: ", response.status_code, "Expected: ", status_code)
+                    print("Response:", response.status_code, "Expected:", status_code)
                     return False
                 
             else:
@@ -198,7 +198,7 @@ def main():
                 total_passed += 1
                 print("line: ", line_num, " passed")
                 
-    print("total passed tests: ", total_passed, " out of: ", line_num)
+    print("total passed tests:", total_passed, " out of:", line_num)
 
 
 if __name__ == '__main__':
