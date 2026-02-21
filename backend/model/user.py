@@ -11,6 +11,21 @@ class User:
         self.description = description
         self.pfp_url = pfp_url
 
+
+    def get_password_hash(self) -> str:
+
+        conn = get_db_connection()
+        try:
+            with conn.cursor() as cur:
+                cur.execute("SELECT password_hash FROM users WHERE id = %s", (self.id,))
+                row = cur.fetchone()
+                if not row:
+                    raise ValueError("User not found")
+
+                return row[0]
+        finally:
+            conn.close()
+
     @staticmethod
     def create(username, email, hashed_password):
         """
@@ -90,6 +105,52 @@ class User:
                 if row:
                     return User(*row)
                 return None
+        finally:
+            conn.close()
+
+
+    def update(self, fields:dict):
+
+        if not fields:
+            raise ValueError("No valid fields provided.")
+
+        # make sure the checks for all these fields happens in the routing logic.
+        allowed = {"username", "description", "email", "password"}
+
+        filtered = {k: v for k,v in fields.items() if k in allowed}
+
+        if not filtered:
+            raise ValueError("No valid fields to update.")
+
+        set_clause = ", ".join(f"{k} = %s" for k in filtered)
+        values = list(filtered.values()) + [self.id]
+
+        print (set_clause)
+        print(values)
+
+    def compare_and_update(self, database_field: str, old_value, new_value):
+        conn = get_db_connection()
+
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                        f"SELECT {database_field} FROM users WHERE id = %s",
+                        (self.id,)
+                        )
+                row = cur.fetchone()
+
+                if not row:
+                    raise ValueError("User not found.")
+
+                if row[0] != old_value:
+                    raise ValueError(f"Old {database_field} is incorrect. {old_value}, {row[0]}")
+
+                cur.execute(f"UPDATE users SET {database_field} = %s WHERE id = %s", (new_value, self.id))
+            conn.commit()
+
+        except Exception as e:
+            conn.rollback()
+            raise e
         finally:
             conn.close()
 

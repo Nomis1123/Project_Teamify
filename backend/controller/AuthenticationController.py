@@ -30,30 +30,49 @@ When the user clicks that link, their browser sends a request to the backend
 Logic: The code looks at the URL, grabs the token part and checks the database for a match
 
 """
+def is_valid_email(email: str) -> bool:
 
+    if not email:
+        return False
+
+    email_regex = r"^[^\s@]+@[^\s@]+\.[^\s@]+$"
+    return bool(re.match(email_regex, email))
+
+def is_valid_password(password: str) -> bool:
+
+    if not password:
+        return False
+
+    password_regex = r"^(?=.*[A-Za-z])(?=.*\d).{8,}$"
+    return bool(re.match(password_regex, password))
+
+def is_valid_username(username: str) -> bool:
+
+    if not username:
+        return False
+
+    username_regex = r"^[A-Za-z0-9]{3,20}$"
+    return bool(re.match(username_regex, username))
 
 def register():
     data = request.json
     # get the information from the request
     username = data.get('username')
-    # check if valid username
-    username_regex = r"^[A-Za-z0-9]{3,20}$"
-    if not re.match(username_regex, username):
-        return jsonify({"status": "Invalid username"}), 400
-    email = data.get('email').lower()
-    # check if valid email
-    email_regex = r"^[^\s@]+@[^\s@]+\.[^\s@]+$"
-    if not re.match(email_regex, email):
-        return jsonify({"status": "Invalid email"}), 400
+    email = data.get('email')
     password = data.get('password')
-    # check if valid password
-    password_regex = r"^(?=.*[A-Za-z])(?=.*\d).{8,}$"
-    if not re.match(password_regex, password):
-        return jsonify({"status": "Invalid password"}), 400
-    # check if empty email or password
-    if not email or not password:
-        return jsonify({"status": "Missing email or password"}), 400
 
+    if not is_valid_email(email):
+        return jsonify({"status": "Invalid email."}), 400
+
+    if not is_valid_username(username):
+        return jsonify({"status": "Invalid username."}), 400
+
+    # check if valid password
+    if not is_valid_password(password):
+        return jsonify({"status": "Invalid password."}), 400
+
+
+    email = email.lower() # ok to lowercase after we check it exists
 
     hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
 
@@ -98,42 +117,29 @@ def login():
     # set to lower if it exists
     email = email.lower()
 
-    # get just the hashed password from the database
-    conn = get_db_connection()
+    user = User.find_by_email(email)
 
-    try:
-        with conn.cursor() as cur:
-            cur.execute("SELECT password_hash FROM users WHERE email = %s", (email,))
-            result = cur.fetchone()
-            cur.close()
-    except Exception as e:
-        conn.rollback()
-        raise e
-    finally:
-        conn.close()
+    # if user does not exist, return 404
+    if not user:
+        return jsonify({"status": "Invalid Credentials."}), 404
 
-    # check if the hashed password and entered password are the same
-    if result and bcrypt.check_password_hash(result[0], password):
+    # get the password for that user
+    database_password = user.get_password_hash()
 
-        # true login
-        # get the user by email
-        user = User.find_by_email(email)
+    # if the password dne, or passwords don't match, return 404
+    if not database_password or not bcrypt.check_password_hash(database_password, password):
+        return jsonify({"status": "Invalid Credentials."}), 404
 
-        # if nothing is returned, 404
-        if not user:
-            return jsonify({"status": "Invalid Credentials."}), 404
+    # create tokens
+    access_token = create_access_token(identity=str(user.id))
+    refresh_token = create_refresh_token(identity=str(user.id))
 
-        # create tokens
-        access_token = create_access_token(identity=str(user.id))
-        refresh_token = create_refresh_token(identity=str(user.id))
+    return jsonify({
+        "user": user.to_dict(),
+        "access_token": access_token,
+        "refresh_token": refresh_token
+        }), 200
 
-        return jsonify({
-            "user": user.to_dict(),
-            "access_token": access_token,
-            "refresh_token": refresh_token
-            }), 200
-
-    return jsonify({"status": "Invalid Credentials."}), 404
 
 #def auth_verify(token):
 #    result = User.verify1(token)
@@ -160,8 +166,91 @@ def get_me():
         return jsonify({"status": "User not found."}), 404
 
     return jsonify({"user": user.to_dict()}), 200
-#
-#
+
+@jwt_required()
+def update_me():
+
+    user_id = get_jwt_identity()
+    user = User.find_by_id(user_id)
+
+    if not user:
+        return jsonify({"status:" "User not found."}), 404
+
+    data = request.get_json()
+
+    if not data:
+        return jsonify({"status": "No data provided."}), 400
+
+
+    # these fields can not be null
+    non_nullable = {"username", "new_password", "old_password", "new_email", "old_email"}
+
+    # ensure that these fields are not null
+    invalid_fields = [k for k in non_nullable if k in data and not data[k]]
+    if invalid_fields:
+        return jsonify({"status": f"Fields cannot be null or empty: {', '.join(invalid_fields)}"}), 400
+
+
+    # if either old_password or new_password in data
+    if "old_password" in data or "new_password" in data:
+
+        # both must be required
+        if not all(k in data for k in ("old_password", "new_password")):
+            return jsonify({"status": "Both old and new passwords are required."}), 400
+
+        # make sure the new password is valid format
+        if not is_valid_password(data["new_password"]):
+            return jsonify({"status": "New password is not of valid format."}), 400
+
+        # get the user's password from database
+        database_password = user.get_password_hash()
+
+        print (database_password)
+        print (data["old_password"])
+        # check that the old password matches the password in our database
+        if not bcrypt.check_password_hash(database_password, data["old_password"]):
+            return jsonify({"status": "Old password is incorrect."}), 400
+
+        # try to update the password
+        try:
+            user.compare_and_update("password_hash", database_password, bcrypt.generate_password_hash(data["new_password"]).decode('utf-8'))
+
+        except ValueError as e:
+            return jsonify({"status": str(e)}), 400
+        except Exception as e:
+            return jsonify({"status": f"Database error: {str(e)}."}), 500
+
+
+    # if either old_email and new_email fields are in data
+    if "old_email" in data or "new_email" in data:
+
+        # both must be required
+        if not all(k in data for k in ("old_email", "new_email")):
+            return jsonify({"status": "Both old and new emails are required."}), 400
+
+        # check if the new email is valid format
+        if not is_valid_email(data["new_email"]):
+            return jsonify({"status": "New email is not of valid format."}), 400
+
+        # try to update the database
+        try:
+            user.compare_and_update("email", data["old_email"].lower(), data["new_email"].lower())
+        except ValueError as e:
+            return jsonify({"status": str(e)}), 400
+        except psycopg2.errors.UniqueViolation:
+            return jsonify({"status": "Email already in use."}), 409
+        except Exception as e:
+            return jsonify({"status": f"Database error {str(e)}."}), 500
+
+    updated_user = User.find_by_id(user.id)
+
+    if not updated_user:
+        return jsonify({"status": "Updated user not found."}), 404
+
+    return jsonify({
+        "user": updated_user.to_dict()
+        }), 200
+
 #
 #
 #@jwt_required()

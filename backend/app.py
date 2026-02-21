@@ -1,12 +1,10 @@
-from controller.extensions import jwt, bcrypt
+from controller.extensions import jwt
 
 from dotenv import load_dotenv
 
 from flask import Flask
-from controller.AuthenticationController import register, login, get_me
+from controller.AuthenticationController import register, login, get_me, update_me
 #, login, auth_verify, get_me, logout, update_me, getOrUpdate_availability
-from flask_bcrypt import Bcrypt
-from flask_jwt_extended import JWTManager
 
 import os 
 #from controller.AuthenticationController import bcrypt
@@ -54,7 +52,7 @@ app.add_url_rule('/api/user/me',  view_func=get_me, methods=['GET'])
 #
 #
 ## 4. Update User Profile (Added to match Reference Sheet)
-#app.add_url_rule('/api/user/me', view_func=update_me,  methods=['PUT'])
+app.add_url_rule('/api/user/me', view_func=update_me,  methods=['PATCH'])
 #
 ## 5. Availability
 #app.add_url_rule('/api/user/availability', view_func=getOrUpdate_availability, methods=['GET','PUT'])
