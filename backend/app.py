@@ -3,8 +3,9 @@ from controller.extensions import jwt
 from dotenv import load_dotenv
 
 from flask import Flask
-from controller.AuthenticationController import register, login, get_me, update_me
-#, login, auth_verify, get_me, logout, update_me, getOrUpdate_availability
+from controller.AuthenticationControllerOOP import register, login, get_me, update_me
+#, login, auth_verify, logout, getOrUpdate_availability
+from controller.AuthenticationController import logout
 
 import os 
 #from controller.AuthenticationController import bcrypt
@@ -16,19 +17,18 @@ load_dotenv()
 app = Flask(__name__)
 
 # set the secret key
-app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
 
 jwt.init_app(app)
 #
 #"The configuration for cookie"
-#app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
-#app.config["JWT_COOKIE_SECURE"]= False  # Set to True in production (HTTPS)
-#app.config["JWT_ACCESS_COOKIE_PATH"]  = "/"
-#app.config["JWT_REFRESH_COOKIE_PATH"]= "/"
-#app.config["JWT_COOKIE_CSRF_PROTECT"] = False # Set to True for better security later
+app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+app.config["JWT_COOKIE_SECURE"]= False  # Set to True in production (HTTPS)
+app.config["JWT_ACCESS_COOKIE_PATH"]  = "/"
+app.config["JWT_REFRESH_COOKIE_PATH"]= "/"
+app.config["JWT_COOKIE_CSRF_PROTECT"] = False # Set to True for better security later
 
 # Configure the seed for the token
-#app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
 
 #bcrypt.init_app(app)
 
@@ -45,7 +45,7 @@ app.add_url_rule('/api/auth/login',view_func=login, methods=['POST'])
 #
 #
 ## 2. Logout (Added to match Reference Sheet)
-#app.add_url_rule('/api/auth/logout',  view_func=logout, methods=['POST'])
+app.add_url_rule('/api/auth/logout',  view_func=logout, methods=['POST'])
 #
 ## 3. User Info & Profile Update
 app.add_url_rule('/api/user/me',  view_func=get_me, methods=['GET'])

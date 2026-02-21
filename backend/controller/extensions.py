@@ -2,6 +2,7 @@ from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 import psycopg2
 from flask import jsonify
+import os
 
 jwt = JWTManager()
 bcrypt = Bcrypt()
@@ -13,6 +14,12 @@ DB_CONFIG = {
     "host": "localhost",
     "port": 5432
 }
+
+DB_CONFIG["dbname"] = os.environ.get("DB_NAME")
+DB_CONFIG["user"] = os.environ.get("DB_USER")
+DB_CONFIG["password"] = os.environ.get("DB_PASSWORD")
+DB_CONFIG["host"] = os.environ.get("DB_HOST")
+DB_CONFIG["port"] = os.environ.get("DB_PORT")
 
 
 def get_db_connection():
