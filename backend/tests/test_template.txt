@@ -1,0 +1,28 @@
+Usage:
+python test_BackendApi.py tests/[testpayload.txt]
+
+Preconditions:
+- Tests must have a command, and specifier if allowed, followed by an expected status code
+- Tests must have the correct amount of inputs for the specific test
+- If testing empty or space inputs, please use "" and " " for readability unless you want to be annoying and test quotes, in which case why are you even reading this document
+
+Register:
+create <expected status code> <username> <email> <password>
+
+Login:
+login <expected status code> <email> <password> <expected status code>
+
+Logout:
+logout <expected status code> <Daniel said skip therefore I shall skip>
+
+Validate:
+validate <expected status code> <something something, the backend api documentation doesnt say anything yet so Daniel says skip>
+
+Profile:
+profile <expected status code> <UID> 
+
+Update:
+update username <expected status code> <new username>
+update email <expected status code> <new email>
+update password <expected status code> <old password> <new password>
+
