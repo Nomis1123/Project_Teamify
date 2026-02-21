@@ -12,3 +12,4 @@ create 400
 create 400     m1151ng2p4r4m
 create 400   missing2params@gmail.com  
 create 201 jeff jeff@gmail.com abcd1234
+create 200 wrongStatusCode StatusCheck@gmail.com 1234abcd

@@ -1,4 +1,4 @@
-Preconditions: All tests must have a command and other specifier, followed by an expected status code
+Preconditions: All tests must have a command and specifier, followed by an expected status code
 
 Register:
 create <expected status code> <username> <email> <password>

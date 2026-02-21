@@ -4,3 +4,4 @@ login 404 IdontExist@gmail.com 1234567a
 login 404 emptyPass@gmail.com  
 login 404  empty3mail
 login 404    
+login 201 StatusCheck@gmail.com 1234abcd
