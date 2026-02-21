@@ -13,6 +13,17 @@ class User:
 
     @staticmethod
     def create(username, email, hashed_password):
+        """
+        Create a new user in the database.
+
+        Args:
+            username: username of the new user.
+            email: email of the new user.
+            hashed_password: the hashed pass of the user.
+
+        Returns:
+            A User object of the new user.
+        """
 
         conn = get_db_connection()
         try:
