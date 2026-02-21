@@ -8,6 +8,9 @@ import valorantImg from "../gameImages/valorant-banner.jpg";
 import pubgImg from "../gameImages/pubg-banner.jpg";
 import lolImg from "../gameImages/lol-banner.webp";
 import minecraftImg from "../gameImages/minecraft.webp";
+import hsrProfile from "../gameImages/hq720.jpg";
+import RegionIcon from "../gameImages/map-5.png";
+import filterIcon from "../gameImages/filterIcon.png"
 
 // data for demo
 const placeboUsers = [
@@ -16,7 +19,7 @@ const placeboUsers = [
     username: "GamerNumberOne",
     rank: "Gold",
     region: "NA",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=1",
+    avatar: "https://api.dicebear.com/9.x/adventurer/svg?seed=Aidan",
     description: "Casual player looking for duo partners",
     game: "Valorant"
   },
@@ -25,7 +28,7 @@ const placeboUsers = [
     username: "ProPlayer99",
     rank: "Diamond",
     region: "EU",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=2",
+    avatar: "https://api.dicebear.com/9.x/lorelei-neutral/svg?seed=Luis",
     description: "Competitive gamer, top tier",
     game: "League"
   },
@@ -34,7 +37,7 @@ const placeboUsers = [
     username: "NightOwl",
     rank: "Pro",
     region: "ASIA",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=3",
+    avatar: "https://api.dicebear.com/9.x/adventurer-neutral/svg?seed=Adrian",
     description: "I play mostly at night",
     game: "Minecraft"
   },
@@ -43,9 +46,18 @@ const placeboUsers = [
     username: "HSRenjoyer",
     rank: "Platinum",
     region: "ASIA",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=3",
+    avatar: hsrProfile,
     description: "I just need the last constellation...",
     game: "PUBG"
+  },
+  {
+    id: 5,
+    username: "RandomPerson",
+    rank: "Immortal",
+    region: "NA",
+    avatar: lolImg,
+    description: "Hello! Need two teammates for rank",
+    game: "Valorant"
   },
 ];
 
@@ -121,47 +133,52 @@ const Matchmaking = () => {
 
                 {/* filter components */}
                 <div className = "filters">
+                    <img src={filterIcon} className="filterIcon"/>
                     <span> Filters </span>
-                    <button className="apply-button"> Apply </button>
-                    <select value={game} onChange={(e) => setGame(e.target.value)}>
-                        <option value="all">All Games</option>
-                        <option value="League">League of Legends</option>
-                        <option value="Valorant">Valorant</option>
-                        <option value="Minecraft">Minecraft</option>
-                        <option value="PUBG">PUBG</option>
-                    </select>
+                    
+                    <div className ="filter-controls">
+                        <select value={game} onChange={(e) => setGame(e.target.value)}>
+                            <option value="all">All Games</option>
+                            <option value="League">League of Legends</option>
+                            <option value="Valorant">Valorant</option>
+                            <option value="Minecraft">Minecraft</option>
+                            <option value="PUBG">PUBG</option>
+                        </select>
 
-                    <select value={rank} onChange={(e) => setRank(e.target.value)}>
-                        <option value="all">All Ranks</option>
-                        <option value="Bronze">Bronze</option>
-                        <option value="Silver">Silver</option>
-                        <option value="Gold">Gold</option>
-                        <option value="Platinum">Platinum</option>
-                        <option value="Diamond">Diamond</option>
-                        <option value="Master">Master</option>
-                    </select>
+                        <select value={rank} onChange={(e) => setRank(e.target.value)}>
+                            <option value="all">All Ranks</option>
+                            <option value="Bronze">Bronze</option>
+                            <option value="Silver">Silver</option>
+                            <option value="Gold">Gold</option>
+                            <option value="Platinum">Platinum</option>
+                            <option value="Diamond">Diamond</option>
+                            <option value="Master">Master</option>
+                        </select>
 
-                    <select value={region} onChange={(e) => setRegion(e.target.value)}>
-                        <option value="all">All Regions</option>
-                        <option value="NA">NA</option>
-                        <option value="Asia">Asia</option>
-                        <option value="EU">EU</option>
-                    </select>
+                        <select value={region} onChange={(e) => setRegion(e.target.value)}>
+                            <option value="all">All Regions</option>
+                            <option value="NA">NA</option>
+                            <option value="Asia">Asia</option>
+                            <option value="EU">EU</option>
+                        </select>
 
-                    {/* create button to show/hide availability filter*/}
-                    <div className="availability-dropdown">
-                        <button className="availability-button" 
-                            onClick={() => setShowAvailability(prev => !prev)}>
-                            {showAvailability ? "Hide Availability" : "Set Availability"}
-                        </button>
-                        {showAvailability && (
-                            <div className="availability-content">
-                                <GameScheduleBar
-                                    schedule={availability}
-                                    onClick={handleAvailabilityToggle}
-                                />
-                            </div>
-                        )}
+                        {/* create button to show/hide availability filter*/}
+                        <div className="availability-dropdown">
+                            <button className="availability-button" 
+                                onClick={() => setShowAvailability(prev => !prev)}>
+                                {showAvailability ? "Hide Availability" : "Set Availability"}
+                            </button>
+                            {showAvailability && (
+                                <div className="availability-content">
+                                    <GameScheduleBar
+                                        schedule={availability}
+                                        onClick={handleAvailabilityToggle}
+                                    />
+                                </div>
+                            )}
+                        </div>
+        
+                        <button className="apply-button"> Apply </button>
                     </div>
                 </div>
             </div>
@@ -171,24 +188,36 @@ const Matchmaking = () => {
                 {users.map((user) => (
                     <div className="user-banners">
                         {/* demo game img for different games*/}
-                        <div className="bg-image"
-                            style={{ backgroundImage: `url(${user.gameImage})` }}
-                            >
+                        <div className="bg-image" style={{ backgroundImage: `url(${user.gameImage})` }}>
                             <div className="bg-gradient-overlay" />
                         </div>
 
-                        <div className="rank">{user.rank}</div>
-
-                        <img src={user.avatar} className="avatar" />
-                        <div className="user-content">
-                            <div className="user-info">
-                                <h3 className="username">{user.username}</h3>
-                                <p className="description">{user.description}</p>
-                                <span>{user.region}</span>
-                            </div>
+                        {/* rank on left of banner*/}
+                        <div className="left-side">
+                            <div className="rank">{user.rank}</div>
                         </div>
 
-                        <button className="connect-button">Connect</button>
+                        {/* other user info on right of banner*/}
+                        <div className="right-side">
+                            <div className="user-content">
+                                <div className="top-row">
+                                    <img src={user.avatar} className="avatar" />
+                                    <h3 className="username">{user.username}</h3>
+                                </div>
+
+                                <div className="user-info">
+                                    <p className="description">{user.description}</p>
+                                    <div className="region">
+                                        <img src={RegionIcon} />
+                                        <span> {user.region}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="connect-wrapper">
+                                <button className="connect-button">Connect</button>
+                            </div>
+                        </div>
                     </div>
                 ))} 
             </div>

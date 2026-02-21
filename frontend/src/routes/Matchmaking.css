@@ -1,5 +1,6 @@
 /* for filters + banners */
 .layout {
+    font-family: 'Roboto', sans-serif; 
 }
 
 .title {
@@ -16,7 +17,11 @@
     margin-top: 40px;
 }
 
-/* for filter area only */
+/* the below css are for the filter area */
+.filters {
+    padding: 5px 30px;
+}
+
 .filters-layout{
     width: 85%; 
     max-width: 1500px;
@@ -30,11 +35,21 @@
     margin-top: 30px;
 }
 
-.filters { 
+.filter-controls{ 
     display: flex;
-    flex-wrap: wrap;         /* wrap on small screens to avoid breaking*/
-    gap: 50px;             
-    justify-content: center; 
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* wrap on small screens to avoid breaking*/          
+    margin-top: 15px;
+}
+.filters span{
+    font-size: 1.1rem;
+}
+
+.filterIcon{
+    display: inline-block;
+    width: 20px;
+    height: 20px;
 }
 
 .filters select,
@@ -42,18 +57,47 @@
     border-radius: 10px;
     border: 0.5px solid #8933da;
     background-color: #39245D;
-    min-width: 210px;
+    width: 180px;
+    min-width: 50px;
     -webkit-appearance: none;
 
     padding: 8px 12px;
 }
 
-/* for user banners only */
+.filter-controls select:hover,
+.filter-controls button:hover {
+    border-color: #a855f7;
+    transform: scale(1.02);
+}
+
+.availability-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* makes availability a pop up */
+.availability-content {
+    position: absolute;  
+    width: 320px;    
+    top: 100%;    /* make sure pop up is below the button */
+    left: 50%;        
+    transform: translateX(-50%); /* center horizontally */
+    background: #4a3194;
+    padding: 12px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    z-index: 999; /* make pop up above other content */
+}
+
+.apply-button {
+    
+}
+
+/* the below css are for user banners only */
 .user-layout {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 20px; 
+  align-items: center; 
 
   margin-top: 50px;
 }
@@ -63,49 +107,88 @@
     width: 85%;
     max-width: 1500px;
     display: flex;
-    align-items: center;
     overflow: hidden;
     border: 1px solid #8933da;
     border-radius: 18px;
-    background: linear-gradient(to right, #562A86, #4A3194); 
+    background: linear-gradient(to right, #562A86, #3f34a2); 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     color: white;
 
-    padding: 20px 30px;
+    padding: 15px 30px 10px;
+    margin-bottom: 20px;
+    z-index: 1;
+}
+
+.user-banners:hover {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 2px 1px #8b5cf6, 0 0 25px 5px #8933da; /* shadow to glow on hover */
 }
 
 .bg-gradient-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to right, transparent, rgba(70,0,120,0.5), #512D8C);
-    pointer-events: none;    /* prevents blocking clicks */
+    background: linear-gradient(to right, transparent, transparent, rgba(70,0,120,0.5), #512D8C);
+    pointer-events: none; /* prevents blocking clicks */
 }
 
 .bg-image {
     position: absolute;
     top: 0;
     left: 0;
-    width: 40%;
+    width: 29%;
     height: 100%;
     background-size: cover;
     background-position: center;
 }
 
-.avatar {
+.left-side{
     position: relative;
-    border: 2px solid white;
-    width: 7%;
-    height: auto;
-    object-fit: cover;
-    flex-shrink: 0;
-    border-radius: 100%;
+    width: 29%;
+    min-height: 140px;
 }
 
 .user-content {
-    position: relative;
-    left: 25%;
+    position: absolute;
+    left: 10px;     /* distance from right edge */
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    justify-content: center;
+    height: 100%;
+    gap: 15px;
+}
+
+.rank {
+    font-size: 1.0rem; /* rem to fit based on screen size*/
+    font-weight: 550;
+    border-radius: 99px;
+    width: fit-content;
+    background: rgba(5, 56, 223, 0.4); 
+    color: white;
+    
+    padding: 4px 10px;
+    margin-left: -5px;
+    margin-right: 30px;
+    margin-bottom: 100px;
+}
+
+.right-side {
+    flex: 1;  /* take up the remaining width of banner */
+    display: flex;
+    align-items: center; 
+    justify-content: flex-end;
+}
+
+.top-row {
+    display: flex;
+}
+
+.avatar {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border-radius: 100%;
 }
 
 .username {
@@ -116,34 +199,45 @@
 .user-info {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 5px;
 }
 
-.rank {
-    position: absolute;
-    top: -30px;
-    right: 15px;
-    font-size: 0.9rem;
-    font-weight: 550;
-    border-radius: 99px;
-    background: rgba(5, 56, 223, 0.4); /* semi-transparent */
-    color: white;
-    
-    padding: 4px 10px;
-    margin-bottom: 4px;
+.region{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.region img {
+    display: inline-block; /* must keep img as inline-block */
+    width: 18px;
+    height: 18px;
 }
 
 .connect-button {
+    position: relative;
+    right: 50px;
     width: 110px;
     height: 45px;
-    background: linear-gradient(to right, #3b82f6, #8b5cf6);
-    border: none;
+    border: 3px solid transparent;
+
+    /* added border animation effect */
+    background: 
+        linear-gradient(to right, #3b82f6, #8b5cf6) padding-box,
+        linear-gradient(90deg, #5090f7, #9369f6) border-box;
+    background-size: 100% 100%, 200% 200%;
+    animation: borderMove 4s linear infinite;
+
     color: white;
     font-weight: bold;
     border-radius: 25px;
-
     padding: 6px 12px;
-    margin-left: auto;
+}
+
+/* defining movement for the above linear infinite animation */
+@keyframes borderMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
 }
 
 .connect-button:hover {
