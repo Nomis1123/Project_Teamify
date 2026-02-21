@@ -1,6 +1,9 @@
 from flask import request, jsonify;
 from controller.extensions import bcrypt, get_db_connection
 from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies
+
+import controller.extensions
+
 #from flask_jwt_extended import JWTManager
 
 import psycopg2
@@ -146,17 +149,17 @@ def login():
 #    user.pop('password_hash', None)
 #    return jsonify({"status": "The information of the current user", "user": user}), 200
 #
-#@jwt_required()
-#def get_me():
-#    # Ask the token to get the id (The identity we set in login)
-#    user_id = get_jwt_identity() 
-#    
-#    user = User.find_by_id(user_id) 
-#    
-#    if not user:
-#        return jsonify({"status": "User not found"}), 404
-#        
-#    return jsonify({"user": user}), 200
+@jwt_required()
+def get_me():
+    # Ask the token to get the id (The identity we set in login)
+    user_id = get_jwt_identity() 
+
+    user = User.find_by_id(user_id) 
+
+    if not user:
+        return jsonify({"status": "User not found."}), 404
+
+    return jsonify({"user": user.to_dict()}), 200
 #
 #
 #
