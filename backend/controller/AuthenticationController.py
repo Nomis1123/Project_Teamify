@@ -170,6 +170,8 @@ def get_me():
 @jwt_required()
 def update_me():
 
+    conn = get_db_connection()
+
     user_id = get_jwt_identity()
     user = User.find_by_id(user_id)
 
@@ -190,58 +192,69 @@ def update_me():
     if invalid_fields:
         return jsonify({"status": f"Fields cannot be null or empty: {', '.join(invalid_fields)}"}), 400
 
+    try:
 
-    # if either old_password or new_password in data
-    if "old_password" in data or "new_password" in data:
+        # if either old_password or new_password in data
+        if "old_password" in data or "new_password" in data:
 
-        # both must be required
-        if not all(k in data for k in ("old_password", "new_password")):
-            return jsonify({"status": "Both old and new passwords are required."}), 400
+            # both must be required
+            if not all(k in data for k in ("old_password", "new_password")):
+                return jsonify({"status": "Both old and new passwords are required."}), 400
 
-        # make sure the new password is valid format
-        if not is_valid_password(data["new_password"]):
-            return jsonify({"status": "New password is not of valid format."}), 400
+            # make sure the new password is valid format
+            if not is_valid_password(data["new_password"]):
+                return jsonify({"status": "New password is not of valid format."}), 400
 
-        # get the user's password from database
-        database_password = user.get_password_hash()
+            # get the user's password from database
+            database_password = user.get_password_hash()
 
-        print (database_password)
-        print (data["old_password"])
-        # check that the old password matches the password in our database
-        if not bcrypt.check_password_hash(database_password, data["old_password"]):
-            return jsonify({"status": "Old password is incorrect."}), 400
+            # check that the old password matches the password in our database
+            if not bcrypt.check_password_hash(database_password, data["old_password"]):
+                return jsonify({"status": "Old password is incorrect."}), 400
 
-        # try to update the password
-        try:
-            user.compare_and_update("password_hash", database_password, bcrypt.generate_password_hash(data["new_password"]).decode('utf-8'))
+            user.compare_and_update("password_hash", 
+                                    database_password, 
+                                    bcrypt.generate_password_hash(data["new_password"]).decode('utf-8'),
+                                    conn=conn)
 
-        except ValueError as e:
-            return jsonify({"status": str(e)}), 400
-        except Exception as e:
-            return jsonify({"status": f"Database error: {str(e)}."}), 500
+        # if either old_email and new_email fields are in data
+        if "old_email" in data or "new_email" in data:
 
+            # both must be required
+            if not all(k in data for k in ("old_email", "new_email")):
+                return jsonify({"status": "Both old and new emails are required."}), 400
 
-    # if either old_email and new_email fields are in data
-    if "old_email" in data or "new_email" in data:
+            # check if the new email is valid format
+            if not is_valid_email(data["new_email"]):
+                return jsonify({"status": "New email is not of valid format."}), 400
 
-        # both must be required
-        if not all(k in data for k in ("old_email", "new_email")):
-            return jsonify({"status": "Both old and new emails are required."}), 400
+            user.compare_and_update("email", 
+                                    data["old_email"].lower(), 
+                                    data["new_email"].lower(),
+                                    conn=conn)
 
-        # check if the new email is valid format
-        if not is_valid_email(data["new_email"]):
-            return jsonify({"status": "New email is not of valid format."}), 400
+        # next, update all fields that dont need a compare and swap
+        user.update(data, conn=conn)
 
-        # try to update the database
-        try:
-            user.compare_and_update("email", data["old_email"].lower(), data["new_email"].lower())
-        except ValueError as e:
-            return jsonify({"status": str(e)}), 400
-        except psycopg2.errors.UniqueViolation:
-            return jsonify({"status": "Email already in use."}), 409
-        except Exception as e:
-            return jsonify({"status": f"Database error {str(e)}."}), 500
+        # finally commit to the db if we were able to make all updates.
+        conn.commit()
 
+    # raise exceptions for the following errors
+    except ValueError as e:
+        conn.rollback()
+        return jsonify({"status": str(e)}), 400
+
+    except psycopg2.errors.UniqueViolation:
+        conn.rollback()
+        return jsonify({"status": "Email already in use."}), 409
+
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"status": f"Database error {str(e)}."}), 500
+    finally:
+        conn.close()
+
+    # retrieve the updated user from db
     updated_user = User.find_by_id(user.id)
 
     if not updated_user:

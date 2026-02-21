@@ -109,14 +109,17 @@ class User:
             conn.close()
 
 
-    def update(self, fields:dict):
+    def update(self, fields:dict, conn=None):
 
+        # check that fields is not empty
         if not fields:
             raise ValueError("No valid fields provided.")
 
-        # make sure the checks for all these fields happens in the routing logic.
-        allowed = {"username", "description", "email", "password"}
+        # these are the fields which will use this update() function
+        allowed = {"username", "description", "pfp_url"}
+        manage_conn = conn is None
 
+        # apply filter onto allowed fields
         filtered = {k: v for k,v in fields.items() if k in allowed}
 
         if not filtered:
@@ -125,11 +128,31 @@ class User:
         set_clause = ", ".join(f"{k} = %s" for k in filtered)
         values = list(filtered.values()) + [self.id]
 
-        print (set_clause)
-        print(values)
+        if manage_conn:
+            conn = get_db_connection()
 
-    def compare_and_update(self, database_field: str, old_value, new_value):
-        conn = get_db_connection()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(
+                    f"UPDATE users SET {set_clause} WHERE id = %s",
+                    values
+                )
+            if manage_conn:
+                conn.commit()
+        except Exception as e:
+            if manage_conn:
+                conn.rollback()
+            raise e
+        finally:
+            if manage_conn:
+                conn.close() 
+
+    def compare_and_update(self, database_field: str, old_value, new_value, conn=None):
+
+        manage_conn = conn is None
+
+        if manage_conn:
+            conn = get_db_connection()
 
         try:
             with conn.cursor() as cur:
@@ -146,13 +169,18 @@ class User:
                     raise ValueError(f"Old {database_field} is incorrect. {old_value}, {row[0]}")
 
                 cur.execute(f"UPDATE users SET {database_field} = %s WHERE id = %s", (new_value, self.id))
-            conn.commit()
+
+                if manage_conn:
+                    conn.commit()
 
         except Exception as e:
-            conn.rollback()
+            if manage_conn:
+                conn.rollback()
             raise e
+
         finally:
-            conn.close()
+            if manage_conn:
+                conn.close()
 
     def to_dict(self):
         """
