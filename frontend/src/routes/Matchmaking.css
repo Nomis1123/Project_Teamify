@@ -42,7 +42,7 @@
     border-radius: 10px;
     border: 0.5px solid #8933da;
     background-color: #39245D;
-    min-width: 230px;
+    min-width: 210px;
     -webkit-appearance: none;
 
     padding: 8px 12px;
@@ -76,7 +76,7 @@
 .bg-gradient-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to right, transparent, transparent, rgba(70,0,120,0.5), #562A86);
+    background: linear-gradient(to right, transparent, rgba(70,0,120,0.5), #512D8C);
     pointer-events: none;    /* prevents blocking clicks */
 }
 
@@ -91,8 +91,9 @@
 }
 
 .avatar {
+    position: relative;
     border: 2px solid white;
-    width: 8%;
+    width: 7%;
     height: auto;
     object-fit: cover;
     flex-shrink: 0;
@@ -100,6 +101,8 @@
 }
 
 .user-content {
+    position: relative;
+    left: 25%;
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -110,13 +113,24 @@
     font-weight: 600;
 }
 
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
 .rank {
+    position: absolute;
+    top: -30px;
+    right: 15px;
+    font-size: 0.9rem;
+    font-weight: 550;
+    border-radius: 99px;
+    background: rgba(5, 56, 223, 0.4); /* semi-transparent */
+    color: white;
+    
     padding: 4px 10px;
-    font-size: 12px;
-    font-weight: 500;
-    border-radius: 20px;
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(6px);
+    margin-bottom: 4px;
 }
 
 .connect-button {

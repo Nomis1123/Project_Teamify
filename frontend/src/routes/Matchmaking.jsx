@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from "react-router-dom";
 import "./Matchmaking.css";
 import GameScheduleBar from "../components/GameScheduleBar";
-import valorantImg from "../gameImages/volerant.webp";
-import pubgImg from "../gameImages/pubg.webp";
-import lolImg from "../gameImages/lol.webp";
+import valorantImg from "../gameImages/valorant-banner.jpg";
+import pubgImg from "../gameImages/pubg-banner.jpg";
+import lolImg from "../gameImages/lol-banner.webp";
 import minecraftImg from "../gameImages/minecraft.webp";
 
 // data for demo
@@ -122,6 +122,7 @@ const Matchmaking = () => {
                 {/* filter components */}
                 <div className = "filters">
                     <span> Filters </span>
+                    <button className="apply-button"> Apply </button>
                     <select value={game} onChange={(e) => setGame(e.target.value)}>
                         <option value="all">All Games</option>
                         <option value="League">League of Legends</option>
@@ -176,9 +177,10 @@ const Matchmaking = () => {
                             <div className="bg-gradient-overlay" />
                         </div>
 
+                        <div className="rank">{user.rank}</div>
+
                         <img src={user.avatar} className="avatar" />
                         <div className="user-content">
-                            <div className="rank">{user.rank}</div>
                             <div className="user-info">
                                 <h3 className="username">{user.username}</h3>
                                 <p className="description">{user.description}</p>
