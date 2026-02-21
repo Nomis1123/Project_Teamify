@@ -1,16 +1,14 @@
-create dupTest duptest@gmail.com 1234abcd 201
-create dupTest duptest@gmail.com 1234abcd 409
-create invalidEmail wazzapMail 1234abcd 400
-create shortpassword shortpass@gmail.com abc 400
-create noAlpha onlyNumPas@gmail.com 123456789 400
-create noNums onlyAlphaPass@gmail.com abcdefghij 400
-create emptyEmail   emailisempty123 400
-create emptyPass emptyPass@gmail.com   400
-create   emptyUserName@gmail.com user15empty 400
-create missing1param notemail@gmail.com notpassword123 
-create missing2params notemail@gmail.com 
-create missing3params 
-create missing4params
-create
-create        
-create jeff jeff@gmail.com abcd1234 201
+create 201 dupTest duptest@gmail.com 1234abcd
+create 409 dupTest duptest@gmail.com 1234abcd
+create 400 invalidEmail wazzapMail 1234abcd
+create 400 shortpassword shortpass@gmail.com abc
+create 400 noAlpha onlyNumPas@gmail.com 123456789
+create 400 noNums onlyAlphaPass@gmail.com abcdefghij
+create 400 emptyEmail   emailisempty123
+create 400 emptyPass emptyPass@gmail.com
+create 400   emptyUserName@gmail.com user15empty
+create 400 missing2params
+create 400
+create 400     m1151ng2p4r4m
+create 400   missing2params@gmail.com  
+create 201 jeff jeff@gmail.com abcd1234

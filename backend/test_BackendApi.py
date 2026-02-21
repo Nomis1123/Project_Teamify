@@ -46,41 +46,89 @@ ENDPOINT = "http://localhost:5173"
 
 
 def parse_create(parts):
-    if len(parts) != 5:
-        print("Insufficient arguments to register")
-        return False
-    else:
-        _, username, email, password, status_code = parts
-        payload = {
-            "username": username,
-            "email": email,
-            "password": password
-        }
-
-        response = requests.post(ENDPOINT + "/api/auth/register", json=payload)
-        if response.status_code == int(status_code):
-            return True
+    # if len(parts) != 5:
+    status_code = parts[1]
+    arguments = [" ", " ", " "]
+    index = 0
+    # If we see 2 '' values we have an empty parameter as an argument for the payload
+    blank_count = 0
+    for value in parts[2:]:
+        if index >= 3:
+            break
+        if value == '':
+            blank_count += 1
+            if blank_count == 2:
+                index += 1
+                blank_count = 0
         else:
-            print("Response:", response.status_code, "Expected:", status_code)
-            return False
+            arguments[index] = value
+            index += 1
+            blank_count = 0
+
+    payload = {
+        "username": arguments[0],
+        "email": arguments[1],
+        "password": arguments[2]
+    }
+    response = requests.post(ENDPOINT + "/api/auth/register", json=payload)
+    if response.status_code == int(status_code):
+        return True
+    else:
+        print("Response:", response.status_code, "Expected:", status_code)
+        return False
+    # else:             # Original
+    #     _, status_code, username, email, password = parts
+    #     payload = {
+    #         "username": username,
+    #         "email": email,
+    #         "password": password
+    #     }
+
+    #     response = requests.post(ENDPOINT + "/api/auth/register", json=payload)
+    #     if response.status_code == int(status_code):
+    #         return True
+    #     else:
+    #         print("Response:", response.status_code, "Expected:", status_code)
+    #         return False
 
 
 def parse_login(parts):
-    if len(parts) != 4:
-        print("Insufficient arguments to login")
-        return False
-    else:
-        _, email, password, status_code = parts
-        payload = {
-            "email": email,
-            "password": password
-        }
-        response = requests.post(ENDPOINT + "/api/auth/login", json=payload)
-        if response.status_code == int(status_code):
-            return True
+    # if len(parts) != 4:
+    status_code = parts[1]
+    arguments = [" ", " "]
+    index = 0
+    for value in parts[2:]:
+        if index >= 2:
+            break
+        if value == '':
+            index += 1
+            continue
         else:
-            print("Response:", response.status_code, "Expected:", status_code)
-            return False
+            arguments[index] = value
+            index += 1
+
+    payload = {
+        "email": arguments[0],
+        "password": arguments[1]
+    }
+    response = requests.post(ENDPOINT + "/api/auth/login", json=payload)
+    if response.status_code == int(status_code):
+        return True
+    else:
+        print("Response:", response.status_code, "Expected:", status_code)
+        return False
+    # else:
+    #     _, status_code, email, password = parts
+    #     payload = {
+    #         "email": email,
+    #         "password": password
+    #     }
+    #     response = requests.post(ENDPOINT + "/api/auth/login", json=payload)
+    #     if response.status_code == int(status_code):
+    #         return True
+    #     else:
+    #         print("Response:", response.status_code, "Expected:", status_code)
+    #         return False
 
 
 def parse_profile(parts):
@@ -111,11 +159,11 @@ def parse_update(parts):
         target = parts[1]
         if target == "password":
             if len(parts) == 5:
-                _, _, _, new_pass, status_code = parts
+                _, _, status_code, old_password, new_password = parts
                 payload = {
-                    "old password": target,
-                    "new password": new_pass,
-                    "confirm new password": new_pass
+                    "old password": old_password,
+                    "new password": new_password,
+                    "confirm new password": new_password
                 }
                 response = requests.put(ENDPOINT + "/api/user/me", json=payload)
                 if response.status_code == int(status_code):
@@ -128,14 +176,14 @@ def parse_update(parts):
                 return False
         else:
             if len(parts) == 4:
-                _, _, new_target, status_code = parts
+                _, _, status_code, new_target = parts
                 if target == "username":
                     payload = {
-                        "username": target
+                        "username": new_target
                     }
                 else:
                     payload = {
-                        "email": target
+                        "email": new_target
                     }
                 response = requests.put(ENDPOINT + "/api/user/me", json=payload)
                 if response.status_code == int(status_code):
@@ -154,7 +202,8 @@ def parse_validate(parts):
     return
 
 def parse_line(line):
-    parts = line.strip().split()
+    parts = line.strip().split(" ")
+    # This will produce additional elements in the case of empty parameters
     if not parts:
         return
 

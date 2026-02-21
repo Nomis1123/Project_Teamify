@@ -1,9 +1,6 @@
-login jeff@gmail.com abcd1234 200
-login jeff@gmail.com passwordDoesNotMatch 401
-login IdontExist@gmail.com 1234567a 404
-login invalidemail 1234abcd 404
-login jeff@gmail.com invalidPass 401
-login emptyPass@gmail.com   404
-login   empty3mail 404
-login      
-login
+login 200 jeff@gmail.com abcd1234
+login 401 jeff@gmail.com passwordDoesNotMatch
+login 404 IdontExist@gmail.com 1234567a
+login 404 emptyPass@gmail.com  
+login 404  empty3mail
+login 404    

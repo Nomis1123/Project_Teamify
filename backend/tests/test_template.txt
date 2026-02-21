@@ -1,20 +1,22 @@
+Preconditions: All tests must have a command and other specifier, followed by an expected status code
+
 Register:
-create <username> <email> <password> <expected status code>
+create <expected status code> <username> <email> <password>
 
 Login:
-login <email> <password> <expected status code>
+login <expected status code> <email> <password> <expected status code>
 
 Logout:
-logout <Daniel said skip therefore I shall skip>
+logout <expected status code> <Daniel said skip therefore I shall skip>
 
 Validate:
-validate <something something, the backend api documentation doesnt say anything yet so Daniel says skip>
+validate <expected status code> <something something, the backend api documentation doesnt say anything yet so Daniel says skip>
 
 Profile:
-profile <UID> <expected status code>
+profile <expected status code> <UID> 
 
 Update:
-update username <new username> <expected status code>
-update email <new email> <expected status code>
-update password <old password> <new password> <expected status code>
+update username <expected status code> <new username>
+update email <expected status code> <new email>
+update password <expected status code> <old password> <new password>
 
