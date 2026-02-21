@@ -1,29 +1,39 @@
+from controller.extensions import jwt, bcrypt
+
+from dotenv import load_dotenv
+
 from flask import Flask
-from controller.AuthenticationController import register, login, auth_verify, get_me, logout, update_me, getOrUpdate_availability
+from controller.AuthenticationController import register
+#, login, auth_verify, get_me, logout, update_me, getOrUpdate_availability
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 import os 
-from dotenv import load_dotenv
-from controller.AuthenticationController import bcrypt
-from controller.MatchmakingController import  get_matches
+#from dotenv import load_dotenv
+#from controller.AuthenticationController import bcrypt
+#from controller.MatchmakingController import  get_matches
 # Load the .env first
+#load_dotenv()
+
 load_dotenv()
-
 app = Flask(__name__)
+jwt = JWTManager(app)
 
-"The configuration for cookie"
-app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
-app.config["JWT_COOKIE_SECURE"]= False  # Set to True in production (HTTPS)
-app.config["JWT_ACCESS_COOKIE_PATH"]  = "/"
-app.config["JWT_REFRESH_COOKIE_PATH"]= "/"
-app.config["JWT_COOKIE_CSRF_PROTECT"] = False # Set to True for better security later
+# set the secret key
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
+#
+#"The configuration for cookie"
+#app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+#app.config["JWT_COOKIE_SECURE"]= False  # Set to True in production (HTTPS)
+#app.config["JWT_ACCESS_COOKIE_PATH"]  = "/"
+#app.config["JWT_REFRESH_COOKIE_PATH"]= "/"
+#app.config["JWT_COOKIE_CSRF_PROTECT"] = False # Set to True for better security later
 
 # Configure the seed for the token
-app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+#app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 
-bcrypt.init_app(app)
+#bcrypt.init_app(app)
 
-jwt =  JWTManager(app)
+#jwt =  JWTManager(app)
 
 
 
@@ -31,24 +41,24 @@ jwt =  JWTManager(app)
 
 # 1. Auth Operations
 app.add_url_rule('/api/auth/register', view_func=register,  methods=['POST'])
-app.add_url_rule('/api/auth/login',view_func=login, methods=['POST'])
-app.add_url_rule('/api/auth/verify/<token>', view_func=auth_verify, methods=['GET'])
-
-
-# 2. Logout (Added to match Reference Sheet)
-app.add_url_rule('/api/auth/logout',  view_func=logout, methods=['POST'])
-
-# 3. User Info & Profile Update
-app.add_url_rule('/api/user/me',  view_func=get_me, methods=['GET'])
-
-
-# 4. Update User Profile (Added to match Reference Sheet)
-app.add_url_rule('/api/user/me', view_func=update_me,  methods=['PUT'])
-
-# 5. Availability
-app.add_url_rule('/api/user/availability', view_func=getOrUpdate_availability, methods=['GET','PUT'])
-
-app.add_url_rule('/api/user/filters', view_func=get_matches, methods=["POST"])
+#app.add_url_rule('/api/auth/login',view_func=login, methods=['POST'])
+#app.add_url_rule('/api/auth/verify/<token>', view_func=auth_verify, methods=['GET'])
+#
+#
+## 2. Logout (Added to match Reference Sheet)
+#app.add_url_rule('/api/auth/logout',  view_func=logout, methods=['POST'])
+#
+## 3. User Info & Profile Update
+#app.add_url_rule('/api/user/me',  view_func=get_me, methods=['GET'])
+#
+#
+## 4. Update User Profile (Added to match Reference Sheet)
+#app.add_url_rule('/api/user/me', view_func=update_me,  methods=['PUT'])
+#
+## 5. Availability
+#app.add_url_rule('/api/user/availability', view_func=getOrUpdate_availability, methods=['GET','PUT'])
+#
+#app.add_url_rule('/api/user/filters', view_func=get_matches, methods=["POST"])
 
 if __name__ == '__main__':
     # Start a local web server on Port 8000
