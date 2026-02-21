@@ -1,17 +1,6 @@
-import psycopg2
+from controller.extensions import get_db_connection
 
 
-DB_CONFIG = {
-    "dbname": "teamify_db",
-    "user": "postgres",
-    "password": "password",
-    "host": "localhost",
-    "port": 5432
-}
-
-
-def get_db_connection():
-    return psycopg2.connect(**DB_CONFIG)
 
 class User:
     def __init__(self, id, username, email, description=None, pfp_url=None):

@@ -1,5 +1,5 @@
 from flask import request, jsonify;
-from controller.extensions import bcrypt
+from controller.extensions import bcrypt, get_db_connection
 from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies
 #from flask_jwt_extended import JWTManager
 
@@ -81,51 +81,57 @@ def register():
         return jsonify({"status": str(e)}), 500
     
 
-#def login():
-#    data = request.json
-#    email = data.get('email').lower()
-#    password = data.get('password')
-#    
-#
-#    if not email or not password:
-#        return jsonify({"status": "Missing email or password"}), 400
-#    
-#    user = User.find_by_email(email)
-#    if not user:
-#        return jsonify({"status": "User not found"}), 404
-#    
-#    if check_password_hash(user['password_hash'], password):
-#        # For testing purpose
-#        # remove by user.get('is_verified') after the email verification
-#        # part is done
-#        is_verified = True
-#        if is_verified:
-#            # After the user login, set the curr_user to user
-#            # Create token using the user's ID as the identity
-#            # usually, do not store those 2 token in the table
-#            # The fontend should store them in Local storage or cookies
-#            # When logout: Since we don't store them in the DB, "logging out" usually means telling the frontend to delete the token
-#            # create those 2 tokens based on JWT_SECRET_KEY
-#            access_token = create_access_token(identity=str(user['id']))
-#            refresh_token = create_refresh_token(identity=str(user['id']))
-#            response = jsonify({
-#            "user": {
-#                "id": user['id'],
-#                "username": user['username'],
-#                "email": user['email'],
-#                "description": user['description'], 
-#                "profile_picture": user['profile_picture_url'],
-#                "availability": user['availability']
-#            },
-#            "access_token": access_token, 
-#            "refresh_token": refresh_token
-#        })
-#            set_access_cookies(response, access_token)
-#            return response, 200
-#        return jsonify({"status": "Please verify email"}), 401
-#    return jsonify({"status": "Invalid password"}), 401
-#    
-#
+def login():
+
+    data = request.json
+
+    email = data.get('email')
+    password = data.get('password')
+
+    # validate that the email/password is not an empty string, None, or white space
+    if not email or not email.strip() or not password or not password.strip():
+        return jsonify({"status": "Missing email or password"}), 400
+
+    # set to lower if it exists
+    email = email.lower()
+
+    # get just the hashed password from the database
+    conn = get_db_connection()
+
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT password_hash FROM users WHERE email = %s", (email,))
+            result = cur.fetchone()
+            cur.close()
+    except Exception as e:
+        conn.rollback()
+        raise e
+    finally:
+        conn.close()
+
+    # check if the hashed password and entered password are the same
+    if result and bcrypt.check_password_hash(result[0], password):
+
+        # true login
+        # get the user by email
+        user = User.find_by_email(email)
+
+        # if nothing is returned, 404
+        if not user:
+            return jsonify({"status": "Invalid Credentials."}), 404
+
+        # create tokens
+        access_token = create_access_token(identity=str(user.id))
+        refresh_token = create_refresh_token(identity=str(user.id))
+
+        return jsonify({
+            "user": user.to_dict(),
+            "access_token": access_token,
+            "refresh_token": refresh_token
+            }), 200
+
+    return jsonify({"status": "Invalid Credentials."}), 404
+
 #def auth_verify(token):
 #    result = User.verify1(token)
 #    if result:

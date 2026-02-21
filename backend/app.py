@@ -3,7 +3,7 @@ from controller.extensions import jwt, bcrypt
 from dotenv import load_dotenv
 
 from flask import Flask
-from controller.AuthenticationController import register
+from controller.AuthenticationController import register, login
 #, login, auth_verify, get_me, logout, update_me, getOrUpdate_availability
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
@@ -41,7 +41,7 @@ app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
 
 # 1. Auth Operations
 app.add_url_rule('/api/auth/register', view_func=register,  methods=['POST'])
-#app.add_url_rule('/api/auth/login',view_func=login, methods=['POST'])
+app.add_url_rule('/api/auth/login',view_func=login, methods=['POST'])
 #app.add_url_rule('/api/auth/verify/<token>', view_func=auth_verify, methods=['GET'])
 #
 #
