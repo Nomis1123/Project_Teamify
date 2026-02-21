@@ -4,12 +4,15 @@ create 400 invalidEmail wazzapMail 1234abcd
 create 400 shortpassword shortpass@gmail.com abc
 create 400 noAlpha onlyNumPas@gmail.com 123456789
 create 400 noNums onlyAlphaPass@gmail.com abcdefghij
-create 400 emptyEmail   emailisempty123
-create 400 emptyPass emptyPass@gmail.com
-create 400   emptyUserName@gmail.com user15empty
-create 400 missing2params
-create 400
-create 400     m1151ng2p4r4m
-create 400   missing2params@gmail.com  
+create 400 emptyEmail "" emailisempty123
+create 400 emptyPass emptyPass@gmail.com ""
+create 400 "" emptyUserName@gmail.com user15empty
+create 400 "" "" missingUser&Mail1
+create 400 missingMail&Pass "" ""
+create 400 "" missingUser&Pass@gmail.com ""
+create 400 spaceTests1 " " " "
+create 400 spaceTests2 " " chezborgor2
+create 400 " " spaceTest3@gmail.com chezborgor3
+create 400 " " " " spaceTest4
 create 201 jeff jeff@gmail.com abcd1234
 create 200 wrongStatusCode StatusCheck@gmail.com 1234abcd

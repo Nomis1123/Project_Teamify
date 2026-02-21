@@ -1,4 +1,10 @@
-Preconditions: All tests must have a command and specifier, followed by an expected status code
+Usage:
+python test_BackendApi.py tests/[testpayload.txt]
+
+Preconditions:
+- Tests must have a command, and specifier if allowed, followed by an expected status code
+- Tests must have the correct amount of inputs for the specific test
+- If testing empty or space inputs, please use "" and " " for readability unless you want to be annoying and test quotes, in which case why are you even reading this document
 
 Register:
 create <expected status code> <username> <email> <password>
