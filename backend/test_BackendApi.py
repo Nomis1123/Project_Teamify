@@ -67,7 +67,7 @@ def parse_create(parts):
 
 def parse_login(parts):
     if len(parts) != 4:
-        print("Insufficient arguments to get login, please provide the correct amount of inputs")
+        print("Insufficient arguments to login, please provide the correct amount of inputs")
         return False
     else:
         _, status_code, email, password = parts
