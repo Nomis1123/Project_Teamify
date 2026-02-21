@@ -1,8 +1,3 @@
--- is_verified is set to false by default when create a new user account
--- An email will be sent to the user; User should click the link in the email to verify
--- After the button in the email is clicked
-
-
 DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
@@ -62,10 +57,3 @@ CREATE TABLE parties (
     CONSTRAINT min_players CHECK (max_players > 0),
     CONSTRAINT positive_players CHECK (current_players >= 1)
 );
-
-
-
-
-
-
-
