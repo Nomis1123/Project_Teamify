@@ -1,5 +1,6 @@
 from flask import Flask
 from controller.AuthenticationController import register, login, auth_verify, get_me, logout, update_me, getOrUpdate_availability
+from controller.AuthenticationController import steam_login, steam_verify
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 import os 
@@ -21,6 +22,9 @@ app.config["JWT_COOKIE_CSRF_PROTECT"] = False # Set to True for better security 
 # Configure the seed for the token
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 
+# Needed for sessions in steam_login
+app.secret_key = os.getenv("JWT_SECRET_KEY")
+
 bcrypt.init_app(app)
 
 jwt =  JWTManager(app)
@@ -33,7 +37,7 @@ jwt =  JWTManager(app)
 app.add_url_rule('/api/auth/register', view_func=register,  methods=['POST'])
 app.add_url_rule('/api/auth/login',view_func=login, methods=['POST'])
 app.add_url_rule('/api/auth/verify/<token>', view_func=auth_verify, methods=['GET'])
-
+app.add_url_rule('/api/auth/steamlogin', view_func=steam_login, methods=['GET'])
 
 # 2. Logout (Added to match Reference Sheet)
 app.add_url_rule('/api/auth/logout',  view_func=logout, methods=['POST'])
