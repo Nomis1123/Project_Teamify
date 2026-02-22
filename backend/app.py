@@ -21,11 +21,14 @@ app = Flask(__name__)
 jwt.init_app(app)
 #
 #"The configuration for cookie"
-app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
-app.config["JWT_COOKIE_SECURE"]= False  # Set to True in production (HTTPS)
-app.config["JWT_ACCESS_COOKIE_PATH"]  = "/"
-app.config["JWT_REFRESH_COOKIE_PATH"]= "/"
-app.config["JWT_COOKIE_CSRF_PROTECT"] = False # Set to True for better security later
+#app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
+#app.config["JWT_COOKIE_SECURE"]= False  # Set to True in production (HTTPS)
+#app.config["JWT_ACCESS_COOKIE_PATH"]  = "/"
+#app.config["JWT_REFRESH_COOKIE_PATH"]= "/"
+#app.config["JWT_COOKIE_CSRF_PROTECT"] = False # Set to True for better security later
+
+from datetime import timedelta
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 
 # Configure the seed for the token
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")

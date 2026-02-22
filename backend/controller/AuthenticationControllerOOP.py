@@ -119,6 +119,9 @@ def login():
 
     user = User.find_by_email(email)
 
+    if user:
+        print (user.to_dict())
+
     # if user does not exist, return 404
     if not user:
         return jsonify({"status": "Invalid Credentials."}), 404
@@ -130,6 +133,7 @@ def login():
     if not database_password or not bcrypt.check_password_hash(database_password, password):
         return jsonify({"status": "Invalid Credentials."}), 404
 
+    print (f"creating token for {user.id}")
     # create tokens
     access_token = create_access_token(identity=str(user.id))
     refresh_token = create_refresh_token(identity=str(user.id))
@@ -160,7 +164,16 @@ def get_me():
     # Ask the token to get the id (The identity we set in login)
     user_id = get_jwt_identity() 
 
-    user = User.find_by_id(user_id) 
+    from flask_jwt_extended import get_jwt
+    raw = get_jwt()
+
+    print("SUB in token:", raw.get("sub"))
+    print("Identity returned:", user_id)
+
+    user = User.find_by_id(int(user_id)) 
+
+    if user:
+        print (user.id)
 
     if not user:
         return jsonify({"status": "User not found."}), 404
@@ -173,7 +186,7 @@ def update_me():
     conn = get_db_connection()
 
     user_id = get_jwt_identity()
-    user = User.find_by_id(user_id)
+    user = User.find_by_id(int(user_id))
 
     if not user:
         return jsonify({"status:" "User not found."}), 404
