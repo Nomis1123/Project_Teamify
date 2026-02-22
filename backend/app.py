@@ -38,6 +38,7 @@ app.add_url_rule('/api/auth/register', view_func=register,  methods=['POST'])
 app.add_url_rule('/api/auth/login',view_func=login, methods=['POST'])
 app.add_url_rule('/api/auth/verify/<token>', view_func=auth_verify, methods=['GET'])
 app.add_url_rule('/api/auth/steamlogin', view_func=steam_login, methods=['GET'])
+app.add_url_rule('/api/auth/steamverify', view_func=steam_verify, methods=['GET'])
 
 # 2. Logout (Added to match Reference Sheet)
 app.add_url_rule('/api/auth/logout',  view_func=logout, methods=['POST'])
