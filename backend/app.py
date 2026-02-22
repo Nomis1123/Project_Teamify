@@ -3,9 +3,9 @@ from controller.extensions import jwt
 from dotenv import load_dotenv
 
 from flask import Flask
-from controller.AuthenticationControllerOOP import register, login, get_me, update_me
+from controller.AuthenticationControllerOOP import register, login, get_me, update_me, logout
 #, login, auth_verify, logout, getOrUpdate_availability
-from controller.AuthenticationController import logout
+#from controller.AuthenticationController import logout
 
 import os 
 #from controller.AuthenticationController import bcrypt

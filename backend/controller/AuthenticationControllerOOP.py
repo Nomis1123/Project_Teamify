@@ -295,13 +295,13 @@ def update_me():
 #    except Exception as e:
 #        return jsonify({"status": f"Update failed: {str(e)}"}), 500
 #
-#@jwt_required()
-#def logout():
-#    # login successfully
-#    response = jsonify({"msg": "logout successful"})
-#    # If the frontend use the cookie, this line actually delete the token from the cookie
-#    unset_jwt_cookies(response)
-#    return response, 200
+@jwt_required()
+def logout():
+    # login successfully
+    response = jsonify({"msg": "logout successful"})
+    # If the frontend use the cookie, this line actually delete the token from the cookie
+    unset_jwt_cookies(response)
+    return response, 200
 #
 #
 #"""
