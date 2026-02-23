@@ -114,16 +114,48 @@ const Matchmaking = () => {
         return newUsers;
     };
 
+    // if "all" is selected, filter is null. Else, add selected filter to obj
+    const buildFilterObj = async () => {
+        return {
+            game_title: game === "all" ? null : game,
+            //rank: rank === "all" ? null : rank,
+            //region: region === "all" ? null : region,
+            apply_availability_filter: showAvailability ? availability : false,
+        }
+    } 
+
     // fetch the list of recommended users from backend upon page load
     useEffect(() => {
-        // placeholder fetch 
-        let users = attachGameImages (placeboUsers)
+        let filter = buildFilterObj()
+        onFilterSubmit(filter)
+        // let users = attachGameImages (placeboUsers)
         setUsers(users);
     }, []);
 
     // sends a filter obj with other info and receives recommended users from backend
-    const onFilterSubmit = async (Filters) => {
-        //setUsers(received result)
+    // filters can be empty or has actual values
+    const onFilterSubmit = async (filters) => {
+       try {
+            const response = await fetch("/api/user/filters", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                },
+                credentials: "include",
+                body: JSON.stringify(filters),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch users");
+            }
+            
+            const data = await response.json();
+            setUsers(attachGameImages(data));
+
+        } catch (error) {
+            console.error("Error fetching users:", error);
+        }
     }
     
     return (
@@ -214,7 +246,7 @@ const Matchmaking = () => {
                                 </div>
                             </div>
 
-                            <div class="connect-wrapper">
+                            <div className="connect-wrapper">
                                 <button className="connect-button">Connect</button>
                             </div>
                         </div>
