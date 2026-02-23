@@ -141,10 +141,15 @@ const Profile = () => {
                         Email: {user.email ? user.email : "-"}
                     </p>
                 </div>
+                <div className='profile-button-container'>
+                    <button className="profile-btn" onClick={() => navigate("/profile_editing")}>
+                        Edit Profile
+                    </button>
+                    <button className="profile-btn" onClick={ () => window.location.replace("/api/auth/steamlogin") }>
+                        Link Steam
+                    </button>
+                </div>
                 
-                <button className="profile-edit-btn" onClick={() => navigate("/profile_editing")}>
-                    Edit Profile
-                </button>
             </div>
             
             <div className='profile-scroll'>
