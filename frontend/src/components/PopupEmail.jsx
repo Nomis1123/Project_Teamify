@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./PopupEmail.css";
 import Popup from "./Popup"
 
-export default function PUEmail() {
+export default function PUEmail({email, emailModifier}) {
   const [open, setOpen] = useState(false);
   const [oldEmail, setOldEmail] = useState("");
   const [newEmail, setNewEmail] = useState("");
@@ -42,7 +42,7 @@ export default function PUEmail() {
     try {
       const res = await fetch("/api/user/me", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
         body: JSON.stringify({ old_email: oldEmail, new_email: newEmail }),
       });
 
@@ -52,12 +52,15 @@ export default function PUEmail() {
         let msg = "";
         try {
           const data = await res.json();
-          if (data?.message) msg = data.message;
+          console.log(data);
+          if (data?.status) msg = data.status;
+          setFail(`Save failed. Please try again later. (${msg})`);
         } catch {}
         throw new Error(msg);
       }
 
       handleClose();
+      emailModifier(newEmail);
     } catch (e) {
       // setFail(e instanceof Error ? e.message : "Save failed.");
       setFail(`Save failed. Please try again later. (${e.message})`);

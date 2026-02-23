@@ -25,17 +25,18 @@ export default function PUUsername({username, usernameModifier}) {
     try {
       const res = await fetch("/api/user/me", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
         body: JSON.stringify({ username: name }),
       });
 
       if (!res.ok) {
         // backend might return JSON error { message: "..." }
-        setFail(`Save failed. Please try again later. (${res.status})`);
         let msg = "";
         try {
           const data = await res.json();
-          if (data?.message) msg = data.message;
+          console.log(data);
+          if (data?.status) msg = data.status;
+          setFail(`Save failed. Please try again later. (${msg})`);
         } catch {}
         throw new Error(msg);
       }
