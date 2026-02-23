@@ -59,9 +59,14 @@
     background-color: #39245D;
     width: 180px;
     min-width: 50px;
+    text-align: left;
     -webkit-appearance: none;
 
     padding: 8px 12px;
+}
+
+.apply-button{
+    text-align: center !important; /* keeps apply text centered */
 }
 
 .filter-controls select:hover,
@@ -87,10 +92,6 @@
     border-radius: 15px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     z-index: 999; /* make pop up above other content */
-}
-
-.apply-button {
-    
 }
 
 /* the below css are for user banners only */
@@ -248,6 +249,17 @@
 .user-banners > *:not(.bg-image) {
     position: relative;
     z-index: 1;
+}
+
+.empty-msg {
+    text-align: center;
+    padding: 2.8rem 0;
+}
+
+.empty-msg p{
+    color: #9CA3AF;
+    font-size: 1.2rem;
+    font-weight: 500;
 }
 
 
