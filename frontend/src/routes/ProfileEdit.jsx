@@ -33,15 +33,17 @@ const ProfileEdit = () => {
         games: [],
         schedule: defaultWeeklySchedule,
     });
-    const [description, setDescription] = useState("");
     const [username, setUsername] = useState("");
-    // const [loading, setLoading] = useState(true);
+    const [id, setID] = useState("");
+    const [email, setEmail] = useState("");
+    const [description, setDescription] = useState("");
+    const [loading, setLoading] = useState(true);
     // const [error, setError] = useState("");
 
     useEffect(() => {
         const loadMe = async () => {
             try {
-                // setLoading(true);
+                setLoading(true);
                 
                 // This is for testing only
                 // setUsername("TestUser");
@@ -51,7 +53,7 @@ const ProfileEdit = () => {
                     method: "GET",
                     // If backend uses cookies/sessions, uncomment:
                     // credentials: "include",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
                 });
                 // console.log("fetch returned:", res.status, res.url);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -77,12 +79,15 @@ const ProfileEdit = () => {
                 };
                 console.log("setting user to:", normalized);
                 setUser(normalized);
+
                 setUsername(normalized.username);
+                setID(normalized.id);
+                setEmail(normalized.email);
                 setDescription(normalized.description);
             } catch (e) {
                 console.log("error:", e);
             } finally {
-                // setLoading(false);
+                setLoading(false);
             }
         };
 
@@ -144,10 +149,13 @@ const ProfileEdit = () => {
 
                 <div className='username'>
                     <h1>
-                        {username ? username : "Unknown User"}
+                        {loading ? "Loading..." : username || "Unknown User"}
                     </h1>
                     <p>
-                        User ID: {user.id || "-"}
+                        User ID: {id ? id : "-"}
+                    </p>
+                    <p>
+                        Email: {email ? email : "-"}
                     </p>
                 </div>
                 
@@ -161,7 +169,7 @@ const ProfileEdit = () => {
                     <PUUsername username={username} usernameModifier={setUsername}/>
                 </div>
                 <div>
-                    <PUEmail />
+                    <PUEmail email={email} emailModifier={setEmail}/>
                 </div>
                 <div>
                     <PUPassword />

@@ -22,7 +22,7 @@ export default function PUDescription({description, descriptionModifier}) {
     try {
       const res = await fetch("/api/user/me", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
         body: JSON.stringify({ description: desc }),
       });
 
@@ -32,7 +32,9 @@ export default function PUDescription({description, descriptionModifier}) {
         let msg = "";
         try {
           const data = await res.json();
-          if (data?.message) msg = data.message;
+          console.log(data);
+          if (data?.status) msg = data.status;
+          setFail(`Save failed. Please try again later. (${msg})`);
         } catch {}
         throw new Error(msg);
       }

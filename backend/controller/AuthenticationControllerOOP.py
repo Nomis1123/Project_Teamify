@@ -246,8 +246,18 @@ def update_me():
                                     data["new_email"].lower(),
                                     conn=conn)
 
-        # next, update all fields that dont need a compare and swap
-        user.update(data, conn=conn)
+        # remove old_email, new_email, old_password, new_password
+        # then if the dictionary is not empty, call the user.update
+        data.pop("old_email", None)
+        data.pop("new_email", None)
+        data.pop("old_password", None)
+        data.pop("new_password", None)
+
+        # if theres anything left to update
+        if data:
+            # next, update all fields that dont need a compare and swap
+            user.update(data, conn=conn)
+
 
         # finally commit to the db if we were able to make all updates.
         conn.commit()
@@ -259,7 +269,7 @@ def update_me():
 
     except psycopg2.errors.UniqueViolation:
         conn.rollback()
-        return jsonify({"status": "Email already in use."}), 409
+        return jsonify({"status": "Field already in use."}), 409
 
     except Exception as e:
         conn.rollback()

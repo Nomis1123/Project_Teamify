@@ -166,7 +166,7 @@ class User:
                     raise ValueError("User not found.")
 
                 if row[0] != old_value:
-                    raise ValueError(f"Old {database_field} is incorrect. {old_value}, {row[0]}")
+                    raise ValueError(f"Old {database_field} is incorrect.")
 
                 cur.execute(f"UPDATE users SET {database_field} = %s WHERE id = %s", (new_value, self.id))
 

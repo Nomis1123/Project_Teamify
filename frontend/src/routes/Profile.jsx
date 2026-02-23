@@ -35,12 +35,13 @@ const Profile = () => {
         const loadMe = async () => {
             try {
                 setLoading(true);
+                console.log(localStorage.getItem("access_token"))
 
                 const res = await fetch("/api/user/me", {
                     method: "GET",
                     // If your backend uses cookies/sessions, uncomment:
                     // credentials: "include",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
                 });
                 // console.log("fetch returned:", res.status, res.url);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -130,8 +131,15 @@ const Profile = () => {
                 />
 
                 <div className='username'>
-                    <h1>{loading ? "Loading..." : user.username || "Unknown User"}</h1>
-                    <p>User ID: {user.id || "-"}</p>
+                    <h1>
+                        {loading ? "Loading..." : user.username || "Unknown User"}
+                    </h1>
+                    <p>
+                        User ID: {user.id ? user.id : "-"}
+                        </p>
+                    <p>
+                        Email: {user.email ? user.email : "-"}
+                    </p>
                 </div>
                 
                 <button className="profile-edit-btn" onClick={() => navigate("/profile_editing")}>
