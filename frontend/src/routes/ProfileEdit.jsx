@@ -33,6 +33,9 @@ const ProfileEdit = () => {
         games: [],
         schedule: defaultWeeklySchedule,
     });
+    const [username, setUsername] = useState("");
+    const [id, setID] = useState("");
+    const [email, setEmail] = useState("");
     const [description, setDescription] = useState("");
     const [loading, setLoading] = useState(true);
     // const [error, setError] = useState("");
@@ -41,12 +44,16 @@ const ProfileEdit = () => {
         const loadMe = async () => {
             try {
                 setLoading(true);
+                
+                // This is for testing only
+                // setUsername("TestUser");
+                // setDescription("TestDesc");
 
                 const res = await fetch("/api/user/me", {
                     method: "GET",
                     // If backend uses cookies/sessions, uncomment:
                     // credentials: "include",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
                 });
                 // console.log("fetch returned:", res.status, res.url);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -72,6 +79,10 @@ const ProfileEdit = () => {
                 };
                 console.log("setting user to:", normalized);
                 setUser(normalized);
+
+                setUsername(normalized.username);
+                setID(normalized.id);
+                setEmail(normalized.email);
                 setDescription(normalized.description);
             } catch (e) {
                 console.log("error:", e);
@@ -137,8 +148,15 @@ const ProfileEdit = () => {
                 />
 
                 <div className='username'>
-                    <h1>{loading ? "Loading..." : user.username || "Unknown User"}</h1>
-                    <p>User ID: {user.id || "-"}</p>
+                    <h1>
+                        {loading ? "Loading..." : username || "Unknown User"}
+                    </h1>
+                    <p>
+                        User ID: {id ? id : "-"}
+                    </p>
+                    <p>
+                        Email: {email ? email : "-"}
+                    </p>
                 </div>
                 
                 <button className="profile-return-btn" onClick={() => navigate("/profile")}>
@@ -148,10 +166,10 @@ const ProfileEdit = () => {
             
             <div className='profile-scroll'>
                 <div>
-                    <PUUsername />
+                    <PUUsername username={username} usernameModifier={setUsername}/>
                 </div>
                 <div>
-                    <PUEmail />
+                    <PUEmail email={email} emailModifier={setEmail}/>
                 </div>
                 <div>
                     <PUPassword />
@@ -164,7 +182,7 @@ const ProfileEdit = () => {
                 </div>
                 <div className="profile-description">
                     <p>
-                        {description ? description: "You have not set a description yet."}
+                        {description ? description : "You have not set a description yet."}
                     </p>
                 </div>
 
