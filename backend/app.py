@@ -3,7 +3,7 @@ from controller.extensions import jwt
 from dotenv import load_dotenv
 
 from flask import Flask
-from controller.AuthenticationControllerOOP import register, login, get_me, update_me, logout
+from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, get_me, update_me, logout
 #, login, auth_verify, logout, getOrUpdate_availability
 #from controller.AuthenticationController import logout
 
