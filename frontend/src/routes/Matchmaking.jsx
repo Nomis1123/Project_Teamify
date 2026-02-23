@@ -186,7 +186,8 @@ const Matchmaking = () => {
                             <option value="Valorant">Valorant</option>
                             <option value="Minecraft">Minecraft</option>
                             <option value="PUBG">PUBG</option>
-                            <option value="PUBG">7dtd</option>
+                            <option value="7dtd">7dtd</option>
+                            <option value="Apex">Apex Legends</option>
                         </select>
 
                         <select value={rank} onChange={(e) => setRank(e.target.value)}>
