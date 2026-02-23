@@ -269,7 +269,7 @@ def update_me():
 
     except psycopg2.errors.UniqueViolation:
         conn.rollback()
-        return jsonify({"status": "Email already in use."}), 409
+        return jsonify({"status": "Field already in use."}), 409
 
     except Exception as e:
         conn.rollback()
