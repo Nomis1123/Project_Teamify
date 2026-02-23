@@ -12,6 +12,7 @@ import sdtdImg from "../gameImages/7dtd.webp";
 import hsrProfile from "../gameImages/hq720.jpg";
 import RegionIcon from "../gameImages/map-5.png";
 import filterIcon from "../gameImages/filterIcon.png";
+import apexImg from "../gameImages/apex.jpg";
 
 // data for demo
 const placeboUsers = [
@@ -68,6 +69,7 @@ const gameImages = {
   League: lolImg,
   Minecraft: minecraftImg,
   sdtd: sdtdImg,
+  "Apex Legends": apexImg,
 };
 
 const Matchmaking = () => {
@@ -131,7 +133,7 @@ const Matchmaking = () => {
         let filter = buildFilterObj()
         onFilterSubmit(filter)
         // let users = attachGameImages (placeboUsers)
-        setUsers(users);
+        // setUsers(users)
     }, []);
 
     const handleApplyFilters = async () =>  {
@@ -159,6 +161,7 @@ const Matchmaking = () => {
             }
 
             const data = await response.json()
+            console.log(data)
             setUsers(attachGameImages(data))
 
         } catch (error) {
