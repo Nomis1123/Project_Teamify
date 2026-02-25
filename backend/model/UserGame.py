@@ -97,12 +97,17 @@ class UserGame:
                     games_list = r[5] or []
                     
                     display_game = "N/A"
+                    display_rank = "N/A" # Default rank
+                    
                     if games_list:
-                        if game_title:
-                            matched = next((g['title'] for g in games_list if game_title.lower() in g['title'].lower()), games_list[0]['title'])
-                            display_game = matched
-                        else:
-                            display_game = games_list[0]['title']
+                        # Find the game object (contains both title and rank)
+                        search_term = game_title.lower() if game_title else ""
+                        matched_obj = next(
+                            (g for g in games_list if search_term in g['title'].lower()), 
+                            games_list[0]
+                        )
+                        display_game = matched_obj['title']
+                        display_rank = matched_obj['rank'] # Extract rank
 
                     results.append({
                         "id": r[0],
@@ -111,6 +116,7 @@ class UserGame:
                         "description": r[3],
                         "match_percentage": f"{round((harmony_score / 21) * 100)}%" if apply_availability_filter else "0%",
                         "game": display_game, 
+                        "rank": display_rank, # Added rank here
                         "region": "NA"
                     })
                 return results
