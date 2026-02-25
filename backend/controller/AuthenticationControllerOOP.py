@@ -155,11 +155,11 @@ def login():
 
 # FRONTEND: when "link steam account" button is clicked, send to GET /auth/steam/login
 # Redirects user to log in to Steam
-# @jwt_required
+@jwt_required()
 def steam_login():
     # Get userID
-    # user_id = get_jwt_identity()
-    user_id = 1
+    user_id = get_jwt_identity()
+    # user_id = 1
 
     # Store info to link SteamID to UserID later
     # NOTE: apparently the JWT does not get stored during a Steam redirect according to Chatgpt
@@ -186,9 +186,9 @@ def steam_verify():
     if not user_id:
         return jsonify({"status": "Steam link session expired"}), 400
 
-    # user = User.find_by_id(int(user_id))
-    # if not user:
-    #     return jsonify({"status:" "User not found."}), 404
+    user = User.find_by_id(int(user_id))
+    if not user:
+        return jsonify({"status:" "User not found."}), 404
 
     # Verify data with Steam
     params = dict(request.args)
@@ -214,7 +214,7 @@ def steam_verify():
     steam_id = match.group(1)
 
     # Link UserID to SteamID
-    # user.update({"steam_id": steam_id})
+    user.update({"steam_id": steam_id})
     session.pop("Account_Link_Steam", None)
 
     # Redirect back to profile page
