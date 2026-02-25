@@ -145,7 +145,7 @@ const Profile = () => {
                     <button className="profile-btn" onClick={() => navigate("/profile_editing")}>
                         Edit Profile
                     </button>
-                    <button className="profile-btn" onClick={ () => window.location.replace("/api/auth/steamlogin") }>
+                    <button className="profile-btn" onClick={ () => window.location.assign("/api/auth/steamlogin") }>
                         Link Steam
                     </button>
                 </div>
