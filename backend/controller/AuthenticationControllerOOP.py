@@ -177,7 +177,8 @@ def steam_login():
 
     query = "&".join([f"{k}={v}" for k, v in params.items()])
 
-    return redirect(f"{STEAM_OPENID_URL}?{query}")
+    return jsonify({"redirect_url": f"{STEAM_OPENID_URL}?{query}"})
+    # return redirect(f"{STEAM_OPENID_URL}?{query}")
 
 
 # Steam redirects users here after logging in to Steam

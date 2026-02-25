@@ -3,14 +3,16 @@ from controller.extensions import get_db_connection
 
 
 class User:
-    def __init__(self, id, username, email, description=None, pfp_url=None, availability=None):
+    def __init__(self, id, username, email, steam_id=None, description=None, pfp_url=None, availability=None):
 
         self.id = id
         self.username = username
         self.email = email
+        self.steam_id = steam_id
         self.description = description
         self.pfp_url = pfp_url
         self.availability = availability
+
 
 
     def get_password_hash(self) -> str:
@@ -194,6 +196,7 @@ class User:
 
         return {
                 "id": self.id,
+                "steam_id": self.steam_id,
                 "username": self.username,
                 "email": self.email,
                 "description": self.description,
@@ -248,5 +251,3 @@ old email new email
 old password new password
 description
 '''
-    
-    

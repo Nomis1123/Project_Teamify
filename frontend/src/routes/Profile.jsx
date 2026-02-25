@@ -47,7 +47,7 @@ const Profile = () => {
                 // console.log("fetch returned:", res.status, res.url);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
-                // console.log("response data:", data);
+                console.log("response data:", data);
                 const normalized = {
                     id: data.user.id ?? "",
                     steam_id: data.user.steam_id ?? "",
@@ -120,6 +120,34 @@ const Profile = () => {
     //     });
     // }, []);
 
+    async function sendToken() {
+        try {
+            const res = await fetch("/api/auth/steamlogin", {
+                method: "GET",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+            });
+            if (!res.ok) {
+                // backend might return JSON error { message: "..." }
+                let msg = "";
+                try {
+                    const data = await res.json();
+                    console.log(data);
+                if (data?.status) msg = data.status;
+                    console.log(msg);
+                } catch {}
+                throw new Error(msg);
+            }
+            const data = await res.json();
+
+            if (data.redirect_url) {
+                window.location.href = data.redirect_url;
+            }
+            // console.log("Token sent successfully");
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
     return (
     <div className="profile-page">
         <div className="profile-card profile-layout">
@@ -149,7 +177,7 @@ const Profile = () => {
                         Edit Profile
                     </button>
                     {!user?.steam_id && 
-                        <button className="profile-btn" onClick={ () => window.location.assign("/api/auth/steamlogin") }>
+                        <button className="profile-btn" onClick={ () => sendToken() }>
                             Link Steam
                         </button>
                     }
