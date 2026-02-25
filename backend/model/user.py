@@ -77,7 +77,7 @@ class User:
         try:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT id, username, email, description, profile_picture_url, availability FROM users WHERE id = %s",
+                    "SELECT id, username, email, steam_id, description, profile_picture_url, availability FROM users WHERE id = %s",
                     (user_id,)
                 )
                 row = cur.fetchone()
@@ -101,7 +101,7 @@ class User:
         try:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT id, username, email, description, profile_picture_url, availability FROM users WHERE email = %s",
+                    "SELECT id, username, email, steam_id, description, profile_picture_url, availability FROM users WHERE email = %s",
                     (email,)
                 )
                 row = cur.fetchone()
