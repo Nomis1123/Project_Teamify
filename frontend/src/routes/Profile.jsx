@@ -21,6 +21,7 @@ const Profile = () => {
     };
     const [user, setUser] = useState({
         id: "",
+        steam_id: "",
         username: "",
         email: "",
         description: "",
@@ -49,6 +50,7 @@ const Profile = () => {
                 // console.log("response data:", data);
                 const normalized = {
                     id: data.user.id ?? "",
+                    steam_id: data.user.steam_id ?? "",
                     username: data.user.username ?? "",
                     email: data.user.email ?? "",
                     description: data.user.description ?? "",
@@ -140,14 +142,18 @@ const Profile = () => {
                     <p>
                         Email: {user.email ? user.email : "-"}
                     </p>
+                    {user?.steam_id && <p>Linked to steam</p>}
                 </div>
                 <div className='profile-button-container'>
                     <button className="profile-btn" onClick={() => navigate("/profile_editing")}>
                         Edit Profile
                     </button>
-                    <button className="profile-btn" onClick={ () => window.location.assign("/api/auth/steamlogin") }>
-                        Link Steam
-                    </button>
+                    {!user?.steam_id && 
+                        <button className="profile-btn" onClick={ () => window.location.assign("/api/auth/steamlogin") }>
+                            Link Steam
+                        </button>
+                    }
+                    
                 </div>
                 
             </div>
