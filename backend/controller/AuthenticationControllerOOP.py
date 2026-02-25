@@ -217,8 +217,9 @@ def steam_verify():
     session.pop("Account_Link_Steam", None)
 
     # Redirect back to profile page
-    return jsonify({"status": "Steam account linked successfully",
-                    "steam_id": steam_id}), 200
+    # return jsonify({"status": "Steam account linked successfully",
+    #                 "steam_id": steam_id}), 200
+    return redirect("http://localhost:5174/profile")
 
 #def auth_verify(token):
 #    result = User.verify1(token)
