@@ -8,9 +8,11 @@ import valorantImg from "../gameImages/valorant-banner.jpg";
 import pubgImg from "../gameImages/pubg-banner.jpg";
 import lolImg from "../gameImages/lol-banner.webp";
 import minecraftImg from "../gameImages/minecraft.webp";
+import sdtdImg from "../gameImages/7dtd.webp";
 import hsrProfile from "../gameImages/hq720.jpg";
 import RegionIcon from "../gameImages/map-5.png";
-import filterIcon from "../gameImages/filterIcon.png"
+import filterIcon from "../gameImages/filterIcon.png";
+import apexImg from "../gameImages/apex.jpg";
 
 // data for demo
 const placeboUsers = [
@@ -66,6 +68,8 @@ const gameImages = {
   PUBG: pubgImg,
   League: lolImg,
   Minecraft: minecraftImg,
+  sdtd: sdtdImg,
+  "Apex Legends": apexImg,
 };
 
 const Matchmaking = () => {
@@ -114,16 +118,55 @@ const Matchmaking = () => {
         return newUsers;
     };
 
+    // if "all" is selected, filter is null. Else, add selected filter to obj
+    const buildFilterObj = async () => {
+        return {
+            game_title: game === "all" ? null : game,
+            //rank: rank === "all" ? null : rank,
+            //region: region === "all" ? null : region,
+            apply_availability_filter: showAvailability ? availability : false,
+        }
+    } 
+
     // fetch the list of recommended users from backend upon page load
     useEffect(() => {
-        // placeholder fetch 
-        let users = attachGameImages (placeboUsers)
-        setUsers(users);
+        let filter = buildFilterObj()
+        onFilterSubmit(filter)
+        // let users = attachGameImages (placeboUsers)
+        // setUsers(users)
     }, []);
 
+    const handleApplyFilters = async () =>  {
+        const filters = await buildFilterObj();
+        onFilterSubmit(filters);
+    }
+
     // sends a filter obj with other info and receives recommended users from backend
-    const onFilterSubmit = async (Filters) => {
-        //setUsers(received result)
+    // filters can be empty or has actual values
+    const onFilterSubmit = async (filters) => {
+       try {
+            console.log(filters)
+            const response = await fetch("/api/user/filters", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                },
+                credentials: "include",
+                body: JSON.stringify(filters),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch users")
+            }
+
+            const data = await response.json()
+            console.log(data)
+            setUsers(attachGameImages(data))
+
+        } catch (error) {
+            console.error("Error fetching users:", error)
+        }
     }
     
     return (
@@ -138,15 +181,17 @@ const Matchmaking = () => {
                     
                     <div className ="filter-controls">
                         <select value={game} onChange={(e) => setGame(e.target.value)}>
-                            <option value="all">All Games</option>
+                            <option value="all">All Games &#9662;</option>
                             <option value="League">League of Legends</option>
                             <option value="Valorant">Valorant</option>
                             <option value="Minecraft">Minecraft</option>
                             <option value="PUBG">PUBG</option>
+                            <option value="7dtd">7dtd</option>
+                            <option value="Apex">Apex Legends</option>
                         </select>
 
                         <select value={rank} onChange={(e) => setRank(e.target.value)}>
-                            <option value="all">All Ranks</option>
+                            <option value="all">All Ranks &#9662;</option>
                             <option value="Bronze">Bronze</option>
                             <option value="Silver">Silver</option>
                             <option value="Gold">Gold</option>
@@ -156,7 +201,7 @@ const Matchmaking = () => {
                         </select>
 
                         <select value={region} onChange={(e) => setRegion(e.target.value)}>
-                            <option value="all">All Regions</option>
+                            <option value="all">All Regions &#9662; </option>
                             <option value="NA">NA</option>
                             <option value="Asia">Asia</option>
                             <option value="EU">EU</option>
@@ -166,7 +211,7 @@ const Matchmaking = () => {
                         <div className="availability-dropdown">
                             <button className="availability-button" 
                                 onClick={() => setShowAvailability(prev => !prev)}>
-                                {showAvailability ? "Hide Availability" : "Set Availability"}
+                                {showAvailability ? "Hide Availability" : "Set Availability ▾"}
                             </button>
                             {showAvailability && (
                                 <div className="availability-content">
@@ -178,7 +223,7 @@ const Matchmaking = () => {
                             )}
                         </div>
         
-                        <button className="apply-button"> Apply </button>
+                        <button className="apply-button" onClick={handleApplyFilters}> Apply </button>
                     </div>
                 </div>
             </div>
@@ -214,14 +259,19 @@ const Matchmaking = () => {
                                 </div>
                             </div>
 
-                            <div class="connect-wrapper">
+                            <div className="connect-wrapper">
                                 <button className="connect-button">Connect</button>
                             </div>
                         </div>
                     </div>
                 ))} 
             </div>
-            {/* Add no player/party found later */}
+            {/* If no users found */}
+            {users.length === 0 && (
+                <div className="empty-msg">
+                    <p>No users found matching your filters</p>
+                </div>
+            )}
         </div>
     )
 }

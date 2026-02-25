@@ -3,13 +3,14 @@ from controller.extensions import get_db_connection
 
 
 class User:
-    def __init__(self, id, username, email, description=None, pfp_url=None):
+    def __init__(self, id, username, email, description=None, pfp_url=None, availability=None):
 
         self.id = id
         self.username = username
         self.email = email
         self.description = description
         self.pfp_url = pfp_url
+        self.availability = availability
 
 
     def get_password_hash(self) -> str:
@@ -74,7 +75,7 @@ class User:
         try:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT id, username, email, description, profile_picture_url FROM users WHERE id = %s",
+                    "SELECT id, username, email, description, profile_picture_url, availability FROM users WHERE id = %s",
                     (user_id,)
                 )
                 row = cur.fetchone()
@@ -98,7 +99,7 @@ class User:
         try:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT id, username, email, description, profile_picture_url FROM users WHERE email = %s",
+                    "SELECT id, username, email, description, profile_picture_url, availability FROM users WHERE email = %s",
                     (email,)
                 )
                 row = cur.fetchone()
@@ -196,8 +197,50 @@ class User:
                 "username": self.username,
                 "email": self.email,
                 "description": self.description,
-                "pfp_url": self.pfp_url
+                "pfp_url": self.pfp_url,
+                "availability": self.availability
                 }
+    
+    @staticmethod
+    def get_availability(user_id, conn=None):
+        manage_conn = conn is None
+        if manage_conn:
+            conn = get_db_connection()
+        
+        try:
+            with conn.cursor() as cur:
+                 cur.execute("SELECT availability FROM users WHERE id = %s", (user_id,))
+                 row = cur.fetchone()
+                 return row[0] if row else None 
+        finally:
+            if manage_conn:
+                conn.close()
+    
+    @staticmethod
+    def update_profile_by_id(user_id, conn=None, **kwargs):
+        if not kwargs:
+            return
+
+        manage_conn = conn is None
+        if manage_conn:
+            conn = get_db_connection()
+
+        set_clause = ", ".join([f"{k} = %s" for k in kwargs.keys()])
+        values = list(kwargs.values()) + [user_id]
+        try:
+            with conn.cursor() as cur:
+                cur.execute(f"UPDATE users SET {set_clause} WHERE id = %s", values)
+            if manage_conn:
+                conn.commit()
+        except Exception as e:
+            if manage_conn:
+                conn.rollback()
+            raise e 
+        finally:
+            if manage_conn:
+                conn.close()
+        
+
 
 '''
 username
@@ -205,3 +248,5 @@ old email new email
 old password new password
 description
 '''
+    
+    

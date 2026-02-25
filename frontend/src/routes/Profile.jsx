@@ -180,6 +180,7 @@ const Profile = () => {
                             { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
                             { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
                             { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                            { id: "6", name: "Apex Legends", img: "src/gameImages/apexBanner.jpg" },
                         ]} />
                         <GamePicker games={[
                             { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
@@ -188,6 +189,7 @@ const Profile = () => {
                             { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
                             { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
                             { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                            { id: "6", name: "Apex Legends", img: "src/gameImages/apexBanner.jpg" },
                         ]} />
                         <GamePicker games={[
                             { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
@@ -196,6 +198,7 @@ const Profile = () => {
                             { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
                             { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
                             { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                            { id: "6", name: "Apex Legends", img: "src/gameImages/apexBanner.jpg" },
                         ]} />
                         <GamePicker games={[
                             { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
@@ -204,6 +207,7 @@ const Profile = () => {
                             { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
                             { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
                             { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                            { id: "6", name: "Apex Legends", img: "src/gameImages/apexBanner.jpg" },
                         ]} />
                         <GamePicker games={[
                             { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
@@ -212,6 +216,7 @@ const Profile = () => {
                             { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
                             { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
                             { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                            { id: "6", name: "Apex Legends", img: "src/gameImages/apexBanner.jpg" },
                         ]} />
                     </div>
                 </div>

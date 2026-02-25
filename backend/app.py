@@ -3,7 +3,8 @@ from controller.extensions import jwt
 from dotenv import load_dotenv
 
 from flask import Flask
-from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, get_me, update_me, logout
+from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, get_me, update_me, logout, getOrUpdate_availability1
+from controller.MatchmakingController import get_matches
 #, login, auth_verify, logout, getOrUpdate_availability
 #from controller.AuthenticationController import logout
 
@@ -62,9 +63,9 @@ app.add_url_rule('/api/user/me',  view_func=get_me, methods=['GET'])
 app.add_url_rule('/api/user/me', view_func=update_me,  methods=['PATCH'])
 #
 ## 5. Availability
-#app.add_url_rule('/api/user/availability', view_func=getOrUpdate_availability, methods=['GET','PUT'])
-#
-#app.add_url_rule('/api/user/filters', view_func=get_matches, methods=["POST"])
+app.add_url_rule('/api/user/availability', view_func=getOrUpdate_availability1, methods=['GET','PUT'])
+
+app.add_url_rule('/api/user/filters', view_func=get_matches, methods=["POST"])
 
 if __name__ == '__main__':
     # Start a local web server on Port 8000
