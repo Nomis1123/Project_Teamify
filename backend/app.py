@@ -3,17 +3,16 @@ from controller.extensions import jwt
 from dotenv import load_dotenv
 
 from flask import Flask
-from controller.AuthenticationControllerOOP import register, login, get_me, update_me, logout, getOrUpdate_availability1
+from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, get_me, update_me, logout, getOrUpdate_availability1
 from controller.MatchmakingController import get_matches
 #, login, auth_verify, logout, getOrUpdate_availability
 #from controller.AuthenticationController import logout
 
-import os 
+import os
 #from controller.AuthenticationController import bcrypt
 #from controller.MatchmakingController import  get_matches
-# Load the .env first
-#load_dotenv()
 
+# Load the .env first
 load_dotenv()
 app = Flask(__name__)
 
@@ -34,6 +33,9 @@ app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 # Configure the seed for the token
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
 
+# Needed for sessions in steam_login
+app.secret_key = os.getenv("JWT_SECRET_KEY")
+
 #bcrypt.init_app(app)
 
 #jwt =  JWTManager(app)
@@ -46,6 +48,8 @@ app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY")
 app.add_url_rule('/api/auth/register', view_func=register,  methods=['POST'])
 app.add_url_rule('/api/auth/login',view_func=login, methods=['POST'])
 #app.add_url_rule('/api/auth/verify/<token>', view_func=auth_verify, methods=['GET'])
+app.add_url_rule('/api/auth/steamlogin', view_func=steam_login, methods=['GET'])
+app.add_url_rule('/api/auth/steamverify', view_func=steam_verify, methods=['GET'])
 #
 #
 ## 2. Logout (Added to match Reference Sheet)

@@ -1,4 +1,4 @@
-from flask import request, jsonify;
+from flask import jsonify, redirect, request, url_for, session
 from controller.extensions import bcrypt, get_db_connection
 from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies
 
@@ -10,6 +10,7 @@ import psycopg2
 import secrets
 import os 
 import re
+import requests
 import json
 #from model.User import User
 from model.user import User
@@ -31,6 +32,9 @@ When the user clicks that link, their browser sends a request to the backend
 Logic: The code looks at the URL, grabs the token part and checks the database for a match
 
 """
+
+STEAM_OPENID_URL = "https://steamcommunity.com/openid/login"
+
 def is_valid_email(email: str) -> bool:
 
     if not email:
@@ -145,6 +149,75 @@ def login():
         "refresh_token": refresh_token
         }), 200
 
+
+# Redirects user to log in to Steam
+@jwt_required()
+def steam_login():
+    # Get userID
+    user_id = get_jwt_identity()
+
+    # Store info to link SteamID to UserID later
+    session["Account_Link_Steam"] = user_id
+
+    # Construct url for redirect
+    return_url = url_for("steam_verify", _external=True)
+    realm = request.host_url
+    params = {"openid.ns": "http://specs.openid.net/auth/2.0",
+              "openid.mode": "checkid_setup",
+              "openid.return_to": return_url,
+              "openid.realm": realm,
+              "openid.identity": "http://specs.openid.net/auth/2.0/identifier_select",
+              "openid.claimed_id": "http://specs.openid.net/auth/2.0/identifier_select"}
+    query = "&".join([f"{k}={v}" for k, v in params.items()])
+
+    # Return url to frontend
+    return jsonify({"redirect_url": f"{STEAM_OPENID_URL}?{query}"})
+
+
+# Steam redirects users here after logging in to Steam
+def steam_verify():
+    # Get UserID stored before linking
+    user_id = session.get("Account_Link_Steam")
+    if not user_id:
+        return jsonify({"status": "Steam link session expired"}), 400
+
+    # Get user object by UserID
+    user = User.find_by_id(int(user_id))
+    if not user:
+        return jsonify({"status:" "User not found."}), 404
+
+    # Verify response with Steam
+    params = dict(request.args)
+    params["openid.mode"] = "check_authentication"
+    response = requests.post(STEAM_OPENID_URL,
+                             data=params,
+                             headers={"Content-Type": "application/x-www-form-urlencoded"})
+    if response.status_code != 200 or "is_valid:true" not in response.text:
+        session.pop("Account_Link_Steam", None)
+        return jsonify({"status": "Steam verification failed"}), 400
+
+    # Receive response from Steam
+    steam_id = request.args.get("openid.claimed_id")
+    if not steam_id:
+        session.pop("Account_Link_Steam", None)
+        return jsonify({"status": "Steam login cancelled"}), 400
+
+    # Extract SteamID from response
+    match = re.search(r"/(\d+)$", steam_id)
+    if not match:
+        session.pop("Account_Link_Steam", None)
+        return jsonify({"status": "SteamID not found"}), 400
+    steam_id = match.group(1)
+
+    # Link UserID to SteamID in database
+    try:
+        user.update({"steam_id": steam_id})
+    except Exception as e:
+        pass # temp placeholder
+    session.pop("Account_Link_Steam", None)
+
+    # Redirect back to profile page
+    return redirect("http://localhost:5173/profile")
 
 #def auth_verify(token):
 #    result = User.verify1(token)
@@ -328,21 +401,21 @@ def getOrUpdate_availability1():
             data = request.json.get("availability")
             if not data:
                 return jsonify({"status": "No availability data provided"}), 400
-            
+
             json_data = json.dumps(data)
             User.update_profile_by_id(user_id, availability=json_data, conn=conn)
-            conn.commit() 
+            conn.commit()
             return jsonify({"status": "Availability updated", "availability": data}), 200
 
-        
+
         availability = User.get_availability(user_id, conn=conn)
         if availability is None:
             return jsonify({"status": "Availability not found"}), 404
-        
+
         return jsonify({"availability": availability}), 200
    except Exception as e:
        if conn: conn.rollback()
        return jsonify({"status": f"Database error: {str(e)}"})
-   
+
    finally:
        if conn: conn.close()

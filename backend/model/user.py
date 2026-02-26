@@ -3,14 +3,16 @@ from controller.extensions import get_db_connection
 
 
 class User:
-    def __init__(self, id, username, email, description=None, pfp_url=None, availability=None):
+    def __init__(self, id, username, email, steam_id=None, description=None, pfp_url=None, availability=None):
 
         self.id = id
         self.username = username
         self.email = email
+        self.steam_id = steam_id
         self.description = description
         self.pfp_url = pfp_url
         self.availability = availability
+
 
 
     def get_password_hash(self) -> str:
@@ -75,7 +77,7 @@ class User:
         try:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT id, username, email, description, profile_picture_url, availability FROM users WHERE id = %s",
+                    "SELECT id, username, email, steam_id, description, profile_picture_url, availability FROM users WHERE id = %s",
                     (user_id,)
                 )
                 row = cur.fetchone()
@@ -99,7 +101,7 @@ class User:
         try:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT id, username, email, description, profile_picture_url, availability FROM users WHERE email = %s",
+                    "SELECT id, username, email, steam_id, description, profile_picture_url, availability FROM users WHERE email = %s",
                     (email,)
                 )
                 row = cur.fetchone()
@@ -117,7 +119,7 @@ class User:
             raise ValueError("No valid fields provided.")
 
         # these are the fields which will use this update() function
-        allowed = {"username", "description", "pfp_url"}
+        allowed = {"username", "description", "pfp_url", "steam_id"}
         manage_conn = conn is None
 
         # apply filter onto allowed fields
@@ -194,6 +196,7 @@ class User:
 
         return {
                 "id": self.id,
+                "steam_id": self.steam_id,
                 "username": self.username,
                 "email": self.email,
                 "description": self.description,
@@ -248,5 +251,3 @@ old email new email
 old password new password
 description
 '''
-    
-    

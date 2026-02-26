@@ -21,6 +21,7 @@ const Profile = () => {
     };
     const [user, setUser] = useState({
         id: "",
+        steam_id: "",
         username: "",
         email: "",
         description: "",
@@ -49,6 +50,7 @@ const Profile = () => {
                 // console.log("response data:", data);
                 const normalized = {
                     id: data.user.id ?? "",
+                    steam_id: data.user.steam_id ?? "",
                     username: data.user.username ?? "",
                     email: data.user.email ?? "",
                     description: data.user.description ?? "",
@@ -118,6 +120,34 @@ const Profile = () => {
     //     });
     // }, []);
 
+    async function sendToken() {
+        try {
+            const res = await fetch("/api/auth/steamlogin", {
+                method: "GET",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+            });
+            if (!res.ok) {
+                // backend might return JSON error { message: "..." }
+                let msg = "";
+                try {
+                    const data = await res.json();
+                    console.log(data);
+                if (data?.status) msg = data.status;
+                    console.log(msg);
+                } catch {}
+                throw new Error(msg);
+            }
+            const data = await res.json();
+
+            if (data.redirect_url) {
+                window.location.href = data.redirect_url;
+            }
+            // console.log("Token sent successfully");
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
     return (
     <div className="profile-page">
         <div className="profile-card profile-layout">
@@ -140,11 +170,20 @@ const Profile = () => {
                     <p>
                         Email: {user.email ? user.email : "-"}
                     </p>
+                    {user?.steam_id && <p>Linked to steam</p>}
+                </div>
+                <div className='profile-button-container'>
+                    <button className="profile-btn" onClick={() => navigate("/profile_editing")}>
+                        Edit Profile
+                    </button>
+                    {!user?.steam_id && 
+                        <button className="profile-btn" onClick={ () => sendToken() }>
+                            Link Steam
+                        </button>
+                    }
+                    
                 </div>
                 
-                <button className="profile-edit-btn" onClick={() => navigate("/profile_editing")}>
-                    Edit Profile
-                </button>
             </div>
             
             <div className='profile-scroll'>
