@@ -47,7 +47,7 @@ const Profile = () => {
                 // console.log("fetch returned:", res.status, res.url);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
-                console.log("response data:", data);
+                // console.log("response data:", data);
                 const normalized = {
                     id: data.user.id ?? "",
                     steam_id: data.user.steam_id ?? "",
