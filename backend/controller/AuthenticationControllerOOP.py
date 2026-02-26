@@ -33,10 +33,6 @@ Logic: The code looks at the URL, grabs the token part and checks the database f
 
 """
 
-# MORE INFO CAN BE FOUND HERE:
-# https://partner.steamgames.com/doc/features/auth#website
-# https://steamcommunity.com/dev
-# https://github.com/byo-software/steam-openid-connect-provider/tree/main
 STEAM_OPENID_URL = "https://steamcommunity.com/openid/login"
 
 def is_valid_email(email: str) -> bool:
@@ -153,48 +149,46 @@ def login():
         "refresh_token": refresh_token
         }), 200
 
-# FRONTEND: when "link steam account" button is clicked, send to GET /auth/steam/login
+
 # Redirects user to log in to Steam
 @jwt_required()
 def steam_login():
     # Get userID
     user_id = get_jwt_identity()
-    # user_id = 1
 
     # Store info to link SteamID to UserID later
-    # NOTE: apparently the JWT does not get stored during a Steam redirect according to Chatgpt
     session["Account_Link_Steam"] = user_id
 
+    # Construct url for redirect
     return_url = url_for("steam_verify", _external=True)
     realm = request.host_url
-
     params = {"openid.ns": "http://specs.openid.net/auth/2.0",
               "openid.mode": "checkid_setup",
               "openid.return_to": return_url,
               "openid.realm": realm,
               "openid.identity": "http://specs.openid.net/auth/2.0/identifier_select",
               "openid.claimed_id": "http://specs.openid.net/auth/2.0/identifier_select"}
-
     query = "&".join([f"{k}={v}" for k, v in params.items()])
 
+    # Return url to frontend
     return jsonify({"redirect_url": f"{STEAM_OPENID_URL}?{query}"})
-    # return redirect(f"{STEAM_OPENID_URL}?{query}")
 
 
 # Steam redirects users here after logging in to Steam
 def steam_verify():
+    # Get UserID stored before linking
     user_id = session.get("Account_Link_Steam")
     if not user_id:
         return jsonify({"status": "Steam link session expired"}), 400
 
+    # Get user object by UserID
     user = User.find_by_id(int(user_id))
     if not user:
         return jsonify({"status:" "User not found."}), 404
 
-    # Verify data with Steam
+    # Verify response with Steam
     params = dict(request.args)
     params["openid.mode"] = "check_authentication"
-
     response = requests.post(STEAM_OPENID_URL,
                              data=params,
                              headers={"Content-Type": "application/x-www-form-urlencoded"})
@@ -202,26 +196,28 @@ def steam_verify():
         session.pop("Account_Link_Steam", None)
         return jsonify({"status": "Steam verification failed"}), 400
 
-    # Extract the SteamID from the response
+    # Receive response from Steam
     steam_id = request.args.get("openid.claimed_id")
     if not steam_id:
         session.pop("Account_Link_Steam", None)
         return jsonify({"status": "Steam login cancelled"}), 400
 
+    # Extract SteamID from response
     match = re.search(r"/(\d+)$", steam_id)
     if not match:
         session.pop("Account_Link_Steam", None)
         return jsonify({"status": "SteamID not found"}), 400
     steam_id = match.group(1)
 
-    # Link UserID to SteamID
-    user.update({"steam_id": steam_id})
+    # Link UserID to SteamID in database
+    try:
+        user.update({"steam_id": steam_id})
+    except Exception as e:
+        pass # temp placeholder
     session.pop("Account_Link_Steam", None)
 
     # Redirect back to profile page
-    # return jsonify({"status": "Steam account linked successfully",
-    #                 "steam_id": steam_id}), 200
-    return redirect("http://localhost:5174/profile")
+    return redirect("http://localhost:5173/profile")
 
 #def auth_verify(token):
 #    result = User.verify1(token)
