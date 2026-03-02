@@ -44,33 +44,11 @@ class UserGame:
                     curr_avail = json.dumps(res[0]) if res and res[0] else json.dumps({})
 
                     sql += """,
-                        (
-                            SELECT COUNT(*)
-                            FROM (
-                                SELECT day, slot
-                                FROM (
-                                    SELECT jsonb_object_keys(COALESCE(u.availability, '{}'::jsonb)) AS day
-                                ) AS days
-                                CROSS JOIN (VALUES ('Morning'), ('Noon'), ('Evening')) AS slots(slot)
-                            ) AS all_slots
-                            WHERE COALESCE((u.availability -> all_slots.day ->> all_slots.slot)::boolean, FALSE) = TRUE
-                            AND COALESCE((%s::jsonb -> all_slots.day ->> all_slots.slot)::boolean, FALSE) = TRUE
-                        ) AS harmony_score,
-                        (
-                            SELECT COUNT(*)
-                            FROM (
-                                SELECT day, slot
-                                FROM (
-                                    SELECT jsonb_object_keys(COALESCE(u.availability, '{}'::jsonb)) AS day
-                                ) AS days
-                                CROSS JOIN (VALUES ('Morning'), ('Noon'), ('Evening')) AS slots(slot)
-                            ) AS all_slots
-                            WHERE COALESCE((%s::jsonb -> all_slots.day ->> all_slots.slot)::boolean, FALSE) = TRUE
-                        ) AS max_score
+                        calculate_harmony_score(u.availability, %s) AS harmony_score
                     """
-                    params.extend([curr_avail, curr_avail])
+                    params.append(curr_avail)
                 else:
-                    sql += ", 0 AS harmony_score, 0 AS max_score"
+                    sql += ", 0 AS harmony_score"
 
                 # game
                 sql += """,
@@ -140,7 +118,9 @@ class UserGame:
 
                 # Ordering
                 if apply_availability_filter:
-                    sql += " ORDER BY harmony_score::float / NULLIF(max_score,0) DESC NULLS LAST"
+                    # Repeat function and parameter here
+                    sql += " ORDER BY calculate_harmony_score(u.availability, %s)::float / 21 DESC NULLS LAST"
+                    params.append(curr_avail)
                 else:
                     sql += " ORDER BY u.id ASC"
 
@@ -155,18 +135,30 @@ class UserGame:
 
                 cur.execute(sql, tuple(params))
                 rows = cur.fetchall()
+                cur.execute("SELECT availability FROM users WHERE id = %s", (current_user_id,))
+                res = cur.fetchone()
+                print("curr_avail:", res[0])
 
         
         results = []
-
+        print(f"The length is {len(rows)}")
         for r in rows:
+            print(f"r: {r}")
             user_id = r[0]
             username = r[1]
             avatar = r[2]
             description = r[3]
-            harmony_score = r[4]
-            max_score = r[5]
-            games_list = r[6] or []
+            harmony_score = float(r[4] or 0)
+
+            print(f"The matched score is {harmony_score}")
+            games_list = r[5] if len(r) > 5 else []
+
+            # total slots for percentage
+            total_slots = 7 * 3  # 7 days * 3 slots
+            match_percentage = (
+                f"{round((harmony_score / total_slots) * 100)}%"
+                if apply_availability_filter else "0%"
+            )
 
             display_game = "N/A"
             display_rank = "N/A"
@@ -175,12 +167,6 @@ class UserGame:
                 matched_obj = games_list[0]
                 display_game = matched_obj['title']
                 display_rank = matched_obj['rank']
-
-            match_percentage = (
-                f"{round((harmony_score / max_score) * 100)}%"
-                if apply_availability_filter and max_score > 0
-                else "0%"
-            )
 
             results.append({
                 "id": user_id,
