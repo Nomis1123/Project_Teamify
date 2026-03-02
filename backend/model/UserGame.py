@@ -12,7 +12,6 @@ def get_db_connection():
         user=os.getenv("DB_USER", "postgres"),
         password=os.getenv("DB_PASSWORD")
     )
-    # This ensures the code looks in the 'public' schema where your tables likely are
     with conn.cursor() as cur:
         cur.execute("SET search_path TO public;")
     return conn
@@ -23,100 +22,175 @@ class UserGame:
         filters = filters or {}
         game_title = filters.get('game')
         rank = filters.get('rank')
-        apply_availability_filter = filters.get('availability') is not None
+        apply_availability_filter = filters.get('availability') is True
 
         params = []
+
         sql = """
             SELECT 
-                u.id, 
-                u.username, 
-                u.profile_picture_url, 
+                u.id,
+                u.username,
+                u.profile_picture_url,
                 u.description
         """
 
         with get_db_connection() as conn:
             with conn.cursor() as cur:
+
+                # Availability
                 if apply_availability_filter:
-                    # Fetch current user availability
                     cur.execute("SELECT availability FROM users WHERE id = %s", (current_user_id,))
                     res = cur.fetchone()
                     curr_avail = json.dumps(res[0]) if res and res[0] else json.dumps({})
-                    
-                    sql += """, (SELECT count(*) 
-                                    FROM (SELECT jsonb_object_keys(COALESCE(u.availability, '{}'::jsonb)) as day) d
-                                    CROSS JOIN (VALUES ('Morning'), ('Noon'), ('Evening')) AS s(slot)
-                                    WHERE COALESCE((u.availability -> d.day ->> s.slot)::boolean, FALSE) = TRUE
-                                    AND COALESCE((%s::jsonb -> d.day ->> s.slot)::boolean, FALSE) = TRUE
-                                ) as harmony_score """
-                    params.append(curr_avail) 
-                else:
-                    sql += ", 0 as harmony_score "
 
+                    sql += """,
+                        (
+                            SELECT COUNT(*)
+                            FROM (
+                                SELECT day, slot
+                                FROM (
+                                    SELECT jsonb_object_keys(COALESCE(u.availability, '{}'::jsonb)) AS day
+                                ) AS days
+                                CROSS JOIN (VALUES ('Morning'), ('Noon'), ('Evening')) AS slots(slot)
+                            ) AS all_slots
+                            WHERE COALESCE((u.availability -> all_slots.day ->> all_slots.slot)::boolean, FALSE) = TRUE
+                            AND COALESCE((%s::jsonb -> all_slots.day ->> all_slots.slot)::boolean, FALSE) = TRUE
+                        ) AS harmony_score,
+                        (
+                            SELECT COUNT(*)
+                            FROM (
+                                SELECT day, slot
+                                FROM (
+                                    SELECT jsonb_object_keys(COALESCE(u.availability, '{}'::jsonb)) AS day
+                                ) AS days
+                                CROSS JOIN (VALUES ('Morning'), ('Noon'), ('Evening')) AS slots(slot)
+                            ) AS all_slots
+                            WHERE COALESCE((%s::jsonb -> all_slots.day ->> all_slots.slot)::boolean, FALSE) = TRUE
+                        ) AS max_score
+                    """
+                    params.extend([curr_avail, curr_avail])
+                else:
+                    sql += ", 0 AS harmony_score, 0 AS max_score"
+
+                # game
+                sql += """,
+                    COALESCE(
+                        jsonb_agg(
+                            jsonb_build_object(
+                                'title', g.title,
+                                'rank', ug.current_rank
+                            )
+                        ) FILTER (WHERE g.id IS NOT NULL),
+                        '[]'
+                    ) AS user_games_list
+                """
+
+                # Base query
                 sql += """
-                        , COALESCE(
-                            jsonb_agg(
-                                jsonb_build_object('title', g.title, 'rank', ug.current_rank)
-                            ) FILTER (WHERE g.id IS NOT NULL), '[]'
-                        ) as user_games_list
-                        FROM users u
-                        LEFT JOIN user_games ug ON u.id = ug.user_id 
-                        LEFT JOIN games g ON ug.game_id = g.id 
-                        WHERE u.id != %s AND u.is_verified = TRUE
+                    FROM users u
+                    LEFT JOIN user_games ug ON u.id = ug.user_id
+                    LEFT JOIN games g ON ug.game_id = g.id
+                    WHERE u.id != %s
+                      AND u.is_verified = TRUE
                 """
                 params.append(current_user_id)
 
-                if game_title:
-                    sql += " AND g.title ILIKE %s "
+                # game filter
+                # Unified Game + Rank Filter
+                if game_title and rank:
+                    sql += """
+                        AND EXISTS (
+                            SELECT 1
+                            FROM user_games ug2
+                            JOIN games g2 ON ug2.game_id = g2.id
+                            WHERE ug2.user_id = u.id
+                            AND g2.title ILIKE %s
+                            AND ug2.current_rank ILIKE %s
+                        )
+                    """
                     params.append(f"%{game_title}%")
-                
-                if rank:
-                    sql += " AND ug.current_rank ILIKE %s " 
                     params.append(f"%{rank}%")
-                
-                sql += " GROUP BY u.id, u.username, u.profile_picture_url, u.description "
 
+                elif game_title:
+                    sql += """
+                        AND EXISTS (
+                            SELECT 1
+                            FROM user_games ug2
+                            JOIN games g2 ON ug2.game_id = g2.id
+                            WHERE ug2.user_id = u.id
+                            AND g2.title ILIKE %s
+                        )
+                    """
+                    params.append(f"%{game_title}%")
+
+                elif rank:
+                    sql += """
+                        AND EXISTS (
+                            SELECT 1
+                            FROM user_games ug2
+                            WHERE ug2.user_id = u.id
+                            AND ug2.current_rank ILIKE %s
+                        )
+                    """
+                    params.append(f"%{rank}%")
+
+                sql += """
+                    GROUP BY u.id, u.username, u.profile_picture_url, u.description
+                """
+
+                # Ordering
                 if apply_availability_filter:
-                    sql += " ORDER BY harmony_score DESC "
+                    sql += " ORDER BY harmony_score::float / NULLIF(max_score,0) DESC NULLS LAST"
                 else:
-                    sql += " ORDER BY u.id ASC "
+                    sql += " ORDER BY u.id ASC"
 
+                # Offset
                 try:
                     clean_offset = int(offset)
                 except (ValueError, TypeError):
                     clean_offset = 0
 
-                sql += " LIMIT 10 OFFSET %s;"
+                sql += " LIMIT 10 OFFSET %s"
                 params.append(clean_offset)
 
                 cur.execute(sql, tuple(params))
                 rows = cur.fetchall()
 
-                results = []
-                for r in rows:
-                    harmony_score = r[4] 
-                    games_list = r[5] or []
-                    
-                    display_game = "N/A"
-                    display_rank = "N/A" # Default rank
-                    
-                    if games_list:
-                        # Find the game object (contains both title and rank)
-                        search_term = game_title.lower() if game_title else ""
-                        matched_obj = next(
-                            (g for g in games_list if search_term in g['title'].lower()), 
-                            games_list[0]
-                        )
-                        display_game = matched_obj['title']
-                        display_rank = matched_obj['rank'] # Extract rank
+        
+        results = []
 
-                    results.append({
-                        "id": r[0],
-                        "username": r[1],
-                        "avatar": r[2] or f"https://api.dicebear.com/7.x/avataaars/svg?seed={r[1]}",
-                        "description": r[3],
-                        "match_percentage": f"{round((harmony_score / 21) * 100)}%" if apply_availability_filter else "0%",
-                        "game": display_game, 
-                        "rank": display_rank, # Added rank here
-                        "region": "NA"
-                    })
-                return results
+        for r in rows:
+            user_id = r[0]
+            username = r[1]
+            avatar = r[2]
+            description = r[3]
+            harmony_score = r[4]
+            max_score = r[5]
+            games_list = r[6] or []
+
+            display_game = "N/A"
+            display_rank = "N/A"
+
+            if games_list:
+                matched_obj = games_list[0]
+                display_game = matched_obj['title']
+                display_rank = matched_obj['rank']
+
+            match_percentage = (
+                f"{round((harmony_score / max_score) * 100)}%"
+                if apply_availability_filter and max_score > 0
+                else "0%"
+            )
+
+            results.append({
+                "id": user_id,
+                "username": username,
+                "avatar": avatar or f"https://api.dicebear.com/7.x/avataaars/svg?seed={username}",
+                "description": description,
+                "match_percentage": match_percentage,
+                "game": display_game,
+                "rank": display_rank,
+                "region": "NA"
+            })
+
+        return results
