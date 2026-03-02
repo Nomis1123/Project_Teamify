@@ -125,7 +125,7 @@ WHERE username = 'FullTimeGamer';
 
 -- First 5 users unique games
 INSERT INTO user_games (user_id, game_id, current_rank) VALUES 
-(1, (SELECT id FROM games WHERE title = 'Valorant'), 'Gold'),
+(1, (SELECT id FROM games WHERE title = 'PUBG'), 'Gold'),
 (2, (SELECT id FROM games WHERE title = 'PUBG'), 'Diamond'),
 (3, (SELECT id FROM games WHERE title = 'League'), 'Silver'),
 (4, (SELECT id FROM games WHERE title = 'Minecraft'), 'Survival'),
@@ -135,4 +135,25 @@ INSERT INTO user_games (user_id, game_id, current_rank) VALUES
 INSERT INTO user_games (user_id, game_id, current_rank)
 SELECT id, (SELECT id FROM games WHERE title = 'Valorant'), 'Gold'
 FROM users
-WHERE id >= 6;
+WHERE id Between 6 and 8;
+
+INSERT INTO user_games (user_id, game_id, current_rank)
+SELECT id, (SELECT id FROM games WHERE title = 'Valorant'), 'Diamond'
+FROM users
+WHERE id Between 9 and 10;
+
+INSERT INTO user_games (user_id, game_id, current_rank)
+SELECT id, (SELECT id FROM games WHERE title = 'Valorant'), 'Silver'
+FROM users
+WHERE id Between 11 and 12;
+
+INSERT INTO user_games (user_id, game_id, current_rank)
+SELECT id, (SELECT id FROM games WHERE title = 'Valorant'), 'Survival'
+FROM users
+WHERE id Between 13 and 15;
+
+
+INSERT INTO user_games (user_id, game_id, current_rank)
+SELECT id, (SELECT id FROM games WHERE title = 'Valorant'), 'Platinum'
+FROM users
+WHERE id >= 16;
