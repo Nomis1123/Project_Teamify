@@ -30,31 +30,31 @@ INSERT INTO games (title, genre, developer) VALUES
 
 INSERT INTO users (
     username, email, password_hash, steam_id,
-    description, is_verified
+    description, is_verified, region
 ) VALUES 
-('LunaVibes', 'luna@test.com', '$2b$12$hash', '76561197960435101', 'Late night sessions only.', true),
-('ShadowStep', 'shadow@test.com', '$2b$12$hash', '76561197960435102', 'I thrive in the dark.', true),
-('WeekendKing', 'king@test.com', '$2b$12$hash', '76561197960435103', 'Work hard, play hard Saturday/Sunday.', true),
-('OfficeWorker95', 'office@test.com', '$2b$12$hash', '76561197960435104', 'Free on weekends!', true),
-('EarlyBird99', 'bird@test.com', '$2b$12$hash', '76561197960435105', 'Gaming before work is the best.', true),
-('FullTimeGamer', 'pro@test.com', '$2b$12$hash', '76561197960435106', 'I have no life, I am always on.', true),
-('UniStudent', 'student@test.com', '$2b$12$hash', '76561197960435107', 'Gaming after lectures.', true),
-('LazyGamer', 'lazy@test.com', '$2b$12$hash', '76561197960435108', 'I havent set my schedule yet.', true),
-('User8', 'u8@test.com', '$2b$12$hash', '76561197960435109', 'Test user 8', true),
-('User9', 'u9@test.com', '$2b$12$hash', '76561197960435110', 'Test user 9', true),
-('User10', 'u10@test.com', '$2b$12$hash', '76561197960435111', 'Test user 10', true),
-('User11', 'u11@test.com', '$2b$12$hash', '76561197960435112', 'Test user 11', true),
-('User12', 'u12@test.com', '$2b$12$hash', '76561197960435113', 'Test user 12', true),
-('User13', 'u13@test.com', '$2b$12$hash', '76561197960435114', 'Test user 13', true),
-('User14', 'u14@test.com', '$2b$12$hash', '76561197960435115', 'Test user 14', true),
-('User15', 'u15@test.com', '$2b$12$hash', '76561197960435116', 'Test user 15', true),
-('User16', 'u16@test.com', '$2b$12$hash', '76561197960435117', 'Test user 16', true),
-('User17', 'u17@test.com', '$2b$12$hash', '76561197960435118', 'Test user 17', true),
-('User18', 'u18@test.com', '$2b$12$hash', '76561197960435119', 'Test user 18', true),
-('User19', 'u19@test.com', '$2b$12$hash', '76561197960435120', 'Test user 19', true),
-('User20', 'u20@test.com', '$2b$12$hash', '76561197960435121', 'Test user 20', true),
-('User21', 'u21@test.com', '$2b$12$hash', '76561197960435122', 'Test user 21', true),
-('User22', 'u22@test.com', '$2b$12$hash', '76561197960435123', 'Test user 22', true);
+('LunaVibes', 'luna@test.com', '$2b$12$hash', '76561197960435101', 'Late night sessions only.', true, 'NL'),
+('ShadowStep', 'shadow@test.com', '$2b$12$hash', '76561197960435102', 'I thrive in the dark.', true, 'NS'),
+('WeekendKing', 'king@test.com', '$2b$12$hash', '76561197960435103', 'Work hard, play hard Saturday/Sunday.', true, 'ON'),
+('OfficeWorker95', 'office@test.com', '$2b$12$hash', '76561197960435104', 'Free on weekends!', true, 'PE'),
+('EarlyBird99', 'bird@test.com', '$2b$12$hash', '76561197960435105', 'Gaming before work is the best.', true, 'QC'),
+('FullTimeGamer', 'pro@test.com', '$2b$12$hash', '76561197960435106', 'I have no life, I am always on.', true, 'SK'),
+('UniStudent', 'student@test.com', '$2b$12$hash', '76561197960435107', 'Gaming after lectures.', true, 'ON'),
+('LazyGamer', 'lazy@test.com', '$2b$12$hash', '76561197960435108', 'I havent set my schedule yet.', true, 'QC'),
+('User8', 'u8@test.com', '$2b$12$hash', '76561197960435109', 'Test user 8', true, 'NL'),
+('User9', 'u9@test.com', '$2b$12$hash', '76561197960435110', 'Test user 9', true, 'NS'),
+('User10', 'u10@test.com', '$2b$12$hash', '76561197960435111', 'Test user 10', true, 'ON'),
+('User11', 'u11@test.com', '$2b$12$hash', '76561197960435112', 'Test user 11', true, 'PE'),
+('User12', 'u12@test.com', '$2b$12$hash', '76561197960435113', 'Test user 12', true, 'QC'),
+('User13', 'u13@test.com', '$2b$12$hash', '76561197960435114', 'Test user 13', true, 'SK'),
+('User14', 'u14@test.com', '$2b$12$hash', '76561197960435115', 'Test user 14', true, 'ON'),
+('User15', 'u15@test.com', '$2b$12$hash', '76561197960435116', 'Test user 15', true, 'QC'),
+('User16', 'u16@test.com', '$2b$12$hash', '76561197960435117', 'Test user 16', true, 'NL'),
+('User17', 'u17@test.com', '$2b$12$hash', '76561197960435118', 'Test user 17', true, 'NS'),
+('User18', 'u18@test.com', '$2b$12$hash', '76561197960435119', 'Test user 18', true, 'ON'),
+('User19', 'u19@test.com', '$2b$12$hash', '76561197960435120', 'Test user 19', true, 'PE'),
+('User20', 'u20@test.com', '$2b$12$hash', '76561197960435121', 'Test user 20', true, 'SK'),
+('User21', 'u21@test.com', '$2b$12$hash', '76561197960435122', 'Test user 21', true, 'QC'),
+('User22', 'u22@test.com', '$2b$12$hash', '76561197960435123', 'Test user 22', true, 'ON');
 
 
 -- LunaVibes and ShadowStep (all evenings true)
