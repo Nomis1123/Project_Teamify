@@ -24,15 +24,17 @@ class UserGame:
         rank = filters.get('rank')
         search_availability = filters.get('availability')
         apply_availability_filter = isinstance(search_availability, dict)
+        region_filter = filters.get('region')
 
         params = []
 
         sql = """
             SELECT 
-                u.id,
-                u.username,
-                u.profile_picture_url,
-                u.description
+            u.id,
+            u.username,
+            u.profile_picture_url,
+            u.description,
+            u.region
         """
 
         with get_db_connection() as conn:
@@ -68,6 +70,10 @@ class UserGame:
                       AND u.is_verified = TRUE
                 """
                 params.append(current_user_id)
+
+                if region_filter:
+                    sql += " AND u.region = %s"
+                    params.append(region_filter)
 
                 # game filter
                 # Unified Game + Rank Filter
@@ -109,7 +115,7 @@ class UserGame:
                     params.append(f"%{rank}%")
 
                 sql += """
-                    GROUP BY u.id, u.username, u.profile_picture_url, u.description
+                    GROUP BY u.id, u.username, u.profile_picture_url, u.description, u.region
                 """
 
                 # Ordering
@@ -139,14 +145,8 @@ class UserGame:
         print(f"The length is {len(rows)}")
         for r in rows:
             print(f"r: {r}")
-            user_id = r[0]
-            username = r[1]
-            avatar = r[2]
-            description = r[3]
-            harmony_score = float(r[4] or 0)
-
+            user_id, username, avatar, description, region, harmony_score, games_list = r
             print(f"The matched score is {harmony_score}")
-            games_list = r[5] if len(r) > 5 else []
 
             # total slots for percentage
             total_slots = 7 * 3  # 7 days * 3 slots
@@ -177,7 +177,7 @@ class UserGame:
                 "match_percentage": match_percentage,
                 "game": display_game,
                 "rank": display_rank,
-                "region": "NA"
+                "region": region 
             })
 
         return results
