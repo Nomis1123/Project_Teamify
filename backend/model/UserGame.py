@@ -22,7 +22,8 @@ class UserGame:
         filters = filters or {}
         game_title = filters.get('game')
         rank = filters.get('rank')
-        apply_availability_filter = filters.get('availability') is True
+        search_availability = filters.get('availability')
+        apply_availability_filter = isinstance(search_availability, dict)
 
         params = []
 
@@ -39,13 +40,8 @@ class UserGame:
 
                 # Availability
                 if apply_availability_filter:
-                    cur.execute("SELECT availability FROM users WHERE id = %s", (current_user_id,))
-                    res = cur.fetchone()
-                    curr_avail = json.dumps(res[0]) if res and res[0] else json.dumps({})
-
-                    sql += """,
-                        calculate_harmony_score(u.availability, %s) AS harmony_score
-                    """
+                    curr_avail = json.dumps(search_availability)
+                    sql += ", calculate_harmony_score(u.availability, %s) AS harmony_score"
                     params.append(curr_avail)
                 else:
                     sql += ", 0 AS harmony_score"
@@ -135,9 +131,8 @@ class UserGame:
 
                 cur.execute(sql, tuple(params))
                 rows = cur.fetchall()
-                cur.execute("SELECT availability FROM users WHERE id = %s", (current_user_id,))
-                res = cur.fetchone()
-                print("curr_avail:", res[0])
+                
+                # print("curr_avail:", rows[0])
 
         
         results = []
@@ -156,15 +151,21 @@ class UserGame:
             # total slots for percentage
             total_slots = 7 * 3  # 7 days * 3 slots
             match_percentage = (
-                f"{round((harmony_score / total_slots) * 100)}%"
+                f"{round((float(harmony_score) / total_slots) * 100)}%"
                 if apply_availability_filter else "0%"
             )
 
             display_game = "N/A"
             display_rank = "N/A"
-
+            
+            # Find the game name to display
             if games_list:
-                matched_obj = games_list[0]
+                search_term = game_title.lower() if game_title else ""
+                # This finds the specific game object that matches your search
+                matched_obj = next(
+                    (g for g in games_list if search_term in g['title'].lower()), 
+                    games_list[0]
+                )
                 display_game = matched_obj['title']
                 display_rank = matched_obj['rank']
 
