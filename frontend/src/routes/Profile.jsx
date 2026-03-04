@@ -21,6 +21,7 @@ const Profile = () => {
     };
     const [user, setUser] = useState({
         id: "",
+        steam_id: "",
         username: "",
         email: "",
         description: "",
@@ -35,12 +36,13 @@ const Profile = () => {
         const loadMe = async () => {
             try {
                 setLoading(true);
+                console.log(localStorage.getItem("access_token"))
 
                 const res = await fetch("/api/user/me", {
                     method: "GET",
                     // If your backend uses cookies/sessions, uncomment:
                     // credentials: "include",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
                 });
                 // console.log("fetch returned:", res.status, res.url);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -48,6 +50,7 @@ const Profile = () => {
                 // console.log("response data:", data);
                 const normalized = {
                     id: data.user.id ?? "",
+                    steam_id: data.user.steam_id ?? "",
                     username: data.user.username ?? "",
                     email: data.user.email ?? "",
                     description: data.user.description ?? "",
@@ -117,6 +120,34 @@ const Profile = () => {
     //     });
     // }, []);
 
+    async function sendToken() {
+        try {
+            const res = await fetch("/api/auth/steamlogin", {
+                method: "GET",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+            });
+            if (!res.ok) {
+                // backend might return JSON error { message: "..." }
+                let msg = "";
+                try {
+                    const data = await res.json();
+                    console.log(data);
+                if (data?.status) msg = data.status;
+                    console.log(msg);
+                } catch {}
+                throw new Error(msg);
+            }
+            const data = await res.json();
+
+            if (data.redirect_url) {
+                window.location.href = data.redirect_url;
+            }
+            // console.log("Token sent successfully");
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
     return (
     <div className="profile-page">
         <div className="profile-card profile-layout">
@@ -130,13 +161,29 @@ const Profile = () => {
                 />
 
                 <div className='username'>
-                    <h1>{loading ? "Loading..." : user.username || "Unknown User"}</h1>
-                    <p>User ID: {user.id || "-"}</p>
+                    <h1>
+                        {loading ? "Loading..." : user.username || "Unknown User"}
+                    </h1>
+                    <p>
+                        User ID: {user.id ? user.id : "-"}
+                        </p>
+                    <p>
+                        Email: {user.email ? user.email : "-"}
+                    </p>
+                    {user?.steam_id && <p>Linked to steam</p>}
+                </div>
+                <div className='profile-button-container'>
+                    <button className="profile-btn" onClick={() => navigate("/profile_editing")}>
+                        Edit Profile
+                    </button>
+                    {!user?.steam_id && 
+                        <button className="profile-btn" onClick={ () => sendToken() }>
+                            Link Steam
+                        </button>
+                    }
+                    
                 </div>
                 
-                <button className="profile-edit-btn" onClick={() => navigate("/profile_editing")}>
-                    Edit Profile
-                </button>
             </div>
             
             <div className='profile-scroll'>
@@ -161,6 +208,7 @@ const Profile = () => {
                             { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
                             { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
                             { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                            { id: "6", name: "Apex Legends", img: "src/gameImages/apexBanner.jpg" },
                         ]} />
                         <GamePicker games={[
                             { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
@@ -169,6 +217,7 @@ const Profile = () => {
                             { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
                             { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
                             { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                            { id: "6", name: "Apex Legends", img: "src/gameImages/apexBanner.jpg" },
                         ]} />
                         <GamePicker games={[
                             { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
@@ -177,6 +226,7 @@ const Profile = () => {
                             { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
                             { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
                             { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                            { id: "6", name: "Apex Legends", img: "src/gameImages/apexBanner.jpg" },
                         ]} />
                         <GamePicker games={[
                             { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
@@ -185,6 +235,7 @@ const Profile = () => {
                             { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
                             { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
                             { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                            { id: "6", name: "Apex Legends", img: "src/gameImages/apexBanner.jpg" },
                         ]} />
                         <GamePicker games={[
                             { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
@@ -193,6 +244,7 @@ const Profile = () => {
                             { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
                             { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
                             { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                            { id: "6", name: "Apex Legends", img: "src/gameImages/apexBanner.jpg" },
                         ]} />
                     </div>
                 </div>

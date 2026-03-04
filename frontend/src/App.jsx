@@ -6,6 +6,7 @@ import Profile from "./routes/Profile"
 import ProfileEdit from './routes/ProfileEdit.jsx'
 import Register from './routes/Register.jsx'
 import { useState, useEffect } from "react"
+import Matchmaking from './routes/Matchmaking.jsx'
 
 // npm run dev http://localhost:5173/ 
 
@@ -48,6 +49,7 @@ function App() {
             <Route path="/profile" element={<Profile/>} />
             <Route path="/profile_editing" element={<ProfileEdit/>} />
             <Route path="/register" element={<Register/>} />
+            <Route path="/matchmaking" element={<Matchmaking/>} />
           </Routes>
       </div>
     </>

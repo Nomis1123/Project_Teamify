@@ -1,0 +1,265 @@
+/* for filters + banners */
+.layout {
+    font-family: 'Roboto', sans-serif; 
+}
+
+.title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-align: center;
+    background: linear-gradient(to right,
+    #60a5fa,
+    #c084fc,
+    #f472b6 );
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    margin-top: 40px;
+}
+
+/* the below css are for the filter area */
+.filters {
+    padding: 5px 30px;
+}
+
+.filters-layout{
+    width: 85%; 
+    max-width: 1500px;
+    margin: 0 auto;           
+    background: linear-gradient(to right, #562A86, #4A3194); 
+    border: 1px solid #8933da;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+
+    padding: 18px;
+    margin-top: 30px;
+}
+
+.filter-controls{ 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap; /* wrap on small screens to avoid breaking*/          
+    margin-top: 15px;
+}
+.filters span{
+    font-size: 1.1rem;
+}
+
+.filterIcon{
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+}
+
+.filters select,
+.filters button {
+    border-radius: 10px;
+    border: 0.5px solid #8933da;
+    background-color: #39245D;
+    width: 180px;
+    min-width: 50px;
+    text-align: left;
+    -webkit-appearance: none;
+
+    padding: 8px 12px;
+}
+
+.apply-button{
+    text-align: center !important; /* keeps apply text centered */
+}
+
+.filter-controls select:hover,
+.filter-controls button:hover {
+    border-color: #a855f7;
+    transform: scale(1.02);
+}
+
+.availability-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* makes availability a pop up */
+.availability-content {
+    position: absolute;  
+    width: 320px;    
+    top: 100%;    /* make sure pop up is below the button */
+    left: 50%;        
+    transform: translateX(-50%); /* center horizontally */
+    background: #4a3194;
+    padding: 12px;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    z-index: 999; /* make pop up above other content */
+}
+
+/* the below css are for user banners only */
+.user-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+
+  margin-top: 50px;
+}
+
+.user-banners {
+    position: relative;
+    width: 85%;
+    max-width: 1500px;
+    display: flex;
+    overflow: hidden;
+    border: 1px solid #8933da;
+    border-radius: 18px;
+    background: linear-gradient(to right, #562A86, #3f34a2); 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    color: white;
+
+    padding: 15px 30px 10px;
+    margin-bottom: 20px;
+    z-index: 1;
+}
+
+.user-banners:hover {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 2px 1px #8b5cf6, 0 0 25px 5px #8933da; /* shadow to glow on hover */
+}
+
+.bg-gradient-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, transparent, transparent, rgba(70,0,120,0.5), #512D8C);
+    pointer-events: none; /* prevents blocking clicks */
+}
+
+.bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 29%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+.left-side{
+    position: relative;
+    width: 29%;
+    min-height: 140px;
+}
+
+.user-content {
+    position: absolute;
+    left: 10px;     /* distance from right edge */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    gap: 15px;
+}
+
+.rank {
+    font-size: 1.0rem; /* rem to fit based on screen size*/
+    font-weight: 550;
+    border-radius: 99px;
+    width: fit-content;
+    background: rgba(5, 56, 223, 0.4); 
+    color: white;
+    
+    padding: 4px 10px;
+    margin-left: -5px;
+    margin-right: 30px;
+    margin-bottom: 100px;
+}
+
+.right-side {
+    flex: 1;  /* take up the remaining width of banner */
+    display: flex;
+    align-items: center; 
+    justify-content: flex-end;
+}
+
+.top-row {
+    display: flex;
+}
+
+.avatar {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border-radius: 100%;
+}
+
+.username {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.region{
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.region img {
+    display: inline-block; /* must keep img as inline-block */
+    width: 18px;
+    height: 18px;
+}
+
+.connect-button {
+    position: relative;
+    right: 50px;
+    width: 110px;
+    height: 45px;
+    border: 3px solid transparent;
+
+    /* added border animation effect */
+    background: 
+        linear-gradient(to right, #3b82f6, #8b5cf6) padding-box,
+        linear-gradient(90deg, #5090f7, #9369f6) border-box;
+    background-size: 100% 100%, 200% 200%;
+    animation: borderMove 4s linear infinite;
+
+    color: white;
+    font-weight: bold;
+    border-radius: 25px;
+    padding: 6px 12px;
+}
+
+/* defining movement for the above linear infinite animation */
+@keyframes borderMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.connect-button:hover {
+    background: linear-gradient(to right, #2563eb, #7c3aed);
+}
+
+/* sets all user contents above the bg game image */
+.user-banners > *:not(.bg-image) {
+    position: relative;
+    z-index: 1;
+}
+
+.empty-msg {
+    text-align: center;
+    padding: 2.8rem 0;
+}
+
+.empty-msg p{
+    color: #9CA3AF;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+

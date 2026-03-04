@@ -1,0 +1,251 @@
+import React from 'react'
+import { useEffect, useState } from "react";
+import "./ProfileEdit.css";
+import { useNavigate } from "react-router-dom";
+import "../components/GameScheduleBar.css";
+import "../components/PopupStarter.css";
+import GameScheduleBar from "../components/GameScheduleBar";
+import GamePicker from "../components/GamePicker";
+import PUUsername from '../components/PopupUsername';
+import PUEmail from '../components/PopupEmail';
+import PUPassword from '../components/PopupPassword';
+import PUDescription from '../components/PopupDescription';
+
+const ProfileEdit = () => {
+    const navigate = useNavigate();
+    const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+    const defaultDailySchedule = { morning: false, afternoon: false, night: false };
+    const defaultWeeklySchedule = {
+            Monday: { ...defaultDailySchedule },
+            Tuesday: { ...defaultDailySchedule },
+            Wednesday: { ...defaultDailySchedule },
+            Thursday: { ...defaultDailySchedule },
+            Friday: { ...defaultDailySchedule },
+            Saturday: { ...defaultDailySchedule },
+            Sunday: { ...defaultDailySchedule },
+    };
+    const [user, setUser] = useState({
+        id: "",
+        username: "",
+        email: "",
+        description: "",
+        profileImageUrl: "",
+        games: [],
+        schedule: defaultWeeklySchedule,
+    });
+    const [username, setUsername] = useState("");
+    const [id, setID] = useState("");
+    const [email, setEmail] = useState("");
+    const [description, setDescription] = useState("");
+    const [loading, setLoading] = useState(true);
+    // const [error, setError] = useState("");
+
+    useEffect(() => {
+        const loadMe = async () => {
+            try {
+                setLoading(true);
+                
+                // This is for testing only
+                // setUsername("TestUser");
+                // setDescription("TestDesc");
+
+                const res = await fetch("/api/user/me", {
+                    method: "GET",
+                    // If backend uses cookies/sessions, uncomment:
+                    // credentials: "include",
+                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+                });
+                // console.log("fetch returned:", res.status, res.url);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                // console.log("response data:", data);
+                const normalized = {
+                    id: data.user.id ?? "",
+                    username: data.user.username ?? "",
+                    email: data.user.email ?? "",
+                    description: data.user.description ?? "",
+                    profile_picture: data.user.profile_picture ?? "",
+                    // games: Array.isArray(data.user.games) ? data.games : [],
+                    // schedule: days.reduce((acc, day) => {
+                    //     // console.log("schedule:", day, data.schedule[day]);
+                    //     const d = data.user.schedule?.[day] ?? defaultDailySchedule;
+                    //     acc[day] = {
+                    //         morning: Boolean(d.morning),
+                    //         afternoon: Boolean(d.afternoon),
+                    //         night: Boolean(d.night),
+                    //     };
+                    //     return acc;
+                    // }, {}),
+                };
+                console.log("setting user to:", normalized);
+                setUser(normalized);
+
+                setUsername(normalized.username);
+                setID(normalized.id);
+                setEmail(normalized.email);
+                setDescription(normalized.description);
+            } catch (e) {
+                console.log("error:", e);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadMe();
+    }, []);
+
+    const handleScheduleToggle = (day, timeSlot) => {
+        
+        setUser((prevUser) => {
+            const updatedSchedule = { ...prevUser.schedule };
+            const updatedDay = { ...(updatedSchedule[day] || defaultDailySchedule) };
+
+            updatedDay[timeSlot] = !updatedDay[timeSlot];
+            updatedSchedule[day] = updatedDay;
+
+            return {
+                ...prevUser,
+                schedule: updatedSchedule,
+                
+            };
+        });
+    };
+
+    useEffect(() => {
+        console.log("user state updated:", user.id);
+    }, [user]);
+    // Test:
+    // useEffect(() => {
+    //     setUser({
+    //         uid: "user123",
+    //         username: "TestUser",
+    //         email: "testingemail@123.com"
+    //         description: "Hello I am a new user",
+    //         profileImageUrl: "",
+    //         games: [],
+    //         schedule: {
+    //         Monday: { morning: true, afternoon: false, night: true },
+    //         Tuesday: { morning: false, afternoon: false, night: false },
+    //         Wednesday: { morning: false, afternoon: true, night: false },
+    //         Thursday: { morning: true, afternoon: true, night: true },
+    //         Friday: { morning: false, afternoon: true, night: true },
+    //         Saturday: { morning: true, afternoon: false, night: false },
+    //         Sunday: { morning: false, afternoon: false, night: true },
+    //         },
+    //     });
+    // }, []);
+
+    return (
+    <div className="profile-page">
+        <div className="profile-card profile-layout">
+            
+            <div className="profile-info-layout">
+                <img
+                    className="profile-image"
+                    // This image link is temporary. Replace it when we figure out a default profile image.
+                    src={user.profile_picture || "https://th.bing.com/th/id/OIP.BXIufrwgTFhg49ux6NTkiQHaQD?w=236"}
+                    alt="Profile"
+                />
+
+                <div className='username'>
+                    <h1>
+                        {loading ? "Loading..." : username || "Unknown User"}
+                    </h1>
+                    <p>
+                        User ID: {id ? id : "-"}
+                    </p>
+                    <p>
+                        Email: {email ? email : "-"}
+                    </p>
+                </div>
+                
+                <button className="profile-return-btn" onClick={() => navigate("/profile")}>
+                    Return to Profile
+                </button>
+            </div>
+            
+            <div className='profile-scroll'>
+                <div>
+                    <PUUsername username={username} usernameModifier={setUsername}/>
+                </div>
+                <div>
+                    <PUEmail email={email} emailModifier={setEmail}/>
+                </div>
+                <div>
+                    <PUPassword />
+                </div>
+                <div className='profile-description-header'>
+                    <h2 className='profile-description-text'>Description:</h2>
+                    <div>
+                        <PUDescription description={description} descriptionModifier={setDescription}/>
+                    </div>
+                </div>
+                <div className="profile-description">
+                    <p>
+                        {description ? description : "You have not set a description yet."}
+                    </p>
+                </div>
+
+                <h2>Games:</h2>
+                <div className='profile-game-section'>
+                    <div className="profile-game-bar">
+                        {/* The image sources are temporary. Replace with game icons and name after.
+                            I still have to modify this so that it accept game image and name from db. */}
+                        <GamePicker games={[
+                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
+                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
+                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
+                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
+                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
+                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                        ]} />
+                        <GamePicker games={[
+                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
+                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
+                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
+                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
+                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
+                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                        ]} />
+                        <GamePicker games={[
+                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
+                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
+                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
+                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
+                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
+                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                        ]} />
+                        <GamePicker games={[
+                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
+                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
+                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
+                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
+                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
+                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                        ]} />
+                        <GamePicker games={[
+                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
+                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
+                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
+                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
+                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
+                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
+                        ]} />
+                    </div>
+                </div>
+            
+                <h2>Game Schedule:</h2>
+                <div className='profile-game-schedule'>
+                    <GameScheduleBar 
+                    schedule={user.schedule} 
+                    onClick={handleScheduleToggle}
+                    />
+                </div>
+            </div>
+            
+      </div>
+    </div>
+  );
+};
+
+export default ProfileEdit;

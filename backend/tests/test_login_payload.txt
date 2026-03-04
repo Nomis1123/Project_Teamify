@@ -1,0 +1,7 @@
+login 200 jeff@gmail.com abcd1234
+login 401 jeff@gmail.com passwordDoesNotMatch
+login 404 IdontExist@gmail.com 1234567a
+login 400 emptyPass@gmail.com ""
+login 400 "" empty3mail
+login 400 "" ""
+login 201 StatusCheck@gmail.com 1234abcd
