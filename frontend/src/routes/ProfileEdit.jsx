@@ -10,6 +10,7 @@ import PUUsername from '../components/PopupUsername';
 import PUEmail from '../components/PopupEmail';
 import PUPassword from '../components/PopupPassword';
 import PUDescription from '../components/PopupDescription';
+import PUGame from '../components/PopupGame';
 import PUSchedule from '../components/PopupSchedule';
 
 const ProfileEdit = () => {
@@ -39,6 +40,7 @@ const ProfileEdit = () => {
     const [email, setEmail] = useState("");
     const [description, setDescription] = useState("");
     const [schedule, setSchedule] = useState(defaultWeeklySchedule);
+    const [game, setGame] = useState([]);
     const [loading, setLoading] = useState(true);
     // const [error, setError] = useState("");
 
@@ -87,6 +89,7 @@ const ProfileEdit = () => {
                 setEmail(normalized.email);
                 setDescription(normalized.description);
                 setSchedule(normalized.schedule);
+                setGame(normalized.game);
             } catch (e) {
                 console.log("error:", e);
             } finally {
@@ -174,7 +177,7 @@ const ProfileEdit = () => {
 
                 <div className='profile-section'>
                     <h2 className='profile-text-right'>Games:</h2>
-                    {/* <PUGame /> */}
+                    <PUGame game={game} gameModifier={setGame}/>
                 </div>
                 <div className='profile-game-section'>
                     <div className="profile-game-bar">
