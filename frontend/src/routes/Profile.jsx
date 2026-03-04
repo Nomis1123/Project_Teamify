@@ -36,7 +36,7 @@ const Profile = () => {
         const loadMe = async () => {
             try {
                 setLoading(true);
-                console.log(localStorage.getItem("access_token"))
+                // console.log(localStorage.getItem("access_token"))
 
                 const res = await fetch("/api/user/me", {
                     method: "GET",
@@ -56,16 +56,16 @@ const Profile = () => {
                     description: data.user.description ?? "",
                     profile_picture: data.user.profile_picture ?? "",
                     // games: Array.isArray(data.user.games) ? data.games : [],
-                    // schedule: days.reduce((acc, day) => {
-                    //     // console.log("schedule:", day, data.schedule[day]);
-                    //     const d = data.user.schedule?.[day] ?? defaultDailySchedule;
-                    //     acc[day] = {
-                    //         morning: Boolean(d.morning),
-                    //         afternoon: Boolean(d.afternoon),
-                    //         night: Boolean(d.night),
-                    //     };
-                    //     return acc;
-                    // }, {}),
+                    schedule: days.reduce((acc, day) => {
+                        // console.log("schedule:", day, data.schedule[day]);
+                        const d = data.user.schedule?.[day] ?? defaultDailySchedule;
+                        acc[day] = {
+                            morning: Boolean(d.morning),
+                            afternoon: Boolean(d.afternoon),
+                            night: Boolean(d.night),
+                        };
+                        return acc;
+                    }, {}),
                 };
                 console.log("setting user to:", normalized);
                 setUser(normalized);
@@ -253,7 +253,7 @@ const Profile = () => {
                 <div className='profile-game-schedule'>
                     <GameScheduleBar 
                     schedule={user.schedule} 
-                    onClick={handleScheduleToggle}
+                    onClick={() => {}}
                     />
                 </div>
             </div>
