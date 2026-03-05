@@ -26,6 +26,11 @@ const Profile = () => {
         email: "",
         description: "",
         profileImageUrl: "",
+        // games: [['lol1', 'src/gameImages/lol.webp', 'gold', 'Support'],
+        //         ['lol2', 'src/gameImages/lol.webp', 'iron', 'top'],
+        //         ['lol3', 'src/gameImages/lol.webp', 'silver', 'some role'],
+        //         ['lol4', 'src/gameImages/lol.webp', 'diamond', 'some role2'],
+        //         ['lol5', 'src/gameImages/lol.webp', 'master']],
         games: [],
         schedule: defaultWeeklySchedule,
     });
@@ -55,7 +60,7 @@ const Profile = () => {
                     email: data.user.email ?? "",
                     description: data.user.description ?? "",
                     profile_picture: data.user.profile_picture ?? "",
-                    // games: Array.isArray(data.user.games) ? data.games : [],
+                    games: Array.isArray(data.user.games) ? data.games : [],
                     schedule: days.reduce((acc, day) => {
                         // console.log("schedule:", day, data.schedule[day]);
                         const d = data.user.schedule?.[day] ?? defaultDailySchedule;
@@ -78,23 +83,6 @@ const Profile = () => {
 
         loadMe();
     }, []);
-
-    const handleScheduleToggle = (day, timeSlot) => {
-        
-        setUser((prevUser) => {
-            const updatedSchedule = { ...prevUser.schedule };
-            const updatedDay = { ...(updatedSchedule[day] || defaultDailySchedule) };
-
-            updatedDay[timeSlot] = !updatedDay[timeSlot];
-            updatedSchedule[day] = updatedDay;
-
-            return {
-                ...prevUser,
-                schedule: updatedSchedule,
-                
-            };
-        });
-    };
 
     useEffect(() => {
         console.log("user state updated:", user.id);
@@ -201,51 +189,54 @@ const Profile = () => {
                     <div className="profile-game-bar">
                         {/* The image sources are temporary. Replace with game icons and name after.
                             I still have to modify this so that it accept game image and name from db. */}
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                            { id: "6", name: "Apex Legends", img: "src/gameImages/apexBanner.jpg" },
-                        ]} />
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                            { id: "6", name: "Apex Legends", img: "src/gameImages/apexBanner.jpg" },
-                        ]} />
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                            { id: "6", name: "Apex Legends", img: "src/gameImages/apexBanner.jpg" },
-                        ]} />
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                            { id: "6", name: "Apex Legends", img: "src/gameImages/apexBanner.jpg" },
-                        ]} />
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                            { id: "6", name: "Apex Legends", img: "src/gameImages/apexBanner.jpg" },
-                        ]} />
+                        {user.games.length === 0 && 
+                            <div className='profile-section' style={{gap: 10}}>
+                                <h2>You haven't select a game yet! Add more games here:</h2>
+                                <button className="profile-btn btn-auto-height" onClick={() => navigate("/profile_editing")}>
+                                    Edit Profile
+                                </button> 
+                            </div>
+                        }
+                        {user.games.length >= 1 && 
+                            <div className='profile-game-image-text-container'>
+                                <img className="profile-game-image" src={user.games[0][1]} alt={user.games[0][0]} />
+                                <span>{user.games[0][0]}</span>
+                                {user.games[0].length >= 3 && <span>Rank: {user.games[0][2]}</span>}
+                                {user.games[0].length >= 4 && <span>Role: {user.games[0][3]}</span>}
+                            </div>
+                        }
+                        {user.games.length >= 2 && 
+                            <div className='profile-game-image-text-container'>
+                                <img className="profile-game-image" src={user.games[1][1]} alt={user.games[1][0]} />
+                                <span>{user.games[1][0]}</span>
+                                {user.games[1].length >= 3 && <span>Rank: {user.games[1][2]}</span>}
+                                {user.games[1].length >= 4 && <span>Role: {user.games[1][3]}</span>}
+                            </div>
+                        }
+                        {user.games.length >= 3 && 
+                            <div className='profile-game-image-text-container'>
+                                <img className="profile-game-image" src={user.games[2][1]} alt={user.games[2][0]} />
+                                <span>{user.games[2][0]}</span>
+                                {user.games[2].length >= 3 && <span>Rank: {user.games[2][2]}</span>}
+                                {user.games[2].length >= 4 && <span>Role: {user.games[2][3]}</span>}
+                            </div>
+                        }
+                        {user.games.length >= 4 && 
+                            <div className='profile-game-image-text-container'>
+                                <img className="profile-game-image" src={user.games[3][1]} alt={user.games[3][0]} />
+                                <span>{user.games[3][0]}</span>
+                                {user.games[3].length >= 3 && <span>Rank: {user.games[3][2]}</span>}
+                                {user.games[3].length >= 4 && <span>Role: {user.games[3][3]}</span>}
+                            </div>
+                        }
+                        {user.games.length === 5 && 
+                            <div className='profile-game-image-text-container'>
+                                <img className="profile-game-image" src={user.games[4][1]} alt={user.games[4][0]} />
+                                <span>{user.games[4][0]}</span>
+                                {user.games[4].length >= 3 && <span>Rank: {user.games[4][2]}</span>}
+                                {user.games[4].length >= 4 && <span>Role: {user.games[4][3]}</span>}
+                            </div>
+                        }
                     </div>
                 </div>
             
