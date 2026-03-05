@@ -40,7 +40,7 @@ const ProfileEdit = () => {
     const [email, setEmail] = useState("");
     const [description, setDescription] = useState("");
     const [schedule, setSchedule] = useState(defaultWeeklySchedule);
-    const [games, setGame] = useState([['lol', 'src/gameImages/lol.webp'], ['pubg', 'src/gameImages/pubg.webp']]);
+    const [games, setGame] = useState([]);
     const [loading, setLoading] = useState(true);
     // const [error, setError] = useState("");
 
@@ -185,43 +185,43 @@ const ProfileEdit = () => {
 
                         {games.length >= 1 && 
                             <div className='profile-game-image-text-container'>
-                                <PUGame game={games} gameModifier={setGame} which={0} isAdding={false}/>
-                                {games[0].length >= 3 && <span>Rank: {games[0][2]}</span>}
-                                {games[0].length >= 4 && <span>Role: {games[0][3]}</span>}
+                                <PUGame games={games} gameModifier={setGame} which={0} isAdding={false}/>
+                                {'rank' in games[0] && <span>Rank: {games[0]['rank']}</span>}
+                                {'role' in games[0] && <span>Role: {games[0]['role']}</span>}
                             </div>
                         }
                         {games.length >= 2 && 
                             <div className='profile-game-image-text-container'>
-                                <PUGame game={games} gameModifier={setGame} which={1} isAdding={false}/>
-                                {games[1].length >= 3 && <span>Rank: {games[1][2]}</span>}
-                                {games[1].length >= 4 && <span>Role: {games[1][3]}</span>}
+                                <PUGame games={games} gameModifier={setGame} which={1} isAdding={false}/>
+                                {'rank' in games[1] && <span>Rank: {games[1]['rank']}</span>}
+                                {'role' in games[1] && <span>Role: {games[1]['role']}</span>}
                             </div>
                         }
                         {games.length >= 3 && 
                             <div className='profile-game-image-text-container'>
-                                <PUGame game={games} gameModifier={setGame} which={2} isAdding={false}/>
-                                {games[2].length >= 3 && <span>Rank: {games[2][2]}</span>}
-                                {games[2].length >= 4 && <span>Role: {games[2][3]}</span>}
+                                <PUGame games={games} gameModifier={setGame} which={2} isAdding={false}/>
+                                {'rank' in games[2] && <span>Rank: {games[2]['rank']}</span>}
+                                {'role' in games[2] && <span>Role: {games[2]['role']}</span>}
                             </div>
                         }
                         {games.length >= 4 && 
                             <div className='profile-game-image-text-container'>
-                                <PUGame game={games} gameModifier={setGame} which={3} isAdding={false}/>
-                                {games[3].length >= 3 && <span>Rank: {games[3][2]}</span>}
-                                {games[3].length >= 4 && <span>Role: {games[3][3]}</span>}
+                                <PUGame games={games} gameModifier={setGame} which={3} isAdding={false}/>
+                                {'rank' in games[3] && <span>Rank: {games[3]['rank']}</span>}
+                                {'role' in games[3] && <span>Role: {games[3]['role']}</span>}
                             </div>
                         }
                         {games.length === 5 && 
                             <div className='profile-game-image-text-container'>
-                                <PUGame game={games} gameModifier={setGame} which={4} isAdding={false}/>
-                                {games[4].length >= 3 && <span>Rank: {games[4][2]}</span>}
-                                {games[4].length >= 4 && <span>Role: {games[4][3]}</span>}
+                                <PUGame games={games} gameModifier={setGame} which={4} isAdding={false}/>
+                                {'rank' in games[4] && <span>Rank: {games[4]['rank']}</span>}
+                                {'role' in games[4] && <span>Role: {games[4]['role']}</span>}
                             </div>
                         }
 
                         {games.length < 5 && 
                             <div>
-                                <PUGame game={games} gameModifier={setGame} which={null} isAdding={true}/>
+                                <PUGame games={games} gameModifier={setGame} which={null} isAdding={true}/>
                             </div>
                         }
                     </div>

@@ -2,17 +2,11 @@ import { useState } from "react";
 import "./PopupGame.css";
 import Popup from "./Popup"
 
-export default function PUGame({game, gameModifier, which, isAdding}) {
+export default function PUGame({games, gameModifier, which, isAdding}) {
     const [open, setOpen] = useState(false);
-    const [selected, setSelected] = useState([null, null, null, null]);
+    const [selected, setSelected] = useState(null);
     const [selectedIndex, setSelectedIndex] = useState(null);
-    const [unselected, setUnselected] = useState([['lol', 'src/gameImages/lol.webp'], 
-        ['minecraft', 'src/gameImages/minecraft.webp'],
-        ['minecraft', 'src/gameImages/minecraft.webp'],
-        ['minecraft', 'src/gameImages/minecraft.webp'],
-        ['minecraft', 'src/gameImages/minecraft.webp'],
-        ['minecraft', 'src/gameImages/minecraft.webp'],
-        ['minecraft', 'src/gameImages/minecraft.webp']]);
+    const [unselected, setUnselected] = useState([{'title': 'minecraft', 'url': 'src/gameImages/minecraft.webp'},]);
     const [isSaving, setIsSaving] = useState(false);
     const [gmeFail, setFail] = useState("");
 
@@ -24,31 +18,38 @@ export default function PUGame({game, gameModifier, which, isAdding}) {
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
             });
             if (!res.ok) {
-                setFail(`Failed to fetch game data. Please try again later. (${res.status})`);
+                setFail(`Failed to fetch game data. Please try again later.`);
             }
             const data = await res.json();
             console.log(data);
             setUnselected(data.unselected);
         } catch (e) {
-            setFail(`Failed to fetch game data. Please try again later. (${e.message})`);
+            setFail(`Failed to fetch game data. Please try again later.`);
         } finally {
         }
     }
     async function handleSave() {
         setFail("");
-        console.log(selected)
-        if (selected[0] == null) {
+        if (selected === null) {
             setFail(`You must select a game before save!`);
             return;
         }
 
         setIsSaving(true);
 
+        const update = isAdding? [...games, selected]: 
+            (() => {
+                const u = [...games];
+                u[which] = selected;
+                return u;
+            })();
+        // gameModifier(update);
+
         try {
             const res = await fetch("/api/user/me", {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
-                body: JSON.stringify({ games: selected }),
+                body: JSON.stringify({ games: update }),
             });
 
             if (!res.ok) {
@@ -64,7 +65,7 @@ export default function PUGame({game, gameModifier, which, isAdding}) {
                 throw new Error(msg);
             }
             handleClose();
-            gameModifier(selected);
+            gameModifier(update);
         } catch (e) {
             // setFail(e instanceof Error ? e.message : "Save failed.");
             setFail(`Save failed. Please try again later. (${e.message})`);
@@ -76,16 +77,19 @@ export default function PUGame({game, gameModifier, which, isAdding}) {
         setIsSaving(false);
         setOpen(false);
         setFail("");
+        setSelected(null);
+        setUnselected([]);
+        setSelectedIndex(null);
     };
 
     return (
         <div className="element-game">
             {which != null? 
-                <button className="btn-game btn-game-image" onClick={() => {setOpen(true);}}>
-                    <img className="popup-game-image" src={game[which][1]} alt={game[which][0]} />
-                    <span>{game[which][0]}</span>
+                <button className="btn-game btn-game-image" onClick={() => {setOpen(true); handleGet();}}>
+                    <img className="popup-game-image" src={games[which]['url']} alt={games[which]['title']} />
+                    <span>{games[which]['title']}</span>
                 </button> :
-                <button className="btn-game btn-game-image" onClick={() => {setOpen(true);}}>
+                <button className="btn-game btn-game-image" onClick={() => {setOpen(true); handleGet();}}>
                     <img className="popup-game-image" src={"src/gameImages/select.webp"} alt={"Select Your Game"} />
                     <span>{"Select Your Game"}</span>
                 </button>
@@ -96,12 +100,16 @@ export default function PUGame({game, gameModifier, which, isAdding}) {
                 <div style={{ display: "flex", gap: 8 }}>
                     {unselected.length > 0 && (
                         <div className="game-input-container">
-                            {unselected.map(([alt, src], index) => (
-                                <img key={`${alt}-${index}`} 
-                                    className={`popup-game-image popup-game-${selectedIndex === index ? "selected" : ""}`} 
-                                    src={src} 
-                                    alt={alt} 
-                                    onClick={() => {setSelected([alt, src, null, null]); setSelectedIndex(index);}}
+                            {unselected.map(({ title, url }, index) => (
+                                <img
+                                    key={`${title}-${index}`}
+                                    className={`popup-game-image ${selectedIndex === index ? "popup-game-selected" : ""}`}
+                                    src={url}
+                                    alt={title}
+                                    onClick={() => {
+                                        setSelected({ title, url });
+                                        setSelectedIndex(index);
+                                    }}
                                 />
                             ))}
                         </div>

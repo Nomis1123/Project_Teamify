@@ -26,11 +26,7 @@ const Profile = () => {
         email: "",
         description: "",
         profileImageUrl: "",
-        // games: [['lol1', 'src/gameImages/lol.webp', 'gold', 'Support'],
-        //         ['lol2', 'src/gameImages/lol.webp', 'iron', 'top'],
-        //         ['lol3', 'src/gameImages/lol.webp', 'silver', 'some role'],
-        //         ['lol4', 'src/gameImages/lol.webp', 'diamond', 'some role2'],
-        //         ['lol5', 'src/gameImages/lol.webp', 'master']],
+        // games: [{'title': 'lol', 'url': 'src/gameImages/lol.webp', 'role': 'Support', 'rank': 'Gold'}],
         games: [],
         schedule: defaultWeeklySchedule,
     });
@@ -199,42 +195,42 @@ const Profile = () => {
                         }
                         {user.games.length >= 1 && 
                             <div className='profile-game-image-text-container'>
-                                <img className="profile-game-image" src={user.games[0][1]} alt={user.games[0][0]} />
-                                <span>{user.games[0][0]}</span>
-                                {user.games[0].length >= 3 && <span>Rank: {user.games[0][2]}</span>}
-                                {user.games[0].length >= 4 && <span>Role: {user.games[0][3]}</span>}
+                                <img className='profile-game-image' src={user.games[0]['url']} alt={user.games[0]['title']} />
+                                <span>{user.games[0]['title']}</span>
+                                {'rank' in user.games[0] && <span>Rank: {user.games[0]['rank']}</span>}
+                                {'role' in user.games[0] && <span>Role: {user.games[0]['role']}</span>}
                             </div>
                         }
                         {user.games.length >= 2 && 
                             <div className='profile-game-image-text-container'>
-                                <img className="profile-game-image" src={user.games[1][1]} alt={user.games[1][0]} />
-                                <span>{user.games[1][0]}</span>
-                                {user.games[1].length >= 3 && <span>Rank: {user.games[1][2]}</span>}
-                                {user.games[1].length >= 4 && <span>Role: {user.games[1][3]}</span>}
+                                <img className='profile-game-image' src={user.games[1]['url']} alt={user.games[1]['title']} />
+                                <span>{user.games[1]['title']}</span>
+                                {'rank' in user.games[1] && <span>Rank: {user.games[1]['rank']}</span>}
+                                {'role' in user.games[1] && <span>Role: {user.games[1]['role']}</span>}
                             </div>
                         }
                         {user.games.length >= 3 && 
                             <div className='profile-game-image-text-container'>
-                                <img className="profile-game-image" src={user.games[2][1]} alt={user.games[2][0]} />
-                                <span>{user.games[2][0]}</span>
-                                {user.games[2].length >= 3 && <span>Rank: {user.games[2][2]}</span>}
-                                {user.games[2].length >= 4 && <span>Role: {user.games[2][3]}</span>}
+                                <img className='profile-game-image' src={user.games[2]['url']} alt={user.games[2]['title']} />
+                                <span>{user.games[2]['title']}</span>
+                                {'rank' in user.games[2] && <span>Rank: {user.games[2]['rank']}</span>}
+                                {'role' in user.games[2] && <span>Role: {user.games[2]['role']}</span>}
                             </div>
                         }
                         {user.games.length >= 4 && 
                             <div className='profile-game-image-text-container'>
-                                <img className="profile-game-image" src={user.games[3][1]} alt={user.games[3][0]} />
-                                <span>{user.games[3][0]}</span>
-                                {user.games[3].length >= 3 && <span>Rank: {user.games[3][2]}</span>}
-                                {user.games[3].length >= 4 && <span>Role: {user.games[3][3]}</span>}
+                                <img className='profile-game-image' src={user.games[3]['url']} alt={user.games[3]['title']} />
+                                <span>{user.games[3]['title']}</span>
+                                {'rank' in user.games[3] && <span>Rank: {user.games[3]['rank']}</span>}
+                                {'role' in user.games[3] && <span>Role: {user.games[3]['role']}</span>}
                             </div>
                         }
                         {user.games.length === 5 && 
                             <div className='profile-game-image-text-container'>
-                                <img className="profile-game-image" src={user.games[4][1]} alt={user.games[4][0]} />
-                                <span>{user.games[4][0]}</span>
-                                {user.games[4].length >= 3 && <span>Rank: {user.games[4][2]}</span>}
-                                {user.games[4].length >= 4 && <span>Role: {user.games[4][3]}</span>}
+                                <img className='profile-game-image' src={user.games[4]['url']} alt={user.games[4]['title']} />
+                                <span>{user.games[4]['title']}</span>
+                                {'rank' in user.games[4] && <span>Rank: {user.games[4]['rank']}</span>}
+                                {'role' in user.games[4] && <span>Role: {user.games[4]['role']}</span>}
                             </div>
                         }
                     </div>
