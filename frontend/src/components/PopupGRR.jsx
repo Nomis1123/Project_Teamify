@@ -17,8 +17,9 @@ export default function PUGRR({games, gameModifier, which}) {
         setFail("");
         try {
             const res = await fetch("/api/user/???", {
-                method: "GET",
+                method: "POST",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+                body: { 'title': games[which]['title']},
             });
             if (!res.ok) {
                 setFail(`Failed to fetch game rank and role data. Please try again later.`);
