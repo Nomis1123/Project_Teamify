@@ -4,7 +4,6 @@ import "./Profile.css";
 import { useNavigate } from "react-router-dom";
 import "../components/GameScheduleBar.css"
 import GameScheduleBar from "../components/GameScheduleBar";
-import GamePicker from "../components/GamePicker";
 
 const Profile = () => {
     const navigate = useNavigate();

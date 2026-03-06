@@ -5,13 +5,13 @@ import { useNavigate } from "react-router-dom";
 import "../components/GameScheduleBar.css";
 import "../components/PopupStarter.css";
 import GameScheduleBar from "../components/GameScheduleBar";
-import GamePicker from "../components/GamePicker";
 import PUUsername from '../components/PopupUsername';
 import PUEmail from '../components/PopupEmail';
 import PUPassword from '../components/PopupPassword';
 import PUDescription from '../components/PopupDescription';
 import PUGame from '../components/PopupGame';
 import PUSchedule from '../components/PopupSchedule';
+import PUGRR from '../components/PopupGRR';
 
 const ProfileEdit = () => {
     const navigate = useNavigate();
@@ -40,6 +40,9 @@ const ProfileEdit = () => {
     const [email, setEmail] = useState("");
     const [description, setDescription] = useState("");
     const [schedule, setSchedule] = useState(defaultWeeklySchedule);
+    // const [games, setGame] = useState([{'title': 'minecraft', 'url': 'src/gameImages/minecraft.webp'},
+    //     {'title': 'lol', 'url': 'src/gameImages/lol.webp', 'rank': 'Gold', 'role': 'Top'},
+    // ]);
     const [games, setGame] = useState([]);
     const [loading, setLoading] = useState(true);
     // const [error, setError] = useState("");
@@ -186,36 +189,31 @@ const ProfileEdit = () => {
                         {games.length >= 1 && 
                             <div className='profile-game-image-text-container'>
                                 <PUGame games={games} gameModifier={setGame} which={0} isAdding={false}/>
-                                {'rank' in games[0] && <span>Rank: {games[0]['rank']}</span>}
-                                {'role' in games[0] && <span>Role: {games[0]['role']}</span>}
+                                <PUGRR games={games} gameModifier={setGame} which={0}/>
                             </div>
                         }
                         {games.length >= 2 && 
                             <div className='profile-game-image-text-container'>
                                 <PUGame games={games} gameModifier={setGame} which={1} isAdding={false}/>
-                                {'rank' in games[1] && <span>Rank: {games[1]['rank']}</span>}
-                                {'role' in games[1] && <span>Role: {games[1]['role']}</span>}
+                                <PUGRR games={games} gameModifier={setGame} which={1}/>
                             </div>
                         }
                         {games.length >= 3 && 
                             <div className='profile-game-image-text-container'>
                                 <PUGame games={games} gameModifier={setGame} which={2} isAdding={false}/>
-                                {'rank' in games[2] && <span>Rank: {games[2]['rank']}</span>}
-                                {'role' in games[2] && <span>Role: {games[2]['role']}</span>}
+                                <PUGRR games={games} gameModifier={setGame} which={2}/>
                             </div>
                         }
                         {games.length >= 4 && 
                             <div className='profile-game-image-text-container'>
                                 <PUGame games={games} gameModifier={setGame} which={3} isAdding={false}/>
-                                {'rank' in games[3] && <span>Rank: {games[3]['rank']}</span>}
-                                {'role' in games[3] && <span>Role: {games[3]['role']}</span>}
+                                <PUGRR games={games} gameModifier={setGame} which={3}/>
                             </div>
                         }
                         {games.length === 5 && 
                             <div className='profile-game-image-text-container'>
                                 <PUGame games={games} gameModifier={setGame} which={4} isAdding={false}/>
-                                {'rank' in games[4] && <span>Rank: {games[4]['rank']}</span>}
-                                {'role' in games[4] && <span>Role: {games[4]['role']}</span>}
+                                <PUGRR games={games} gameModifier={setGame} which={4}/>
                             </div>
                         }
 

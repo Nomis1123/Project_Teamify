@@ -6,7 +6,8 @@ export default function PUGame({games, gameModifier, which, isAdding}) {
     const [open, setOpen] = useState(false);
     const [selected, setSelected] = useState(null);
     const [selectedIndex, setSelectedIndex] = useState(null);
-    const [unselected, setUnselected] = useState([{'title': 'minecraft', 'url': 'src/gameImages/minecraft.webp'},]);
+    // const [unselected, setUnselected] = useState([{'title': 'minecraft', 'url': 'src/gameImages/minecraft.webp'},]);
+    const [unselected, setUnselected] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
     const [gmeFail, setFail] = useState("");
 
