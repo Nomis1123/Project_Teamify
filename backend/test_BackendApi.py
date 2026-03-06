@@ -91,7 +91,7 @@ def parse_profile(parts):
     else:
         _, status_code = parts
         # header = {
-        #     "Authorization": f"Bearer {token}"
+        #     "Authorization": f"Bearer {acess_token}"
         # }
         # print(header)
         response = requests.get(ENDPOINT + "/api/user/me")
@@ -105,19 +105,22 @@ def parse_profile(parts):
 def parse_update(parts):
     # Currently, not functional
     if len(parts) < 2:
-        print("Insufficient arguments for update")
+        print("Insufficient arguments for update, please provide the correct amount of inputs")
         return False
     else:
         target = parts[1]
+        # header = {
+        #     "Authorization": f"Bearer {token}"
+        # }
         if target == "password":
-            if len(parts) == 5:
-                _, _, status_code, old_password, new_password = parts
+            if len(parts) == 6:
+                _, _, status_code, old_password, new_password, confirm_password = parts
                 payload = {
                     "old password": old_password,
-                    "new password": new_password,
-                    "confirm new password": new_password
+                    "new password": new_password
+                    # "confirm new password": confirm_password
                 }
-                response = requests.put(ENDPOINT + "/api/user/me", json=payload)
+                response = requests.patch(ENDPOINT + "/api/user/me", json=payload)
                 if response.status_code == int(status_code):
                     return True
                 else:
@@ -126,27 +129,41 @@ def parse_update(parts):
             else:
                 print("Insufficient arguments for updating password")
                 return False
-        else:
-            if len(parts) == 4:
-                _, _, status_code, new_target = parts
-                if target == "username":
-                    payload = {
-                        "username": new_target
-                    }
-                else:
-                    payload = {
-                        "email": new_target
-                    }
-                response = requests.put(ENDPOINT + "/api/user/me", json=payload)
+        elif target == "email":
+            if len(parts) == 5:
+                _, _, status_code, old_email, new_email = parts
+
+                payload = {
+                    "old_email": old_email,
+                    "new_email": new_email
+                }
+                response = requests.patch(ENDPOINT + "/api/user/me", json=payload)
                 if response.status_code == int(status_code):
                     return True
                 else:
                     print("Response:", response.status_code, "Expected:", status_code)
                     return False
-                
             else:
-                print("Insufficient arguments for updating username/email")
+                print("Insufficient arguments of updating email")
                 return False
+        elif target == "username":
+            if len(parts) == 4:
+                _, _, status_code, new_username = parts
+                payload = {
+                    "username": new_username
+                }
+                response = requests.patch(ENDPOINT + "/api/user/me", json=payload)
+                if response.status_code == int(status_code):
+                    return True
+                else:
+                    print("Response:", response.status_code, "Expected:", status_code)
+                    return False
+            else:
+                print("Insufficient arguments for updating username")
+                return False
+        else:
+            print("Invalid update target, use 'password', 'username', or 'email'")
+            return False
 
 
 def parse_validate(parts):
