@@ -22,162 +22,90 @@ class UserGame:
         filters = filters or {}
         game_title = filters.get('game')
         rank = filters.get('rank')
-        search_availability = filters.get('availability')
-        apply_availability_filter = isinstance(search_availability, dict)
-        region_filter = filters.get('region')
+        role_filter = filters.get('role')
 
         params = []
 
-        sql = """
-            SELECT 
-            u.id,
-            u.username,
-            u.profile_picture_url,
-            u.description,
-            u.region
-        """
-
         with get_db_connection() as conn:
             with conn.cursor() as cur:
-
-                # Availability
-                if apply_availability_filter:
-                    curr_avail = json.dumps(search_availability)
-                    sql += ", calculate_harmony_score(u.availability, %s) AS harmony_score"
-                    params.append(curr_avail)
-                else:
-                    sql += ", 0 AS harmony_score"
-
-                # game
-                sql += """,
-                    COALESCE(
-                        jsonb_agg(
-                            jsonb_build_object(
-                                'title', g.title,
-                                'rank', ug.current_rank
-                            )
-                        ) FILTER (WHERE g.id IS NOT NULL),
-                        '[]'
-                    ) AS user_games_list
-                """
-
-                # Base query
-                sql += """
+                sql = """
+                    SELECT 
+                        u.id, 
+                        u.username, 
+                        u.profile_picture_url, 
+                        u.description, 
+                        u.roles,
+                        COALESCE(
+                            jsonb_agg(
+                                jsonb_build_object('title', g.title, 'rank', ug.current_rank)
+                            ) FILTER (WHERE g.id IS NOT NULL),
+                            '[]'
+                        ) AS user_games_list
                     FROM users u
                     LEFT JOIN user_games ug ON u.id = ug.user_id
                     LEFT JOIN games g ON ug.game_id = g.id
-                    WHERE u.id != %s
-                      AND u.is_verified = TRUE
+                    WHERE u.id != %s AND u.is_verified = TRUE
                 """
                 params.append(current_user_id)
 
-                if region_filter:
-                    sql += " AND u.region = %s"
-                    params.append(region_filter)
+                if role_filter:
+                    sql += " AND u.roles ILIKE %s"
+                    params.append(f"%{role_filter}%")
 
-                # game filter
-                # Unified Game + Rank Filter
                 if game_title and rank:
                     sql += """
                         AND EXISTS (
-                            SELECT 1
-                            FROM user_games ug2
-                            JOIN games g2 ON ug2.game_id = g2.id
-                            WHERE ug2.user_id = u.id
-                            AND g2.title ILIKE %s
-                            AND ug2.current_rank ILIKE %s
+                            SELECT 1 FROM user_games ug2 JOIN games g2 ON ug2.game_id = g2.id
+                            WHERE ug2.user_id = u.id AND g2.title ILIKE %s AND ug2.current_rank ILIKE %s
                         )
                     """
-                    params.append(f"%{game_title}%")
-                    params.append(f"%{rank}%")
-
+                    params.extend([f"%{game_title}%", f"%{rank}%"])
                 elif game_title:
                     sql += """
                         AND EXISTS (
-                            SELECT 1
-                            FROM user_games ug2
-                            JOIN games g2 ON ug2.game_id = g2.id
-                            WHERE ug2.user_id = u.id
-                            AND g2.title ILIKE %s
+                            SELECT 1 FROM user_games ug2 JOIN games g2 ON ug2.game_id = g2.id
+                            WHERE ug2.user_id = u.id AND g2.title ILIKE %s
                         )
                     """
                     params.append(f"%{game_title}%")
-
                 elif rank:
                     sql += """
                         AND EXISTS (
-                            SELECT 1
-                            FROM user_games ug2
-                            WHERE ug2.user_id = u.id
-                            AND ug2.current_rank ILIKE %s
+                            SELECT 1 FROM user_games ug2 WHERE ug2.user_id = u.id AND ug2.current_rank ILIKE %s
                         )
                     """
                     params.append(f"%{rank}%")
 
-                sql += """
-                    GROUP BY u.id, u.username, u.profile_picture_url, u.description, u.region
-                """
-
-                # Ordering
-                if apply_availability_filter:
-                    # Repeat function and parameter here
-                    sql += " ORDER BY calculate_harmony_score(u.availability, %s)::float / 21 DESC NULLS LAST"
-                    params.append(curr_avail)
-                else:
-                    sql += " ORDER BY u.id ASC"
-
-                # Offset
-                try:
-                    clean_offset = int(offset)
-                except (ValueError, TypeError):
-                    clean_offset = 0
-
+                sql += " GROUP BY u.id, u.username, u.profile_picture_url, u.description, u.roles"
+                sql += " ORDER BY u.id ASC"
                 sql += " LIMIT 10 OFFSET %s"
-                params.append(clean_offset)
+                params.append(int(offset))
 
                 cur.execute(sql, tuple(params))
                 rows = cur.fetchall()
-                
-                # print("curr_avail:", rows[0])
 
-        
-        results = []
-        print(f"The length is {len(rows)}")
-        for r in rows:
-            print(f"r: {r}")
-            user_id, username, avatar, description, region, harmony_score, games_list = r
-            print(f"The matched score is {harmony_score}")
+                results = []
+                for r in rows:
+                    user_id, username, avatar, description, user_roles, games_list = r
 
-            # total slots for percentage
-            total_slots = 7 * 3  # 7 days * 3 slots
-            match_percentage = (
-                f"{round((float(harmony_score) / total_slots) * 100)}%"
-                if apply_availability_filter else "0%"
-            )
+                    display_game, display_rank = "N/A", "N/A"
+                    if games_list:
+                        search_term = game_title.lower() if game_title else ""
+                        matched_obj = next(
+                            (g for g in games_list if search_term in g['title'].lower()), 
+                            games_list[0]
+                        )
+                        display_game = matched_obj['title']
+                        display_rank = matched_obj['rank']
 
-            display_game = "N/A"
-            display_rank = "N/A"
-            
-            # Find the game name to display
-            if games_list:
-                search_term = game_title.lower() if game_title else ""
-                # This finds the specific game object that matches your search
-                matched_obj = next(
-                    (g for g in games_list if search_term in g['title'].lower()), 
-                    games_list[0]
-                )
-                display_game = matched_obj['title']
-                display_rank = matched_obj['rank']
+                    results.append({
+                        "id": user_id,
+                        "username": username,
+                        "avatar": avatar or f"https://api.dicebear.com/7.x/avataaars/svg?seed={username}",
+                        "description": description,
+                        "game": display_game,
+                        "rank": display_rank,
+                        "roles": user_roles 
+                    })
 
-            results.append({
-                "id": user_id,
-                "username": username,
-                "avatar": avatar or f"https://api.dicebear.com/7.x/avataaars/svg?seed={username}",
-                "description": description,
-                "match_percentage": match_percentage,
-                "game": display_game,
-                "rank": display_rank,
-                "region": region 
-            })
-
-        return results
+                return results

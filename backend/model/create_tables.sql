@@ -10,7 +10,7 @@ CREATE TABLE users (
     sub_class VARCHAR(50),
     is_verified BOOLEAN DEFAULT FALSE,
     verification_token VARCHAR(255),
-    region VARCHAR(10) DEFAULT 'NA',
+    roles VARCHAR(100) DEFAULT 'Any',
     availability JSONB DEFAULT '{
   "Monday": {"Morning": false, "Noon": false, "Evening": false},
   "Tuesday": {"Morning": false, "Noon": false, "Evening": false},
