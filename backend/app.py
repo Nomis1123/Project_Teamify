@@ -69,5 +69,5 @@ app.add_url_rule('/api/user/filters', view_func=get_matches, methods=["POST"])
 
 if __name__ == '__main__':
     # Start a local web server on Port 8000
-    print("testing webhook!")
+    print("webhook test!")
     app.run(debug=True, port=8000)
