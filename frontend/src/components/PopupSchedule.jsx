@@ -65,7 +65,8 @@ export default function PUSchedule({schedule, scheduleModifier}) {
             Change Schedule
             </button>
 
-            <Popup open={open} onClose={handleClose} title="Change Schedule" fail_msg={scheFail} className="popup-schedule">
+            <Popup open={open} onClose={handleClose} title="Change Schedule" fail_msg={scheFail} 
+                body_height="popup-schedule-body-height" popup_width="popup-schedule-popup-width">
                 <div style={{ display: "flex", gap: 8 }}>
                     <div className="schedule-input-container">
                         <GameScheduleBar 

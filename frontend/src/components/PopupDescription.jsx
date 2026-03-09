@@ -60,7 +60,8 @@ export default function PUDescription({description, descriptionModifier}) {
         Change Description
       </button>
 
-      <Popup open={open} onClose={handleClose} title="Change Description" fail_msg={descriptionFail} className="popup-description">
+      <Popup open={open} onClose={handleClose} title="Change Description" fail_msg={descriptionFail} 
+        body_height="popup-description-body-height" popup_width="popup-description-popup-width">
         
         <div style={{ display: "flex", gap: 8 }}>
             <div className="description-input-container">

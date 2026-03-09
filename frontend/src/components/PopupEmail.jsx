@@ -84,7 +84,8 @@ export default function PUEmail({email, emailModifier}) {
         Change Email
       </button>
 
-      <Popup open={open} onClose={handleClose} title="Change Email" fail_msg={emailFail} className="popup-email">
+      <Popup open={open} onClose={handleClose} title="Change Email" fail_msg={emailFail} 
+        body_height="popup-email-body-height" popup_width="popup-email-popup-width">
         <div style={{ display: "flex", gap: 8 }}>
           <div className="email-input-container">
             <div className="single-input-block-email"><h2>Enter your current email</h2>

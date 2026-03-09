@@ -48,6 +48,9 @@ button.btn-pfimage-image {
   height: 200px;
   display: block;
   object-fit: cover;
+  border-radius: 20px;
+  border: 4px solid;
+  border-color: rgb(0, 255, 255, 0.5);
 }
 
 .btn-pfimage-change:hover {
@@ -84,9 +87,12 @@ button.btn-pfimage-image {
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
-.popup-pfimage {
-  height: 230px;
-  width: 360px;
+.popup-pfimage-popup-width {
+  width: 450px;
+}
+
+.popup-pfimage-body-height {
+  height: 240px;
 }
 
 .single-input-block-pfimage {

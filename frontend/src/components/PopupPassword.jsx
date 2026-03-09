@@ -104,7 +104,8 @@ export default function PUPassword() {
         Change Password
       </button>
 
-      <Popup open={open} onClose={handleClose} title="Change Password" fail_msg={passwordFail} className="popup-pwd">
+      <Popup open={open} onClose={handleClose} title="Change Password" fail_msg={passwordFail} 
+                body_height="popup-pwd-body-height" popup_width="popup-pwd-popup-width">
         <div style={{ display: "flex", gap: 8 }}>
           <div className="pwd-input-container">
             <div className="single-input-block-pwd">

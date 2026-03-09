@@ -52,6 +52,22 @@
   color: rgb(255, 0, 0);
 }
 
-.popup-username {
-  height: 130px;
+.popup-username-popup-width {
+  width: 500px;
+}
+
+.popup-username-body-height {
+  height: 150px;
+}
+
+.username-input-container {
+  flex: 1;
+  width: 300px;
+}
+
+.pwd-save-container {
+  flex: 0 0 auto;
+  height: 300px;
+  display: flex;  
+  align-items: center;  
 }

@@ -81,7 +81,8 @@ async function handleSave() {
                 />
             </button>
 
-            <Popup open={open} onClose={handleClose} title="Change Profile Image" fail_msg={imageFail} className="popup-pfimage">
+            <Popup open={open} onClose={handleClose} title="Change Profile Image" fail_msg={imageFail} 
+                body_height="popup-pfimage-body-height" popup_width="popup-pfimage-popup-width">
                 <div style={{ display: "flex", gap: 8 }}>
                     <div className="pfimage-image-container">
                         <img

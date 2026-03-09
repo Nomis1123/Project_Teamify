@@ -63,30 +63,38 @@ export default function PUUsername({username, usernameModifier}) {
         Change Username
       </button>
 
-      <Popup open={open} onClose={handleClose} title="Change Username" fail_msg={usernameFail} className="popup-username">
+      <Popup open={open} onClose={handleClose} title="Change Username" fail_msg={usernameFail} 
+        body_height="popup-username-body-height" popup_width="popup-username-popup-width">
         <h2>Enter your new username</h2>
         <div style={{ display: "flex", gap: 8 }}>
-          <input
-            className="input-username"
-            placeholder="Type here..."
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleSave();
-            }}
-          />
+          <div className="username-input-container">
+            <div style={{ display: "flex"}}>
+               <input
+              className="input-username"
+              placeholder="Type here..."
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSave();
+              }}
+            />  
+            </div>
+           
+            {usernameError ? <p className="error-msg">{usernameError}</p> : ""}
+          </div>
 
-          <button
-            className="btn-username btn-username-save"
-            onClick={handleSave}
-            disabled={isSaving}
-            type="button"
-          >
-            {isSaving ? "Saving..." : "Save"}
-          </button>
-
+          
+          <div className="username-save-container">
+            <button
+              className="btn-username btn-username-save"
+              onClick={handleSave}
+              disabled={isSaving}
+              type="button"
+            >
+              {isSaving ? "Saving..." : "Save"}
+            </button>
+          </div>
         </div>
-        {usernameError ? <p className="error-msg">{usernameError}</p> : ""}
       </Popup>
     </div>
   );
