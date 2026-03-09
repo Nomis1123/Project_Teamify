@@ -64,7 +64,11 @@
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
-.popup-grr {
+.popup-grr-popup-width {
+  width: 600px;
+}
+
+.popup-grr-body-height {
   height: 240px;
 }
 

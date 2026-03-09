@@ -103,7 +103,8 @@ export default function PUGRR({games, gameModifier, which}) {
             </button>
             
 
-            <Popup open={open} onClose={handleClose} title="Change Game Rank and Role" fail_msg={gmeFail} className="popup-grr">
+            <Popup open={open} onClose={handleClose} title="Change Game Rank and Role" fail_msg={gmeFail} 
+                body_height="popup-grr-body-height" popup_width="popup-grr-popup-width">
                 <div style={{ display: "flex", gap: 8 }}>
                     <div className="grr-image-container">
                         <img className="popup-game-image" src={games[which]['url']} alt={games[which]['title']}/>

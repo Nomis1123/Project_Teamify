@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import "./Popup.css";
 
-export default function Popup({ open, onClose, title = "Popup" , children, fail_msg, className }) {
+export default function Popup({ open, onClose, title = "Popup" , children, fail_msg, body_height, popup_width }) {
   // Close on esc
   useEffect(() => {
     if (!open) return;
@@ -25,18 +25,18 @@ export default function Popup({ open, onClose, title = "Popup" , children, fail_
       role="presentation"
     >
       <div className="popup" role="dialog" aria-popup="true" aria-label={title}>
-        <div className="popup-header">
+        <div className={`popup-header ${popup_width}`}>
           <h2 className="popup-title">{title}</h2>
           <button className="popup-close" onClick={onClose} aria-label="Close">
             Cancel
           </button>
         </div>
 
-        <div className={`popup-body ${className}`}>
+        <div className={`popup-body ${body_height} ${popup_width}`}>
           {children}
         </div>
 
-        <div className="popup-footer">
+        <div className={`popup-footer ${popup_width}`}>
           {fail_msg ? <p className="error-msg">{fail_msg}</p> : ""}
         </div>
       </div>

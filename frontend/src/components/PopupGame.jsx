@@ -97,7 +97,8 @@ export default function PUGame({games, gameModifier, which, isAdding}) {
             }
             
 
-            <Popup open={open} onClose={handleClose} title="Change Game" fail_msg={gmeFail} className="popup-game">
+            <Popup open={open} onClose={handleClose} title="Change Game" fail_msg={gmeFail} 
+                body_height="popup-game-body-height" popup_width="popup-game-popup-width">
                 <div style={{ display: "flex", gap: 8 }}>
                     {unselected.length > 0 && (
                         <div className="game-input-container">

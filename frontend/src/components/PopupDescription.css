@@ -54,7 +54,11 @@
   color: rgb(255, 0, 0);
 }
 
-.popup-description {
+.popup-description-popup-width {
+  width: 600px;
+}
+
+.popup-description-body-height {
   height: 300px;
 }
 

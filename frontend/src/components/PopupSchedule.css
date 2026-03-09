@@ -51,7 +51,11 @@
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
-.popup-schedule {
+.popup-schedule-popup-width {
+  width: 500px;
+}
+
+.popup-schedule-body-height {
   height: 480px;
 }
 
