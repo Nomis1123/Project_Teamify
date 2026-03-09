@@ -38,18 +38,30 @@
 .filter-controls{ 
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
     flex-wrap: wrap; /* wrap on small screens to avoid breaking*/          
-    margin-top: 15px;
+    margin-top: 5px;
 }
 .filters span{
     font-size: 1.1rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .filterIcon{
     display: inline-block;
     width: 20px;
     height: 20px;
+}
+
+.sortIcon{
+    display: inline-block;
+    width: 17px;
+    height: 12px;
 }
 
 .filters select,
