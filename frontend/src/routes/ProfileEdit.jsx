@@ -5,12 +5,13 @@ import { useNavigate } from "react-router-dom";
 import "../components/GameScheduleBar.css";
 import "../components/PopupStarter.css";
 import GameScheduleBar from "../components/GameScheduleBar";
-import GamePicker from "../components/GamePicker";
 import PUUsername from '../components/PopupUsername';
 import PUEmail from '../components/PopupEmail';
 import PUPassword from '../components/PopupPassword';
 import PUDescription from '../components/PopupDescription';
+import PUGame from '../components/PopupGame';
 import PUSchedule from '../components/PopupSchedule';
+import PUGRR from '../components/PopupGRR';
 
 const ProfileEdit = () => {
     const navigate = useNavigate();
@@ -39,6 +40,10 @@ const ProfileEdit = () => {
     const [email, setEmail] = useState("");
     const [description, setDescription] = useState("");
     const [schedule, setSchedule] = useState(defaultWeeklySchedule);
+    // const [games, setGame] = useState([{'title': 'minecraft', 'url': 'src/gameImages/minecraft.webp'},
+    //     {'title': 'lol', 'url': 'src/gameImages/lol.webp', 'rank': 'Gold', 'role': 'Top'},
+    // ]);
+    const [games, setGame] = useState([]);
     const [loading, setLoading] = useState(true);
     // const [error, setError] = useState("");
 
@@ -67,7 +72,7 @@ const ProfileEdit = () => {
                     email: data.user.email ?? "",
                     description: data.user.description ?? "",
                     profile_picture: data.user.profile_picture ?? "",
-                    // games: Array.isArray(data.user.games) ? data.games : [],
+                    games: Array.isArray(data.games) ? data.user.games : [],
                     schedule: days.reduce((acc, day) => {
                         // console.log("schedule:", day, data.schedule[day]);
                         const d = data.user.schedule?.[day] ?? defaultDailySchedule;
@@ -87,6 +92,7 @@ const ProfileEdit = () => {
                 setEmail(normalized.email);
                 setDescription(normalized.description);
                 setSchedule(normalized.schedule);
+                setGame(normalized.games);
             } catch (e) {
                 console.log("error:", e);
             } finally {
@@ -174,52 +180,48 @@ const ProfileEdit = () => {
 
                 <div className='profile-section'>
                     <h2 className='profile-text-right'>Games:</h2>
-                    {/* <PUGame /> */}
                 </div>
                 <div className='profile-game-section'>
                     <div className="profile-game-bar">
                         {/* The image sources are temporary. Replace with game icons and name after.
                             I still have to modify this so that it accept game image and name from db. */}
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                        ]} />
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                        ]} />
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                        ]} />
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                        ]} />
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                        ]} />
+
+                        {games.length >= 1 && 
+                            <div className='profile-game-image-text-container'>
+                                <PUGame games={games} gameModifier={setGame} which={0} isAdding={false}/>
+                                <PUGRR games={games} gameModifier={setGame} which={0}/>
+                            </div>
+                        }
+                        {games.length >= 2 && 
+                            <div className='profile-game-image-text-container'>
+                                <PUGame games={games} gameModifier={setGame} which={1} isAdding={false}/>
+                                <PUGRR games={games} gameModifier={setGame} which={1}/>
+                            </div>
+                        }
+                        {games.length >= 3 && 
+                            <div className='profile-game-image-text-container'>
+                                <PUGame games={games} gameModifier={setGame} which={2} isAdding={false}/>
+                                <PUGRR games={games} gameModifier={setGame} which={2}/>
+                            </div>
+                        }
+                        {games.length >= 4 && 
+                            <div className='profile-game-image-text-container'>
+                                <PUGame games={games} gameModifier={setGame} which={3} isAdding={false}/>
+                                <PUGRR games={games} gameModifier={setGame} which={3}/>
+                            </div>
+                        }
+                        {games.length === 5 && 
+                            <div className='profile-game-image-text-container'>
+                                <PUGame games={games} gameModifier={setGame} which={4} isAdding={false}/>
+                                <PUGRR games={games} gameModifier={setGame} which={4}/>
+                            </div>
+                        }
+
+                        {games.length < 5 && 
+                            <div>
+                                <PUGame games={games} gameModifier={setGame} which={null} isAdding={true}/>
+                            </div>
+                        }
                     </div>
                 </div>
 

@@ -129,7 +129,6 @@ h2 {
   overflow-x: auto;
   overflow-y: hidden;
   gap: 16px;
-  padding-bottom: 10px;
   scrollbar-color: rgba(255,255,255,0.45) rgba(255,255,255,0.10);
   scrollbar-width: thin;
 }
@@ -137,6 +136,8 @@ h2 {
 .profile-game-image-text-container {
   flex: 0 0 auto;
   text-align: center;
+  display: flex;
+  flex-direction: column;
 }
 
 .profile-game-image {
@@ -151,5 +152,8 @@ h2 {
 
 .profile-game-schedule { grid-area: schedule; }
 
+.btn-auto-height {
+  height: auto;
+}
 
 
