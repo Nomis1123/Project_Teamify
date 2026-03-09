@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import "./ProfileEdit.css";
 import { useNavigate } from "react-router-dom";
 import "../components/GameScheduleBar.css";
-import "../components/PopupStarter.css";
 import GameScheduleBar from "../components/GameScheduleBar";
 import PUUsername from '../components/PopupUsername';
 import PUEmail from '../components/PopupEmail';
