@@ -12,6 +12,7 @@ import PUDescription from '../components/PopupDescription';
 import PUGame from '../components/PopupGame';
 import PUSchedule from '../components/PopupSchedule';
 import PUGRR from '../components/PopupGRR';
+import PUPFImage from '../components/PopupImage';
 
 const ProfileEdit = () => {
     const navigate = useNavigate();
@@ -35,6 +36,7 @@ const ProfileEdit = () => {
         games: [],
         schedule: defaultWeeklySchedule,
     });
+    const [image, setImage] = useState("https://th.bing.com/th/id/OIP.BXIufrwgTFhg49ux6NTkiQHaQD?w=236")
     const [username, setUsername] = useState("");
     const [id, setID] = useState("");
     const [email, setEmail] = useState("");
@@ -91,6 +93,7 @@ const ProfileEdit = () => {
                 setID(normalized.id);
                 setEmail(normalized.email);
                 setDescription(normalized.description);
+                setImage(normalized.profile_picture);
                 setSchedule(normalized.schedule);
                 setGame(normalized.games);
             } catch (e) {
@@ -132,12 +135,7 @@ const ProfileEdit = () => {
         <div className="profile-card profile-layout">
             
             <div className="profile-info-layout">
-                <img
-                    className="profile-image"
-                    // This image link is temporary. Replace it when we figure out a default profile image.
-                    src={user.profile_picture || "https://th.bing.com/th/id/OIP.BXIufrwgTFhg49ux6NTkiQHaQD?w=236"}
-                    alt="Profile"
-                />
+                <PUPFImage image={image} imageModifier={setImage} />
 
                 <div className='username'>
                     <h1>

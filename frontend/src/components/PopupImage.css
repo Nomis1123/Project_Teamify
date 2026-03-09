@@ -1,0 +1,113 @@
+.element-pfimage {
+  padding: 5px;
+}
+
+button.btn-pfimage {
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  flex: 0 0 auto;
+}
+
+.btn-pfimage-change {
+  background: rgb(255, 255, 255, 0.2);
+  color: white;
+  width: 100%;
+  padding: 10px 14px;
+}
+
+button.btn-pfimage-image {
+  width: 100px;
+  height: 100px;
+  padding: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-pfimage-image:hover {
+  transform: scale(1.2);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+}
+
+.popup-pfimage-image-auto {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.popup-pfimage-image-fixed {
+  width: 200px;
+  height: 200px;
+  display: block;
+  object-fit: cover;
+}
+
+.btn-pfimage-change:hover {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid;
+  border-color: rgb(255, 255, 255);
+}
+
+.btn-pfimage-save {
+  height: 50px;
+  width: 100px;
+  background: rgb(255, 255, 255, 0.2);
+  color: white;
+  margin-left: auto;
+}
+
+.btn-pfimage-save:hover {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid;
+  border-color: rgb(255, 255, 255);
+}
+
+.input-pfimage {
+  flex: 1;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+}
+
+.input-pfimage:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.popup-pfimage {
+  height: 230px;
+  width: 360px;
+}
+
+.single-input-block-pfimage {
+  height: 100px;
+}
+
+.pfimage-image-container {
+  flex: 1;
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pfimage-save-container {
+  flex: 0 0 auto;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;  
+  justify-content: center;
+}
