@@ -254,10 +254,10 @@ const Matchmaking = () => {
                         </select>
 
                         <select value={role} onChange={(e) => setRole(e.target.value)}>
-                            <option value="all">All Regions &#9662; </option>
-                            <option value="supporter">NA</option>
-                            <option value="controller">Asia</option>
-                            <option value="">EU</option>
+                            <option value="all">All Roles &#9662; </option>
+                            <option value="supporter">Support</option>
+                            <option value="controller">DPS</option>
+                            <option value="">Tank</option>
                         </select>
                         
                         <div className="header">
