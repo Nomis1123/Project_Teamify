@@ -10,6 +10,7 @@ import PUUsername from '../components/PopupUsername';
 import PUEmail from '../components/PopupEmail';
 import PUPassword from '../components/PopupPassword';
 import PUDescription from '../components/PopupDescription';
+import PUSchedule from '../components/PopupSchedule';
 
 const ProfileEdit = () => {
     const navigate = useNavigate();
@@ -37,6 +38,7 @@ const ProfileEdit = () => {
     const [id, setID] = useState("");
     const [email, setEmail] = useState("");
     const [description, setDescription] = useState("");
+    const [schedule, setSchedule] = useState(defaultWeeklySchedule);
     const [loading, setLoading] = useState(true);
     // const [error, setError] = useState("");
 
@@ -66,16 +68,16 @@ const ProfileEdit = () => {
                     description: data.user.description ?? "",
                     profile_picture: data.user.profile_picture ?? "",
                     // games: Array.isArray(data.user.games) ? data.games : [],
-                    // schedule: days.reduce((acc, day) => {
-                    //     // console.log("schedule:", day, data.schedule[day]);
-                    //     const d = data.user.schedule?.[day] ?? defaultDailySchedule;
-                    //     acc[day] = {
-                    //         morning: Boolean(d.morning),
-                    //         afternoon: Boolean(d.afternoon),
-                    //         night: Boolean(d.night),
-                    //     };
-                    //     return acc;
-                    // }, {}),
+                    schedule: days.reduce((acc, day) => {
+                        // console.log("schedule:", day, data.schedule[day]);
+                        const d = data.user.schedule?.[day] ?? defaultDailySchedule;
+                        acc[day] = {
+                            morning: Boolean(d.morning),
+                            afternoon: Boolean(d.afternoon),
+                            night: Boolean(d.night),
+                        };
+                        return acc;
+                    }, {}),
                 };
                 console.log("setting user to:", normalized);
                 setUser(normalized);
@@ -84,6 +86,7 @@ const ProfileEdit = () => {
                 setID(normalized.id);
                 setEmail(normalized.email);
                 setDescription(normalized.description);
+                setSchedule(normalized.schedule);
             } catch (e) {
                 console.log("error:", e);
             } finally {
@@ -93,23 +96,6 @@ const ProfileEdit = () => {
 
         loadMe();
     }, []);
-
-    const handleScheduleToggle = (day, timeSlot) => {
-        
-        setUser((prevUser) => {
-            const updatedSchedule = { ...prevUser.schedule };
-            const updatedDay = { ...(updatedSchedule[day] || defaultDailySchedule) };
-
-            updatedDay[timeSlot] = !updatedDay[timeSlot];
-            updatedSchedule[day] = updatedDay;
-
-            return {
-                ...prevUser,
-                schedule: updatedSchedule,
-                
-            };
-        });
-    };
 
     useEffect(() => {
         console.log("user state updated:", user.id);
@@ -174,8 +160,8 @@ const ProfileEdit = () => {
                 <div>
                     <PUPassword />
                 </div>
-                <div className='profile-description-header'>
-                    <h2 className='profile-description-text'>Description:</h2>
+                <div className='profile-section'>
+                    <h2 className='profile-text-right'>Description:</h2>
                     <div>
                         <PUDescription description={description} descriptionModifier={setDescription}/>
                     </div>
@@ -186,7 +172,10 @@ const ProfileEdit = () => {
                     </p>
                 </div>
 
-                <h2>Games:</h2>
+                <div className='profile-section'>
+                    <h2 className='profile-text-right'>Games:</h2>
+                    {/* <PUGame /> */}
+                </div>
                 <div className='profile-game-section'>
                     <div className="profile-game-bar">
                         {/* The image sources are temporary. Replace with game icons and name after.
@@ -233,12 +222,16 @@ const ProfileEdit = () => {
                         ]} />
                     </div>
                 </div>
-            
-                <h2>Game Schedule:</h2>
+
+                <div className='profile-section'>
+                    <h2 className='profile-text-right'>Game Schedule:</h2>
+                    <PUSchedule schedule={schedule} scheduleModifier={setSchedule}/>
+                </div>
+                
                 <div className='profile-game-schedule'>
                     <GameScheduleBar 
-                    schedule={user.schedule} 
-                    onClick={handleScheduleToggle}
+                    schedule={schedule} 
+                    onClick={() => {}}
                     />
                 </div>
             </div>

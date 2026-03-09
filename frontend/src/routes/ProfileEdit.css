@@ -102,12 +102,12 @@ h2 {
   margin-bottom: 16px;
 }
 
-.profile-description-header {
+.profile-section {
   display: flex;
   align-items: center;
 }
 
-.profile-description-text {
+.profile-text-right {
   flex: 1;
 }
 
