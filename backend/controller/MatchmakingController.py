@@ -8,14 +8,13 @@ def get_matches():
     current_user_id = get_jwt_identity()
 
     data = request.get_json() or {}
-    game_title = data.get("game_title")
-    apply_avail = data.get("apply_availability_filter", False)
-
+    print(data)
+    filters = data.get('filters', {}) if data else {}
     try:
         users = UserGame.get_filtered_users(
             current_user_id,
-            game_title,
-            apply_avail
+            filters,
+            
         )
         return jsonify(users), 200
     
