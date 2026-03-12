@@ -54,7 +54,7 @@ const Profile = () => {
                     username: data.user.username ?? "",
                     email: data.user.email ?? "",
                     description: data.user.description ?? "",
-                    profile_picture: data.user.profile_picture ?? "",
+                    profile_picture: data.user.pfp_url ?? "",
                     games: Array.isArray(data.user.games) ? data.games : [],
                     schedule: days.reduce((acc, day) => {
                         // console.log("schedule:", day, data.schedule[day]);
@@ -139,7 +139,7 @@ const Profile = () => {
                 <img
                     className="profile-image"
                     // This image link is temporary. Replace it when we figure out a default profile image.
-                    src={user.profile_picture || "https://th.bing.com/th/id/OIP.BXIufrwgTFhg49ux6NTkiQHaQD?w=236"}
+                    src={user.pfp_url || "https://th.bing.com/th/id/OIP.BXIufrwgTFhg49ux6NTkiQHaQD?w=236"}
                     alt="Profile"
                 />
 

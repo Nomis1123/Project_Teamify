@@ -1,4 +1,4 @@
-from flask import jsonify, redirect, request, url_for, session
+from flask import jsonify, redirect, request, url_for, session, current_app, send_from_directory
 from controller.extensions import bcrypt, get_db_connection
 from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies
 
@@ -12,10 +12,12 @@ import os
 import re
 import requests
 import json
+import uuid
 #from model.User import User
 from model.user import User
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_jwt_extended import unset_jwt_cookies
+# from werkzeug.utils import secure_filename
 
 """
 The AuthenticationController class. It hashes the password, creates the token
@@ -256,13 +258,26 @@ def get_me():
 
 @jwt_required()
 def update_me():
+    image = request.files.get("image")
+    is_image = request.content_type.startswith('multipart/form-data')
+
+    # Handle Upload Profile Image if we receive an image in formData format.
+    if image:
+        return upload_image(image)
 
     conn = get_db_connection()
 
     user_id = get_jwt_identity()
     user = User.find_by_id(int(user_id))
 
+    # We check if content type is formData which is only for image uploads,
+    # If we dont, then we may get 415 as data only accepts json not an image.
+    if is_image:
+        # We could just have this part do nothing instead.
+        return jsonify({"status": "No new image provided"}), 400
+
     if not user:
+        # Somebody else check this, : is instead string.
         return jsonify({"status:" "User not found."}), 404
 
     data = request.get_json()
@@ -419,3 +434,75 @@ def getOrUpdate_availability1():
 
    finally:
        if conn: conn.close()
+
+
+
+def upload_image(image_file):
+    # This is a helper function for handling upload in update_me() which already requires jwt
+    user_id = get_jwt_identity()
+    user = User.find_by_id(int(user_id))
+    upload_folder = current_app.config["UPLOAD_FOLDER"]
+    conn = get_db_connection()
+
+    if not user:
+        # Somebody else check this, : is instead string.
+        return jsonify({"status": "User not found."}), 404
+
+    try:
+        print("image file is: ", image_file)
+        if not image_file:
+            return jsonify({"status": "No image provided"}), 400
+
+        print("the filename is", image_file.filename)
+        if image_file.filename == "":
+            return jsonify({"status": "No file selected"}), 400
+
+        # Suspicious upload, this implies sender renamed the extension
+        if image_file.content_type not in ["image/png", "image/jpg", "image/jpeg"]:
+            return jsonify({"status": "Invalid content"}), 400
+        
+        # Lastly check if header uses valid extension (this can be different from content_type)
+        if check_extension(image_file.filename):
+            # Uncomment if we dont care about unique images or testing so you can read file names, 
+            # also needs to uncomment werkzeug.utils import.
+            # filename = secure_filename(image_file.filename)
+
+            # print("before upload", user.pfp_url)
+
+            ext = image_file.filename.rsplit(".", 1)[1].lower()
+            # Generate unique names for uploaded images:
+            filename = f"{uuid.uuid4()}.{ext}"
+
+            filepath = os.path.join(upload_folder, filename)
+            image_file.save(filepath)
+            public_url = f"/uploads/{filename}"
+            user.update({"profile_picture_url": public_url}, conn=conn)
+            conn.commit()
+            
+            user = User.find_by_id(user.id)
+            # print("after upload", user.pfp_url)
+            return jsonify({
+                "status": "Upload successful",
+                "public_url": public_url
+            }), 200
+        else:
+            return jsonify({"status": "Invalid image"}), 400
+    except Exception as e:
+        # Might need to change this later
+        if conn: conn.rollback()
+        return jsonify({"status": f"Database error: {str(e)}"})
+    finally:
+        if conn: conn.close()
+
+
+
+# @app.route("/uploads/game_banners/<filename>")
+def retrieve_image(filename):
+    return send_from_directory(current_app.config["UPLOAD_FOLDER"], filename)
+
+
+def check_extension(filename):
+    # Valid image extensions for now are "png", "jpg", and "jpeg" which may change later
+    IMAGE_EXTENSIONS = {"png", "jpg", "jpeg"}
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in IMAGE_EXTENSIONS
+

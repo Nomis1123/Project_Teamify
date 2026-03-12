@@ -17,10 +17,12 @@ async function handleSave() {
         // imageModifier(preview);
 
         try {
+            const formData = new FormData();
+            formData.append("image", imageFile);
             const res = await fetch("/api/user/me", {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
-                body: JSON.stringify({ image: imageFile }),
+                headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+                body: formData,
             });
 
             if (!res.ok) {
@@ -36,7 +38,7 @@ async function handleSave() {
                 throw new Error(msg);
             } else {
                 const data = await res.json();
-                setPreview(data.url);
+                setPreview(data.public_url);
             }
             handleClose();
             imageModifier(preview);

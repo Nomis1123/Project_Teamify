@@ -40,6 +40,14 @@ app.secret_key = os.getenv("JWT_SECRET_KEY")
 
 #jwt =  JWTManager(app)
 
+# For Image Uploading
+UPLOAD_FOLDER = "uploads"
+# Valid image extensions which may change later
+# IMAGE_EXTENSIONS = {"png", "jpg", "jpeg"}
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024  # 5MB
+
+os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
 
 
 # --- Routes ---

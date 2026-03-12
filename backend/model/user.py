@@ -119,7 +119,8 @@ class User:
             raise ValueError("No valid fields provided.")
 
         # these are the fields which will use this update() function
-        allowed = {"username", "description", "pfp_url", "steam_id"}
+        allowed = {"username", "description", "profile_picture_url", "steam_id"}
+        # pfp_url is NOT a parameter in the db, profile_picture_url
         manage_conn = conn is None
 
         # apply filter onto allowed fields
