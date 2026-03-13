@@ -445,7 +445,6 @@ def upload_image(image_file):
     conn = get_db_connection()
 
     if not user:
-        # Somebody else check this, : is instead string.
         return jsonify({"status": "User not found."}), 404
 
     try:
