@@ -36,6 +36,7 @@ Logic: The code looks at the URL, grabs the token part and checks the database f
 """
 
 STEAM_OPENID_URL = "https://steamcommunity.com/openid/login"
+MAX_IMAGE_SIZE = 5 * 1024 * 1024
 
 def is_valid_email(email: str) -> bool:
 
@@ -454,7 +455,7 @@ def upload_image(image_file):
         if image_file.filename == "":
             return jsonify({"status": "No file selected"}), 400
 
-        if image_file.content_length > 5 * 1024 * 1024:
+        if image_file.content_length >  MAX_IMAGE_SIZE:
             return jsonify({"status": "File size too large (+5MB)"}), 413
 
         # Suspicious upload, this implies sender renamed the extension
