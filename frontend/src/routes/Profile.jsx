@@ -139,7 +139,7 @@ const Profile = () => {
                 <img
                     className="profile-image"
                     // This image link is temporary. Replace it when we figure out a default profile image.
-                    src={user.pfp_url || "https://th.bing.com/th/id/OIP.BXIufrwgTFhg49ux6NTkiQHaQD?w=236"}
+                    src={user.profile_picture || "https://th.bing.com/th/id/OIP.BXIufrwgTFhg49ux6NTkiQHaQD?w=236"}
                     alt="Profile"
                 />
 

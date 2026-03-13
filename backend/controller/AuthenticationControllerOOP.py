@@ -430,7 +430,7 @@ def getOrUpdate_availability1():
         return jsonify({"availability": availability}), 200
    except Exception as e:
        if conn: conn.rollback()
-       return jsonify({"status": f"Database error: {str(e)}"})
+       return jsonify({"status": f"Database error: {str(e)}"}), 500
 
    finally:
        if conn: conn.close()
@@ -449,13 +449,14 @@ def upload_image(image_file):
         return jsonify({"status": "User not found."}), 404
 
     try:
-        print("image file is: ", image_file)
         if not image_file:
             return jsonify({"status": "No image provided"}), 400
 
-        print("the filename is", image_file.filename)
         if image_file.filename == "":
             return jsonify({"status": "No file selected"}), 400
+
+        if image_file.content_length > 5 * 1024 * 1024:
+            return jsonify({"status": "File size too large (+5MB)"}), 413
 
         # Suspicious upload, this implies sender renamed the extension
         if image_file.content_type not in ["image/png", "image/jpg", "image/jpeg"]:
@@ -469,13 +470,23 @@ def upload_image(image_file):
 
             # print("before upload", user.pfp_url)
 
+            # Remove old image if the user already has an image by concating the
+            # old filename with upload folder's path because the user.pfp_url element
+            # is just for frontend and may not fully represent the upload path.
+            old_filename = user.pfp_url.split("/")[-1]
+            old_url = os.path.join(upload_folder, old_filename)
+            # Path may not exist if we already deleted it
+            if os.path.exists(old_url):
+                os.remove(old_url)
+
             ext = image_file.filename.rsplit(".", 1)[1].lower()
             # Generate unique names for uploaded images:
-            filename = f"{uuid.uuid4()}.{ext}"
+            filename = f"{uuid.uuid4().hex}.{ext}"
 
             filepath = os.path.join(upload_folder, filename)
             image_file.save(filepath)
-            public_url = f"/uploads/{filename}"
+            # we may want separate directories in the future for different users for scalability
+            public_url = f"http://localhost:8000/uploads/{filename}"
             user.update({"profile_picture_url": public_url}, conn=conn)
             conn.commit()
             
@@ -486,11 +497,11 @@ def upload_image(image_file):
                 "public_url": public_url
             }), 200
         else:
-            return jsonify({"status": "Invalid image"}), 400
+            return jsonify({"status": "Invalid image, must be of extension .jpg/.png/.jpeg"}), 400
     except Exception as e:
         # Might need to change this later
         if conn: conn.rollback()
-        return jsonify({"status": f"Database error: {str(e)}"})
+        return jsonify({"status": f"Database error: {str(e)}"}), 500
     finally:
         if conn: conn.close()
 
@@ -503,6 +514,7 @@ def retrieve_image(filename):
 
 def check_extension(filename):
     # Valid image extensions for now are "png", "jpg", and "jpeg" which may change later
+    # File name must also contain a period . otherwise they aren't telling us the extension
     IMAGE_EXTENSIONS = {"png", "jpg", "jpeg"}
     return "." in filename and filename.rsplit(".", 1)[1].lower() in IMAGE_EXTENSIONS
 

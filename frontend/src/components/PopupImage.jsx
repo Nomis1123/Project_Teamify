@@ -9,6 +9,9 @@ export default function PUPFImage({image, imageModifier}) {
     const [imageFile, setImageFile] = useState();
     const [imageFail, setFail] = useState("");
 
+    // 5 MB limit for file size unless changes happen
+    const MAX_FILE_SIZE = 5*1024*1024;
+
 async function handleSave() {
         setFail("");
 
@@ -58,12 +61,18 @@ async function handleSave() {
     function handleUpload() {
         const input = document.createElement("input");
         input.type = "file";
+        // Somebody needs to change this to strictly accept jpg/png/jpeg unless otherwise stated
         input.accept = "image/*";
 
         input.onchange = (e) => {
             const file = e.target.files?.[0];
             if (!file) return;
 
+            // Preview shouldn't update if uploading fails or is invalid
+            if (file.size > MAX_FILE_SIZE) {
+                setFail("Save failed. File too big (5MB max)");
+                return;
+            }
             const previewUrl = URL.createObjectURL(file);
 
             setPreview(previewUrl);
