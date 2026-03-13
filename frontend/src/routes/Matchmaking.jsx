@@ -97,13 +97,13 @@ const Matchmaking = () => {
 
     // set availability selections by creating a temp copy of availability to prevent direct modifications
     // function not in use anymore but kept for reference
-    const handleAvailabilityToggle = (day, time) => {
-        let temp = {...availability}
-        let newDay = {...temp[day]} // get the modified day
-        newDay[time] = !newDay[time]; // toggle on/off the time for that day
-        temp[day] = newDay;          
-        setAvailability(temp);  
-    }
+    //const handleAvailabilityToggle = (day, time) => {
+        //let temp = {...availability}
+        //let newDay = {...temp[day]} // get the modified day
+        //newDay[time] = !newDay[time]; // toggle on/off the time for that day
+        //temp[day] = newDay;          
+        //setAvailability(temp);  
+    //}
 
     // map the game for each user to background images for each game
     const attachGameImages = (users) => {
@@ -125,9 +125,11 @@ const Matchmaking = () => {
     // if "all" is selected, filter is null. Else, add selected filter to obj
     const buildFilterObj = async () => {
         return {
-            game_title: game === "all" ? null : game,
-            rank: rank === "all" ? null : rank,
-            role: role === "all" ? null : role,
+            filters:{
+                game: game === "all" ? null : game,
+                rank: rank === "all" ? null : rank,
+                role: role === "all" ? null : role,
+            }
         }
     } 
 
@@ -255,9 +257,9 @@ const Matchmaking = () => {
 
                         <select value={role} onChange={(e) => setRole(e.target.value)}>
                             <option value="all">All Roles &#9662; </option>
-                            <option value="supporter">Support</option>
-                            <option value="controller">DPS</option>
-                            <option value="">Tank</option>
+                            <option value="Support">Support</option>
+                            <option value="DPS">DPS</option>
+                            <option value="Tank">Tank</option>
                         </select>
                         
                         <div className="header">
@@ -319,7 +321,7 @@ const Matchmaking = () => {
                                     <p className="description">{user.description}</p>
                                     <div className="region">
                                         <img src={RegionIcon} />
-                                        <span> {user.role}</span>
+                                        <span> {user.roles}</span>
                                     </div>
                                 </div>
                             </div>
