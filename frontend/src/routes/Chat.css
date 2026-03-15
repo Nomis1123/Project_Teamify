@@ -11,11 +11,12 @@
   border-radius: 10px;
   border: 2px solid;
   border-color: rgb(255, 255, 255, 0.15);
-  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden; 
   flex: 4;
   height: calc(100vh - 48px - 64px);
-  box-sizing: border-box;
   box-shadow: 0 12px 30px rgba(53, 53, 53, 0.5);
 }
 
@@ -24,10 +25,11 @@
   border-radius: 10px;
   border: 2px solid;
   border-color: rgb(255, 255, 255, 0.15);
-  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden; 
   flex: 1;
   height: calc(100vh - 48px - 64px);
-  box-sizing: border-box;
   box-shadow: 0 12px 30px rgba(53, 53, 53, 0.5);
 }

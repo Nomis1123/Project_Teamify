@@ -4,7 +4,6 @@ import { Routes, Route} from "react-router-dom"
 import Login from "./routes/Login"
 import Profile from "./routes/Profile"
 import ProfileEdit from './routes/ProfileEdit.jsx'
-import Register from './routes/Register.jsx'
 import { useState, useEffect } from "react"
 import Matchmaking from './routes/Matchmaking.jsx'
 import Chat from './routes/Chat.jsx'
