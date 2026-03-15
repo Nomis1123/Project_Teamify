@@ -1,0 +1,33 @@
+.chat-page {
+    display: flex;
+    gap: 10px;
+    padding: 24px;
+    padding-top: 24px; 
+    padding-bottom: 24px;
+}
+
+.chat-window {
+  background: rgb(82, 53, 124);
+  border-radius: 10px;
+  border: 2px solid;
+  border-color: rgb(255, 255, 255, 0.15);
+  padding: 24px;
+  overflow: hidden; 
+  flex: 4;
+  height: calc(100vh - 48px - 64px);
+  box-sizing: border-box;
+  box-shadow: 0 12px 30px rgba(53, 53, 53, 0.5);
+}
+
+.chat-friend-list {
+  background: rgb(82, 53, 124);
+  border-radius: 10px;
+  border: 2px solid;
+  border-color: rgb(255, 255, 255, 0.15);
+  padding: 24px;
+  overflow: hidden; 
+  flex: 1;
+  height: calc(100vh - 48px - 64px);
+  box-sizing: border-box;
+  box-shadow: 0 12px 30px rgba(53, 53, 53, 0.5);
+}
