@@ -1,5 +1,9 @@
 /* Box shadows in this file are all taken from online */
 
+html {
+    font-size: clamp(12px, 1.5vw, 16px);
+}
+
 /* for filters + banners */
 .layout-friends {
     font-family: 'Roboto', sans-serif; 
@@ -106,7 +110,7 @@
 
     border: 1px solid #8d62b6;
     border-radius: 15px;
-    background: linear-gradient(to right, #562A86, #3f34a2); 
+    background: linear-gradient(to right, #562A86, #3f34a2, #7434a2); 
     box-shadow: 0 4px 10px rgba(0,0,0,0.2);
 
     color: white;
@@ -136,7 +140,7 @@
     flex-direction: column;
     justify-content: center;
     height: 100%;
-    gap: 15px;
+    gap: 8px;
 }
 
 .right-side-friends {
@@ -160,7 +164,7 @@
 }
 
 .username {
-    font-size: 20px;
+    font-size: 1.2rem;
     font-weight: 600;
 }
 
@@ -170,7 +174,7 @@
     gap: 5px;
 }
 
-.connect-button-friends {
+.message-button-friends {
     position: relative;
     right: 50px;
     width: 110px;
@@ -184,9 +188,13 @@
     background-size: 100% 100%, 200% 200%;
     animation: borderMove 4s linear infinite;
 
+    box-shadow:
+    0 10px 15px rgba(168, 85, 247, 0.2),
+    0 0 15px rgba(168, 85, 247, 0.15);
+
     color: white;
     font-weight: bold;
-    border-radius: 25px;
+    border-radius: 10px;
     padding: 6px 12px;
 }
 
@@ -196,8 +204,31 @@
   100% { background-position: 200% 50%; }
 }
 
-.connect-button-friends:hover {
+.message-button-friends:hover {
     background: linear-gradient(to right, #2563eb, #7c3aed);
+}
+
+.unfriend {
+    position: relative;
+    height: 45px;
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0px;
+
+    right: 30px;
+    border: 0.5px solid rgb(251, 102, 102);
+    border-radius: 10px;
+    background: rgba(254, 99, 99, 0.3);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.unfriend-icon {
+    width: 20px;
+    height: auto;
 }
 
 /* sets all user contents above the bg game image */
