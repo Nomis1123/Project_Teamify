@@ -4,6 +4,12 @@ import "./ChatWindow.css";
 export default function ChatWindow({messages, target, friends_list, user}) {
     const targetUser = friends_list.find((u) => u.userid === target);
     const [input, setInput] = useState("");
+
+    useEffect(() => {
+        console.log("############## Resetting input box ###############");
+        setInput("");
+    }, [target]);
+
     return (
         <div className="chat-window-section">
             <div className="chat-window-top-bar">
@@ -19,46 +25,54 @@ export default function ChatWindow({messages, target, friends_list, user}) {
             </div>
             <div className="chat-list">
                 {messages.map((message, index) => (
-                    <div key={index} className="chat-block">
-                        <div className="chat-timestamp">{message.timestamp}</div>
-                        {message.sender === target ? (
-                        <div className="chat-element chat-target">
-                            <img
-                            className="chat-pfp"
-                            src={targetUser.pfp_url}
-                            alt={targetUser.id}
-                            />
-                            <div className="chat-body">
-                            <div className="chat-username-target">
-                                {targetUser.username}
+                    message.sender === target ? (
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                            <div className="chat-timestamp">
+                                {message.timestamp}
                             </div>
-                            <div className="chat-message">
-                                {message.message}
-                            </div>
+                            <div className="chat-element chat-target">
+                                <img
+                                    className="chat-pfp"
+                                    src={targetUser.pfp_url}
+                                    alt={targetUser.id}
+                                />
+                                <div className="chat-body">
+                                    <div className="chat-username-target">
+                                        {targetUser.username}
+                                    </div>
+                                    <div className="chat-message">
+                                        {message.message}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        ) : message.sender === user.id ? (
-                        <div className="chat-element chat-user">
-                            <div className="chat-body">
-                            <div className="chat-username-user">
-                                {user.username}
+                    ) : message.sender === user.id ? (
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                            <div className="chat-timestamp">
+                                {message.timestamp}
                             </div>
-                            <div className="chat-message">
-                                {message.message}
+                            <div className="chat-element chat-user">
+                                <div className="chat-body">
+                                    <div className="chat-username-user">
+                                        {user.username}
+                                    </div>
+                                    <div className="chat-message">
+                                        {message.message}
+                                    </div>
+                                </div>
+                                <img
+                                    className="chat-pfp"
+                                    src={user.pfp_url}
+                                    alt={user.id}
+                                />
                             </div>
-                            </div>
-                            <img
-                            className="chat-pfp"
-                            src={user.pfp_url}
-                            alt={user.id}
-                            />
                         </div>
-                        ) : null}
-                    </div>
+                    ) : null
                 ))}
             </div>
             <textarea 
                 className="chat-input-box"
+                value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={`Send message to ${targetUser.username}`}
                 onKeyDown={(e) => {
