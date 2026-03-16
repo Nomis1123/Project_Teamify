@@ -14,8 +14,8 @@
     -ms-overflow-style: none;
 }
 
-.chat-list::-webkit-scrollbar {
-  display: none;
+.friends-list::-webkit-scrollbar {
+    display: none;
 }
 
 .friends-list-top-bar {
