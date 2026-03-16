@@ -50,6 +50,18 @@
     display: none;
 }
 
+.chat-block {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-timestamp {
+    display: flex;
+    justify-content: center;
+    font-size: 10px;
+}
+
 .chat-element {
     display: flex;
     flex-direction: row;

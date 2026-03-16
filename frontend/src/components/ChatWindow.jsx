@@ -18,45 +18,44 @@ export default function ChatWindow({messages, target, friends_list, user}) {
                 </div>
             </div>
             <div className="chat-list">
-                {messages.map((message, index) => {
-                    if (message.sender === target) {
-                        return (
-                            <div key={index} className="chat-element chat-target">
-                                <img
-                                    className={"chat-pfp"}
-                                    src={targetUser.pfp_url}
-                                    alt={targetUser.id}
-                                />
-                                <div className="chat-body">
-                                    <div className="chat-username-target">
-                                        {targetUser.username}
-                                    </div>
-                                    <div className="chat-message">
-                                        {message.message}
-                                    </div>
-                                </div>
+                {messages.map((message, index) => (
+                    <div key={index} className="chat-block">
+                        <div className="chat-timestamp">{message.timestamp}</div>
+                        {message.sender === target ? (
+                        <div className="chat-element chat-target">
+                            <img
+                            className="chat-pfp"
+                            src={targetUser.pfp_url}
+                            alt={targetUser.id}
+                            />
+                            <div className="chat-body">
+                            <div className="chat-username-target">
+                                {targetUser.username}
                             </div>
-                        );
-                    } else if (message.sender === user.id) {
-                        return (
-                            <div key={index} className="chat-element chat-user">
-                                <div className="chat-body">
-                                    <div className="chat-username-user">
-                                        {user.username}
-                                    </div>
-                                    <div className="chat-message">
-                                        {message.message}
-                                    </div>
-                                </div>
-                                <img
-                                    className={"chat-pfp"}
-                                    src={user.pfp_url}
-                                    alt={user.id}
-                                />
+                            <div className="chat-message">
+                                {message.message}
                             </div>
-                        );
-                    }
-                })}
+                            </div>
+                        </div>
+                        ) : message.sender === user.id ? (
+                        <div className="chat-element chat-user">
+                            <div className="chat-body">
+                            <div className="chat-username-user">
+                                {user.username}
+                            </div>
+                            <div className="chat-message">
+                                {message.message}
+                            </div>
+                            </div>
+                            <img
+                            className="chat-pfp"
+                            src={user.pfp_url}
+                            alt={user.id}
+                            />
+                        </div>
+                        ) : null}
+                    </div>
+                ))}
             </div>
             <textarea 
                 className="chat-input-box"
