@@ -81,7 +81,7 @@ const Chat = ({ target = null }) => {
     return (
     <div className="chat-page">
         <div className='chat-window'>
-            {target ? <span>Chat with user {target}</span> : <span>Select a friend to start a chat</span>}
+            {currTarget ? <span>Chat with user {currTarget}</span> : <span>Select a friend to start a chat</span>}
         </div>
         <div className='chat-friend-list'>
             <ChatFriendsList friends_list={friends_list} target={currTarget} targetModifier={setCurrTarget}/>
