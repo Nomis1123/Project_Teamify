@@ -1,9 +1,36 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./ChatWindow.css";
 
 export default function ChatWindow({messages, target, friends_list, user}) {
     const targetUser = friends_list.find((u) => u.userid === target);
     const [input, setInput] = useState("");
+    const socketRef = useRef(null);
+
+    useEffect(() => {
+        const ws = new WebSocket(`ws://localhost:8000/ws/${currentUserId}`);
+        socketRef.current = ws;
+
+        ws.onopen = () => {
+            console.log("WebSocket Connection ON");
+        };
+
+        ws.onmessage = (event) => {
+            const msg = JSON.parse(event.data);
+
+            if (msg.type === "Send") {
+                
+            } 
+        };
+
+        ws.onclose = () => {
+            console.log("WebSocket Connection OFF");
+        };
+
+        ws.onerror = (e) => {
+            console.log(`WebSocket Error: ${e}`)
+        }
+
+    }, []);
 
     useEffect(() => {
         console.log("############## Resetting input box ###############");

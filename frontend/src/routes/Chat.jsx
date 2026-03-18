@@ -82,8 +82,14 @@ const Chat = ({ target = null }) => {
                 // console.log("fetch returned:", res.status, res.url);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
+                const normalized_friends = data.friends_list.map((friend) => ({
+                    id: friend.id ?? "",
+                    username: friend.username ?? "",
+                    profile_picture: friend.profile_picture ?? "",
+                    unread: "",
+                }));
                 // console.log("response data:", data);
-                setFriendsList(data.friends_list);
+                setFriendsList(normalized_friends);
 
                 setLoadingFL(true);
 
@@ -95,12 +101,12 @@ const Chat = ({ target = null }) => {
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 data = await res.json();
                 // console.log("response data:", data);
-                const normalized = {
+                const normalized_user = {
                     id: data.user.id ?? "",
                     username: data.user.username ?? "",
                     profile_picture: data.user.profile_picture ?? "",
                 };
-                setUser(normalized);
+                setUser(normalized_user);
             } catch (e) {
                 console.log("error:", e);
             } finally {
