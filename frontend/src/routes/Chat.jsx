@@ -7,17 +7,17 @@ import ChatWindow from '../components/ChatWindow';
 
 const Chat = ({ target = null }) => {
     const [friends_list, setFriendsList] = useState([
-        {username: "Man!", userid: 12, pfp_url: "https://motionbgs.com/media/474/arknights.jpg", unread: ""},
-        {username: "Doggggggggggggg", userid: 111111111111111111, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: ""},
-        {username: "Dog", userid: 1, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: ""},
-        {username: "Dog", userid: 2, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: "You have unread messages"},
-        {username: "Dog", userid: 3, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: ""},
-        {username: "Dog", userid: 4, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: ""},
-        {username: "Dog", userid: 5, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: ""},
-        {username: "Dog", userid: 6, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: ""},
-        {username: "Dog", userid: 7, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: ""},
-        {username: "Dog", userid: 8, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: ""},
-        {username: "Dog", userid: 9, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: ""},
+        {username: "Man!", userid: 12, pfp_url: "https://motionbgs.com/media/474/arknights.jpg", conversation_id: null, unread: ""},
+        {username: "Doggggggggggggg", userid: 111111111111111111, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: null, unread: ""},
+        {username: "Dog", userid: 1, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: null, unread: ""},
+        {username: "Dog", userid: 2, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: null, unread: "You have unread messages"},
+        {username: "Dog", userid: 3, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: null, unread: ""},
+        {username: "Dog", userid: 4, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: null, unread: ""},
+        {username: "Dog", userid: 5, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: null, unread: ""},
+        {username: "Dog", userid: 6, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: null, unread: ""},
+        {username: "Dog", userid: 7, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: null, unread: ""},
+        {username: "Dog", userid: 8, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: null, unread: ""},
+        {username: "Dog", userid: 9, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: null, unread: ""},
     ]);
     const [conversation_id , setConversationID] = useState(null);
     const [messages, setMessages] = useState([
@@ -90,7 +90,8 @@ const Chat = ({ target = null }) => {
                     id: friend.id ?? "",
                     username: friend.username ?? "",
                     profile_picture: friend.profile_picture ?? "",
-                    unread: "You have unread messages",
+                    conversation_id: friend.conversation_id ?? "",
+                    unread: "",
                 }));
                 // console.log("response data:", data);
                 setFriendsList(normalized_friends);
@@ -148,8 +149,8 @@ const Chat = ({ target = null }) => {
                     console.log("WebSocket Connection OFF");
                 };
 
-                ws.onerror = (e) => {
-                    console.log(`WebSocket Error: ${e}`)
+                ws.onerror = (err) => {
+                    console.log(`WebSocket Error: ${err}`)
                 }
             } catch (e) {
                 console.log("error:", e);
@@ -158,9 +159,9 @@ const Chat = ({ target = null }) => {
         loadMe();
     }, []);
 
-    useEffect(() => {
-        console.log("User's friends list:", friends_list);
-    }, [friends_list]);
+    // useEffect(() => {
+    //     console.log("User's friends list:", friends_list);
+    // }, [friends_list]);
 
     // Get the conversation_id between current user and the target user and set the messages
     useEffect(() => {
@@ -173,29 +174,28 @@ const Chat = ({ target = null }) => {
                     target_friend.unread = "";
                     console.log("########## Successfully reset the unread message! ############")
                     console.log(friends_list);
+
+                    // const res = await fetch("/api/conversations", {
+                    //     method: "POST",
+                    //     headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+                    //     body: {target_id: target},
+                    // });
+                    // console.log("fetch returned:", res.status, res.url);
+                    // if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    // const data = await res.json();
+                    // console.log("response data:", data);
+                    setConversationID(target_friend.conversation_id);
+
+                    res = await fetch(`/api/conversations/${conversation_id}/messages`, {
+                        method: "GET",
+                        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+                    });
+                    // console.log("fetch returned:", res.status, res.url);
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    data = await res.json();
+                    // console.log("response data:", data);
+                    setMessages(data.messages);
                 };
-
-                const res = await fetch("/api/conversations", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
-                    body: {target_id: target},
-                });
-                // console.log("fetch returned:", res.status, res.url);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-                // console.log("response data:", data);
-                setConversationID(data.conversation_id);
-
-                res = await fetch(`/api/conversations/${conversation_id}/messages`, {
-                    method: "GET",
-                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
-                });
-                // console.log("fetch returned:", res.status, res.url);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                data = await res.json();
-                // console.log("response data:", data);
-                setMessages(data.messages);
-
                 
             } catch (e) {
                 console.log("error:", e);
@@ -206,10 +206,11 @@ const Chat = ({ target = null }) => {
         loadMe();
     }, [currTarget]);
 
-    useEffect(() => {
-        console.log("Changed the chatting target to ", currTarget);
-    }, [currTarget]);
+    // useEffect(() => {
+    //     console.log("Changed the chatting target to ", currTarget);
+    // }, [currTarget]);
 
+    // Send the user input to the socket
     const sendMessage = (input) => {
         const trimmed = input.trim();
         if (!trimmed) return;
