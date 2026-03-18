@@ -5,6 +5,7 @@ import Login from "./routes/Login"
 import Profile from "./routes/Profile"
 import ProfileEdit from './routes/ProfileEdit.jsx'
 import { useState, useEffect } from "react"
+import Register from './routes/Register.jsx'
 import Matchmaking from './routes/Matchmaking.jsx'
 import Chat from './routes/Chat.jsx'
 
@@ -49,6 +50,7 @@ function App() {
             <Route path="/profile" element={<Profile/>} />
             <Route path="/profile_editing" element={<ProfileEdit/>} />
             <Route path="/chat" element={<Chat/>} />
+            <Route path="/register" element={<Register/>} />
             <Route path="/matchmaking" element={<Matchmaking/>} />
           </Routes>
       </div>
