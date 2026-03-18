@@ -1,5 +1,5 @@
 import React from 'react'
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import "./Chat.css";
 import { useNavigate } from "react-router-dom";
 import ChatFriendsList from "../components/ChatFriendsList"
@@ -70,6 +70,7 @@ const Chat = ({ target = null }) => {
         username: "Man!",
         pfp_url: "https://motionbgs.com/media/474/arknights.jpg",
     });
+    const socketRef = useRef(null);
 
     // Get the user's friend list, info and build live chat
     useEffect(() => {
@@ -131,13 +132,13 @@ const Chat = ({ target = null }) => {
                         timestamp: msg.timestamp,
                     }
 
-                    if (income_conversation_id = conversation_id) {
+                    if (income_conversation_id === conversation_id) {
                         setMessages((prevMessages) => [
                             newMsg,
                             ...prevMessages,
                         ]);
                     } else {
-                        const target_friend = friends_list.find((f) => f.conversation_id = income_conversation_id);
+                        const target_friend = friends_list.find((f) => f.conversation_id === income_conversation_id);
                         target_friend.unread = newMsg.message;
                     }
                 };
@@ -166,6 +167,13 @@ const Chat = ({ target = null }) => {
         const loadMe = async () => {
             try {
                 setLoadingCH(true);
+                // Reset the unread message from this friend
+                if (currTarget != null) {
+                    const target_friend = friends_list.find((f) => f.userid === currTarget);
+                    target_friend.unread = "";
+                    console.log("########## Successfully reset the unread message! ############")
+                    console.log(friends_list);
+                };
 
                 const res = await fetch("/api/conversations", {
                     method: "POST",
@@ -187,6 +195,8 @@ const Chat = ({ target = null }) => {
                 data = await res.json();
                 // console.log("response data:", data);
                 setMessages(data.messages);
+
+                
             } catch (e) {
                 console.log("error:", e);
             } finally {
@@ -200,29 +210,23 @@ const Chat = ({ target = null }) => {
         console.log("Changed the chatting target to ", currTarget);
     }, [currTarget]);
 
-    useEffect(() => {
-        const loadMe = async () => {
-            try {
-                setLoadingCH(true);
+    const sendMessage = (input) => {
+        const trimmed = input.trim();
+        if (!trimmed) return;
+        if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
+            console.log("Socket not open");
+            return false;
+        }
 
-                const res = await fetch("/api/conversations", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
-                    body: {target_id: target},
-                });
-                // console.log("fetch returned:", res.status, res.url);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-                // console.log("response data:", data);
-                setConversationID(data.conversation_id);
-            } catch (e) {
-                console.log("error:", e);
-            } finally {
-                setLoadingCH(false);
-            }
-        };
-        loadMe();
-    }, [currTarget]);
+        socketRef.current.send(
+            JSON.stringify({
+                sender: user.userid,
+                message: trimmed,
+                conversation_id: conversation_id,
+            })
+        );
+        return true;
+    };
 
     return (
         <div className="chat-page">
@@ -233,6 +237,7 @@ const Chat = ({ target = null }) => {
                         target={currTarget} 
                         friends_list={friends_list} 
                         user={user} 
+                        sendMessage={sendMessage}
                     /> : 
                     <span>Select a friend to start a chat</span>}
             </div>

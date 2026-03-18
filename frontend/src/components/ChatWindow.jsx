@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import "./ChatWindow.css";
 
-export default function ChatWindow({messages, target, friends_list, user}) {
+export default function ChatWindow({messages, target, friends_list, user, sendMessage}) {
     const targetUser = friends_list.find((u) => u.userid === target);
     const [input, setInput] = useState("");
-    const socketRef = useRef(null);
 
     useEffect(() => {
         console.log("############## Resetting input box ###############");
@@ -76,10 +75,13 @@ export default function ChatWindow({messages, target, friends_list, user}) {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={`Send message to ${targetUser.username}`}
-                onKeyDown={(e) => {
+                onKeyDown={async (e) => {
                     if (e.key === "Enter") {
-                        // e.preventDefault();
-                        // handleSend();
+                        e.preventDefault();
+                        const ok = await sendMessage(input);
+                        if (ok) {
+                            setInput("");
+                        }
                     }
                 }}
             />
