@@ -9,7 +9,9 @@ export default function ChatFriendsList({friends_list, target, targetModifier}) 
             </div>
             <div className="friends-list">
                 {friends_list.map((user) => (
-                    <button className={`friend-element ${user.userid === target ? "friend-target" : "friend-default"}`} key={`${user.userid}`} onClick={() => targetModifier(user.userid)}>
+                    <button className={`friend-element ${user.userid === target ? "friend-target" : "friend-default"}`} 
+                        key={`${user.userid}`} 
+                        onClick={() => targetModifier(user.userid)}>
                         <img
                             className={`friend-pfp`}
                             src={user.pfp_url}
@@ -19,12 +21,11 @@ export default function ChatFriendsList({friends_list, target, targetModifier}) 
                             <div className="friend-username">
                                 {user.username}
                             </div>
-                            <div className="friend-userid">
-                                User ID: {user.userid}
+                            <div className="friend-unread">
+                                {user.unread}
                             </div>
                         </div>
-                        <div className="friend-unread">
-                        </div>
+                        {user.unread === "" ? null : <div className="friend-unread-dot"/>}
                     </button>
                 ))}
             </div>

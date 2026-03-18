@@ -7,32 +7,6 @@ export default function ChatWindow({messages, target, friends_list, user}) {
     const socketRef = useRef(null);
 
     useEffect(() => {
-        const ws = new WebSocket(`ws://localhost:8000/ws/${currentUserId}`);
-        socketRef.current = ws;
-
-        ws.onopen = () => {
-            console.log("WebSocket Connection ON");
-        };
-
-        ws.onmessage = (event) => {
-            const msg = JSON.parse(event.data);
-
-            if (msg.type === "Send") {
-                
-            } 
-        };
-
-        ws.onclose = () => {
-            console.log("WebSocket Connection OFF");
-        };
-
-        ws.onerror = (e) => {
-            console.log(`WebSocket Error: ${e}`)
-        }
-
-    }, []);
-
-    useEffect(() => {
         console.log("############## Resetting input box ###############");
         setInput("");
     }, [target]);
@@ -53,7 +27,7 @@ export default function ChatWindow({messages, target, friends_list, user}) {
             <div className="chat-list">
                 {messages.map((message, index) => (
                     message.sender === target ? (
-                        <div style={{ display: "flex", flexDirection: "column" }}>
+                        <div key={index} style={{ display: "flex", flexDirection: "column" }}>
                             <div className="chat-timestamp">
                                 {message.timestamp}
                             </div>
@@ -74,7 +48,7 @@ export default function ChatWindow({messages, target, friends_list, user}) {
                             </div>
                         </div>
                     ) : message.sender === user.id ? (
-                        <div style={{ display: "flex", flexDirection: "column" }}>
+                        <div key={index} style={{ display: "flex", flexDirection: "column" }}>
                             <div className="chat-timestamp">
                                 {message.timestamp}
                             </div>

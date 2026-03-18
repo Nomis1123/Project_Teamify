@@ -37,6 +37,7 @@
     padding: 5px;
     margin: 5px;
     gap: 8px;
+    align-items: center;
     transition: transform 0.15s ease;
 }
 
@@ -68,11 +69,12 @@
 }
 
 .friend-username {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 500;
 }
 
-.friend-userid {
+.friend-unread {
+    font-size: 10px;
     white-space: nowrap;
 }
 
@@ -82,4 +84,11 @@
 
 .friend-target {
     background-color: rgba(0, 0, 0, 0.2);
+}
+
+.friend-unread-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: red;
 }

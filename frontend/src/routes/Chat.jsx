@@ -7,17 +7,17 @@ import ChatWindow from '../components/ChatWindow';
 
 const Chat = ({ target = null }) => {
     const [friends_list, setFriendsList] = useState([
-        {username: "Man!", userid: 12, pfp_url: "https://motionbgs.com/media/474/arknights.jpg"},
-        {username: "Doggggggggggggg", userid: 111111111111111111, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg"},
-        {username: "Dog", userid: 1, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg"},
-        {username: "Dog", userid: 2, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg"},
-        {username: "Dog", userid: 3, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg"},
-        {username: "Dog", userid: 4, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg"},
-        {username: "Dog", userid: 5, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg"},
-        {username: "Dog", userid: 6, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg"},
-        {username: "Dog", userid: 7, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg"},
-        {username: "Dog", userid: 8, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg"},
-        {username: "Dog", userid: 9, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg"},
+        {username: "Man!", userid: 12, pfp_url: "https://motionbgs.com/media/474/arknights.jpg", unread: ""},
+        {username: "Doggggggggggggg", userid: 111111111111111111, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: ""},
+        {username: "Dog", userid: 1, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: ""},
+        {username: "Dog", userid: 2, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: "You have unread messages"},
+        {username: "Dog", userid: 3, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: ""},
+        {username: "Dog", userid: 4, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: ""},
+        {username: "Dog", userid: 5, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: ""},
+        {username: "Dog", userid: 6, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: ""},
+        {username: "Dog", userid: 7, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: ""},
+        {username: "Dog", userid: 8, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: ""},
+        {username: "Dog", userid: 9, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", unread: ""},
     ]);
     const [conversation_id , setConversationID] = useState(null);
     const [messages, setMessages] = useState([
@@ -63,6 +63,7 @@ const Chat = ({ target = null }) => {
         ]);
     const [loading_fl, setLoadingFL] = useState(false);
     const [loading_ch, setLoadingCH] = useState(false);
+    const [connected, setConnected] = useState(false);
     const [currTarget, setCurrTarget] = useState(target);
     const [user, setUser] = useState({
         id: 12,
@@ -70,11 +71,13 @@ const Chat = ({ target = null }) => {
         pfp_url: "https://motionbgs.com/media/474/arknights.jpg",
     });
 
+    // Get the user's friend list, info and build live chat
     useEffect(() => {
         const loadMe = async () => {
             try {
                 setLoadingFL(true);
 
+                // Get the user's friends list
                 const res = await fetch("???", {
                     method: "GET",
                     headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
@@ -86,13 +89,13 @@ const Chat = ({ target = null }) => {
                     id: friend.id ?? "",
                     username: friend.username ?? "",
                     profile_picture: friend.profile_picture ?? "",
-                    unread: "",
+                    unread: "You have unread messages",
                 }));
                 // console.log("response data:", data);
                 setFriendsList(normalized_friends);
 
                 setLoadingFL(true);
-
+                // Get user info
                 res = await fetch("/api/user/me", {
                     method: "GET",
                     headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
@@ -107,11 +110,49 @@ const Chat = ({ target = null }) => {
                     profile_picture: data.user.profile_picture ?? "",
                 };
                 setUser(normalized_user);
+
+                // Setup the live chat connection
+                const ws = new WebSocket(`ws://localhost:8000/ws/${user.id}`);
+                socketRef.current = ws;
+
+                ws.onopen = () => {
+                    setConnected(true);
+                    console.log("WebSocket Connection ON");
+                };
+
+                ws.onmessage = (event) => {
+                    const msg = JSON.parse(event.data);
+
+                    const income_conversation_id = msg.conversation_id;
+
+                    const newMsg = {
+                        message: msg.message,
+                        sender: msg.sender,
+                        timestamp: msg.timestamp,
+                    }
+
+                    if (income_conversation_id = conversation_id) {
+                        setMessages((prevMessages) => [
+                            newMsg,
+                            ...prevMessages,
+                        ]);
+                    } else {
+                        const target_friend = friends_list.find((f) => f.conversation_id = income_conversation_id);
+                        target_friend.unread = newMsg.message;
+                    }
+                };
+
+                ws.onclose = () => {
+                    setConnected(false);
+                    console.log("WebSocket Connection OFF");
+                };
+
+                ws.onerror = (e) => {
+                    console.log(`WebSocket Error: ${e}`)
+                }
             } catch (e) {
                 console.log("error:", e);
-            } finally {
-                setLoadingFL(false);
-            }
+            } 
         };
         loadMe();
     }, []);
@@ -120,6 +161,7 @@ const Chat = ({ target = null }) => {
         console.log("User's friends list:", friends_list);
     }, [friends_list]);
 
+    // Get the conversation_id between current user and the target user and set the messages
     useEffect(() => {
         const loadMe = async () => {
             try {
@@ -158,7 +200,7 @@ const Chat = ({ target = null }) => {
         console.log("Changed the chatting target to ", currTarget);
     }, [currTarget]);
 
-        useEffect(() => {
+    useEffect(() => {
         const loadMe = async () => {
             try {
                 setLoadingCH(true);
@@ -183,27 +225,27 @@ const Chat = ({ target = null }) => {
     }, [currTarget]);
 
     return (
-    <div className="chat-page">
-        <div className='chat-window'>
-            {currTarget ? 
-                <ChatWindow 
-                    messages={messages} 
-                    target={currTarget} 
+        <div className="chat-page">
+            <div className='chat-window'>
+                {currTarget ? 
+                    <ChatWindow 
+                        messages={messages} 
+                        target={currTarget} 
+                        friends_list={friends_list} 
+                        user={user} 
+                    /> : 
+                    <span>Select a friend to start a chat</span>}
+            </div>
+            <div className='chat-friend-list'>
+                <ChatFriendsList 
                     friends_list={friends_list} 
-                    user={user} 
-                /> : 
-                <span>Select a friend to start a chat</span>}
+                    target={currTarget} 
+                    targetModifier={setCurrTarget}
+                />
+            </div>
+    
         </div>
-        <div className='chat-friend-list'>
-            <ChatFriendsList 
-                friends_list={friends_list} 
-                target={currTarget} 
-                targetModifier={setCurrTarget}
-            />
-        </div>
- 
-    </div>
-  );
+    );
 };
 
 export default Chat;
