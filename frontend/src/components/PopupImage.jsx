@@ -9,6 +9,9 @@ export default function PUPFImage({image, imageModifier}) {
     const [imageFile, setImageFile] = useState();
     const [imageFail, setFail] = useState("");
 
+    // 5 MB limit for file size unless changes happen
+    const MAX_IMAGE_SIZE = 5*1024*1024;
+
 async function handleSave() {
         setFail("");
 
@@ -17,10 +20,12 @@ async function handleSave() {
         // imageModifier(preview);
 
         try {
+            const formData = new FormData();
+            formData.append("image", imageFile);
             const res = await fetch("/api/user/me", {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
-                body: JSON.stringify({ image: imageFile }),
+                headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+                body: formData,
             });
 
             if (!res.ok) {
@@ -36,7 +41,7 @@ async function handleSave() {
                 throw new Error(msg);
             } else {
                 const data = await res.json();
-                setPreview(data.url);
+                setPreview(data.public_url);
             }
             handleClose();
             imageModifier(preview);
@@ -56,12 +61,18 @@ async function handleSave() {
     function handleUpload() {
         const input = document.createElement("input");
         input.type = "file";
+        // Somebody needs to change this to strictly accept jpg/png/jpeg unless otherwise stated
         input.accept = "image/*";
 
         input.onchange = (e) => {
             const file = e.target.files?.[0];
             if (!file) return;
 
+            // Preview shouldn't update if uploading fails or is invalid
+            if (file.size > MAX_IMAGE_SIZE) {
+                setFail("Save failed. File too big (5MB max)");
+                return;
+            }
             const previewUrl = URL.createObjectURL(file);
 
             setPreview(previewUrl);
