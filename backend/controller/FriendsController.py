@@ -24,7 +24,7 @@ def search_users():
             query = """
                 SELECT id, username
                 FROM users
-                WHERE username ILIKE %s
+                WHERE username ILIKE %s AND id != %s
                 ORDER BY username
                 LIMIT %s OFFSET %s
             """
@@ -33,6 +33,7 @@ def search_users():
             query = """
                 SELECT id, username
                 FROM users
+                WHERE id != %s
                 ORDER BY username
                 LIMIT %s OFFSET %s
             """
