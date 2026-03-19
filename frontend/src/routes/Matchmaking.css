@@ -212,16 +212,16 @@
 .user-info {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 8px;
 }
 
-.region{
+.game-role{
     display: flex;
     align-items: center;
     gap: 5px;
 }
 
-.region img {
+.game-role img {
     display: inline-block; /* must keep img as inline-block */
     width: 18px;
     height: 18px;

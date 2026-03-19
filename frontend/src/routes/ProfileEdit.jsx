@@ -72,7 +72,7 @@ const ProfileEdit = () => {
                     username: data.user.username ?? "",
                     email: data.user.email ?? "",
                     description: data.user.description ?? "",
-                    profile_picture: data.user.profile_picture ?? "",
+                    profile_picture: data.user.pfp_url ?? "",
                     games: Array.isArray(data.games) ? data.user.games : [],
                     schedule: days.reduce((acc, day) => {
                         // console.log("schedule:", day, data.schedule[day]);
