@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from flask import Flask
 from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image
 from controller.MatchmakingController import get_matches
+
+from controller.ChatController import init_conversation, get_messages
 #, login, auth_verify, logout, getOrUpdate_availability
 #from controller.AuthenticationController import logout
 
@@ -78,7 +80,18 @@ app.add_url_rule('/api/user/filters', view_func=get_matches, methods=["POST"])
 ## 6. Uploads
 app.add_url_rule('/uploads/<filename>', view_func=retrieve_image, methods=['GET'])
 
+# Chat
+
+# start conversation
+app.add_url_rule('api/conversations',
+                 view_func=init_conversation,
+                 methods=['POST'])
+
+# get messages
+app.add_url_rule('/api/conversations/<int: conversation_id>/messages',
+                 view_func=get_messages,
+                 methods=['GET'])
+
 if __name__ == '__main__':
     # Start a local web server on Port 8000
-    print("webhook test!2")
     app.run(debug=True, port=8000)
