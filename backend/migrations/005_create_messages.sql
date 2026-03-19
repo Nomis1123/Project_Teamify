@@ -9,7 +9,7 @@ CREATE TABLE messages (
 
     -- Highly Recommended Addition: Tracks if the recipient has seen it
     is_read BOOLEAN DEFAULT FALSE,
-    is_edited BOOLEAN DEFAULT FALSE,
+    is_edited BOOLEAN DEFAULT FALSE
 
 );
 
