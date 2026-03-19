@@ -25,18 +25,18 @@ def search_users():
                 SELECT id, username
                 FROM users
                 WHERE username ILIKE %s
-                ORDER BY id
+                ORDER BY username
                 LIMIT %s OFFSET %s
             """
-            params = (f"%{search}%", limit, offset)
+            params = (f"%{search}%", user_id, limit, offset)
         else:
             query = """
                 SELECT id, username
                 FROM users
-                ORDER BY id
+                ORDER BY username
                 LIMIT %s OFFSET %s
             """
-            params = (limit, offset)
+            params = (user_id, limit, offset)
 
         cursor.execute(query, params)
         rows = cursor.fetchall()
