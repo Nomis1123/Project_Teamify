@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import get_jwt_identity
 from extensions import get_db_connection
 
 # This whole file might be deleted and may be moved to another file
