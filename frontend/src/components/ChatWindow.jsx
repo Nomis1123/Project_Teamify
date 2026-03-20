@@ -25,10 +25,10 @@ export default function ChatWindow({messages, target, friends_list, user, sendMe
             </div>
             <div className="chat-list">
                 {messages.map((message, index) => (
-                    message.sender === target ? (
+                    message.sender_id === target ? (
                         <div key={index} style={{ display: "flex", flexDirection: "column" }}>
                             <div className="chat-timestamp">
-                                {message.timestamp}
+                                {message.created_at}
                             </div>
                             <div className="chat-element chat-target">
                                 <img
@@ -41,15 +41,15 @@ export default function ChatWindow({messages, target, friends_list, user, sendMe
                                         {targetUser.username}
                                     </div>
                                     <div className="chat-message">
-                                        {message.message}
+                                        {message.content}
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    ) : message.sender === user.id ? (
+                    ) : message.sender_id === user.id ? (
                         <div key={index} style={{ display: "flex", flexDirection: "column" }}>
                             <div className="chat-timestamp">
-                                {message.timestamp}
+                                {message.created_at}
                             </div>
                             <div className="chat-element chat-user">
                                 <div className="chat-body">
@@ -57,7 +57,7 @@ export default function ChatWindow({messages, target, friends_list, user, sendMe
                                         {user.username}
                                     </div>
                                     <div className="chat-message">
-                                        {message.message}
+                                        {message.content}
                                     </div>
                                 </div>
                                 <img
