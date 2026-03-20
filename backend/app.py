@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from flask import Flask
 from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image
 from controller.MatchmakingController import get_matches
+from controller.Friend_controller import get_user_friends, accept_friend
 
 from controller.ChatController import init_conversation, get_messages
 #, login, auth_verify, logout, getOrUpdate_availability
@@ -91,6 +92,13 @@ app.add_url_rule('/api/conversations',
 app.add_url_rule('/api/conversations/<int:conversation_id>/messages',
                  view_func=get_messages,
                  methods=['GET'])
+
+# Get friends and requests
+app.add_url_rule('/api/friends', view_func=get_user_friends, methods=['GET'])
+
+# Accept or Decline a request
+app.add_url_rule('/api/friends/accept', view_func=accept_friend, methods=['POST'])
+
 
 if __name__ == '__main__':
     # Start a local web server on Port 8000
