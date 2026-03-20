@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from extensions import get_db_connection
+from controller.extensions import get_db_connection
 
 '''
 Create or find a conversations between two users.

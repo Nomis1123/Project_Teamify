@@ -83,12 +83,12 @@ app.add_url_rule('/uploads/<filename>', view_func=retrieve_image, methods=['GET'
 # Chat
 
 # start conversation
-app.add_url_rule('api/conversations',
+app.add_url_rule('/api/conversations',
                  view_func=init_conversation,
                  methods=['POST'])
 
 # get messages
-app.add_url_rule('/api/conversations/<int: conversation_id>/messages',
+app.add_url_rule('/api/conversations/<int:conversation_id>/messages',
                  view_func=get_messages,
                  methods=['GET'])
 
