@@ -20,14 +20,14 @@ def init_conversation():
     target_user_id = data.get('target_user_id')
 
     if not current_user_id or not target_user_id:
-        return jsonify({"error": "Missing user IDs"}), 400
+        return jsonify({"status": "Missing user IDs"}), 400
 
     try:
         current_user_id = int(current_user_id)
         target_user_id = int(target_user_id)
 
     except ValueError:
-        return jsonify({"error": "User IDs must be two numbers"}), 400
+        return jsonify({"status": "User IDs must be two numbers"}), 400
 
 
     # 1. Enforce your SQL Schema Rule (Smaller ID goes first)
@@ -60,11 +60,11 @@ def init_conversation():
         new_room_id = cursor.fetchone()[0]
         conn.commit()
 
-        return jsonify({"conversation_id": new_room_id, "is_new": True}), 201
+        return jsonify({"conversation_id": new_room_id, "is_new": True}), 200
 
     except Exception as e:
         conn.rollback()
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"status": str(e)}), 500
     finally:
         cursor.close()
         conn.close()
@@ -117,7 +117,7 @@ def get_messages(conversation_id):
         return jsonify(formatted_messages), 200
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"status": str(e)}), 500
     finally:
         cursor.close()
         conn.close()
