@@ -66,7 +66,7 @@ app.add_url_rule('/api/auth/logout',  view_func=logout, methods=['POST'])
 
 ## 3. User Info & Profile Update
 app.add_url_rule('/api/user/me',  view_func=get_me, methods=['GET'])
-app.add_url_rule('api/user/me', view_func=sync_games, methods=['POST'])
+app.add_url_rule('/api/user/me/sync', view_func=sync_games, methods=['POST'])
 
 ## 4. Update User Profile (Added to match Reference Sheet)
 app.add_url_rule('/api/user/me', view_func=update_me,  methods=['PATCH'])
