@@ -1,0 +1,34 @@
+.element-friend {
+  padding: 5px;
+}
+
+.btn-friend {
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 14px;
+  flex: 0 0 auto;
+}
+
+.btn-friend-save {
+  background: rgba(255, 255, 255, 0.2);
+  width: 100px;
+  color: #fbfbfb;
+}
+
+.btn-friend-save:hover {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid;
+  border-color: rgb(255, 255, 255);
+}
+
+.popup-friend-popup-width {
+  width: 600px;
+}
+
+.friend-length-display {
+  align-self: flex-end;
+  font-size: 12px;
+  opacity: 0.7;
+}
