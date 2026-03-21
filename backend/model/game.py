@@ -25,6 +25,21 @@ class Game:
         for key, default in GAME_RELATION_DEFAULTS.items():
             setattr(self, key, kwargs.get(key, default))
 
+    # Used for SteamAPI
+    # Add game to DB if it is not in DB already
+    @classmethod
+    def get(cls, conn, title: str, **kwargs):
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            # Check if game exists in DB
+            cur.execute("SELECT * FROM games WHERE title = %s", (title,))
+            row = cur.fetchone()
+
+            if row:
+                return cls._build(cur, row)
+
+            # Add game to DB if not exist
+            return cls.create(conn, title=title, rank=[], role=[], **kwargs)
+
     @classmethod
     def create(cls, conn, title: str, ranks: list, roles: list, **kwargs):
         fields = ["title"] + list(kwargs.keys())
