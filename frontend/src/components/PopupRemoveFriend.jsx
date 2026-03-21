@@ -2,13 +2,14 @@ import { useState } from "react";
 import "../components/PopupRemoveFriend.css";
 import Popup from "./Popup"
 
-export default function PURemoveFriend({ user, open, onClose }) {
+export default function PURemoveFriend({ user, open, onClose, onUnfriend }) {
     const [isSaving, setIsSaving] = useState(false);
     const [desc, setDesc] = useState("");
     const [descriptionError, setDescriptionError] = useState("");
     const [descriptionFail, setFail] = useState("");
 
-    async function handleSave() {
+    async function handleUnfriend() {
+        //onUnfriend(user); // to test friend deleted from friends list 
         setFail("");
         setIsSaving(true);
         setDescriptionError("");
@@ -22,24 +23,22 @@ export default function PURemoveFriend({ user, open, onClose }) {
 
             if (!res.ok) {
                 // backend might return JSON error { message: "..." }
-                setFail(`Save failed. Please try again later. (${res.status})`);
-                let msg = "";
-                try {
-                    const data = await res.json();
-                    console.log(data);
-                    if (data?.status) msg = data.status;
-                    setFail(`Save failed. Please try again later. (${msg})`);
-                } catch {}
-                throw new Error(msg);
+                setFail(`Unfriend failed. Please try again later. (${res.status})`);
+                throw new Error("Failed to fetch users")
             }
+
+            const data = await res.json();
+            console.log(data);
+            onUnfriend(user); // remove friend from friends list
             handleClose();
+
         } catch (e) {
-            // setFail(e instanceof Error ? e.message : "Save failed.");
             setFail(`Something went wrong. Please try again later. (${e.message})`);
         } finally {
             setIsSaving(false);
         }
     };
+
     function handleClose() {
         setIsSaving(false);
         onClose();
@@ -62,7 +61,7 @@ export default function PURemoveFriend({ user, open, onClose }) {
                     <div className="friend-save-container">
                         <button
                             className="btn-friend btn-friend-save"
-                            onClick={handleSave}
+                            onClick={handleUnfriend}
                             disabled={isSaving}
                             type="button"
                         >

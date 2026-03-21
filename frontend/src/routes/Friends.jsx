@@ -55,13 +55,21 @@ const Friends = () => {
     // fetch the list of friends from backend upon page load
     useEffect(() => {
         const init = async () => {
-            //const data = await getFriends();
+            //const data = await getFriendsAndRequests();
             setUsers(placeboUsers); // switch to data later
         }
         init();
     }, []);
 
-    const getFriends = async () =>  {
+    const handleUnfriend = (username) => {
+        setUsers(prev => prev.filter(user => user.username !== username));
+    };
+
+    const handleAddFriend = (newUser) => {
+        setUsers(prev => [...prev, newUser]);
+    };
+
+    const getFriendsAndRequests = async () =>  {
          try {
             const response = await fetch("...", {
                 method: "POST",
@@ -77,6 +85,8 @@ const Friends = () => {
             }
 
             const data = await response.json()
+            setUsers(data.friends);        
+            setFriendRequests(data.pending_requests);
             console.log(data)
             return data
         
@@ -96,7 +106,7 @@ const Friends = () => {
                     Authorization: `Bearer ${localStorage.getItem("access_token")}`,
                 },
                 credentials: "include",
-                body: JSON.stringify(text),
+                body: JSON.stringify({ text }),
             });
 
             if (!response.ok) {
@@ -111,35 +121,10 @@ const Friends = () => {
             console.error("Error fetching users:", error)
         }
     }
-
-    const getFriendRequests = async () => {
-        try {
-            const response = await fetch("...", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-                },
-                credentials: "include",
-            });
-
-            if (!response.ok) {
-                throw new Error("Failed to fetch users")
-            }
-
-            // sort endpoint responds with the list of users sorted with name or availability
-            const data = await response.json()
-            console.log(data)
-            setFriendRequests(data)
-
-        } catch (error) {
-            console.error("Error fetching users:", error)
-        }
-    }
     
     return (
         <div className="layout-friends">
-            <PUFriendRequest user={selectedUser} open={showPU2} onClose={() => setShowPU2(false)}/>
+            <PUFriendRequest user={selectedUser} open={showPU2} onClose={() => setShowPU2(false)} onAddFriend={getFriendsAndRequests} />
             <h1 className="title-friends">Player Connections</h1>
             <div className="top-bar">
 
@@ -169,7 +154,7 @@ const Friends = () => {
             {/* For each returned user, map its attributes to a banner*/}
             <div className="user-layout-friends">
 
-                <PURemoveFriend user={selectedUser} open={showPU1} onClose={() => setShowPU1(false)}/>
+                <PURemoveFriend user={selectedUser} open={showPU1} onClose={() => setShowPU1(false)} />
                 
                 {users.map((user) => (
                     <div className="friend-banners">

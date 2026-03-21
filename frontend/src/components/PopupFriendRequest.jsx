@@ -39,7 +39,7 @@ const placeboUsers = [
   },
 ];
 
-export default function PUFriendRequest({ open, onClose }) {
+export default function PUFriendRequest({ open, onClose, onAddFriend}) {
     const [users, setUsers] = useState([]); 
     const [frError, setFrError] = useState("");
     const [descriptionFail, setFail] = useState("");
@@ -54,8 +54,13 @@ export default function PUFriendRequest({ open, onClose }) {
         init();
     }, []);
 
+    // remove user from friend request list
+    async function removePerson(userID){
+        setUsers(prevUsers => prevUsers.filter(user => user.id !== userID));
+    }
+
     // calls api endpoint to reject a friend request
-    async function rejectFR() { 
+    async function rejectFR(userID) { 
         setFail("");
         setFrError("");
         try {
@@ -67,15 +72,13 @@ export default function PUFriendRequest({ open, onClose }) {
             if (!res.ok) {
                 // backend might return JSON error { message: "..." }
                 setFail(`Something went wrong. Please try again later. (${res.status})`);
-                let msg = "";
-                try {
-                    const data = await res.json();
-                    console.log(data);
-                    if (data?.status) msg = data.status;
-                    setFail(`Something went wrong. Please try again later. (${msg})`);
-                } catch {}
-                throw new Error(msg);
+                throw new Error("something went wrong");
             }
+
+            const data = await res.json();
+            console.log(data);
+            removePerson(userID); 
+
             handleClose();
         } catch (e) {
             // setFail(e instanceof Error ? e.message : "Save failed.");
@@ -84,15 +87,16 @@ export default function PUFriendRequest({ open, onClose }) {
     }
 
     // calls an endpoint to accept a friend request, which is basically adding a friend
-    const acceptFR = async () => {
+    const acceptFR = async (userID) => {
         try {
-            const response = await fetch("...", { //add friend endpoint
+            const response = await fetch("/api/friends/accept", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${localStorage.getItem("access_token")}`,
                 },
                 credentials: "include",
+                body: JSON.stringify({ friend_id: userID }),
             });
 
             if (!response.ok) {
@@ -100,17 +104,15 @@ export default function PUFriendRequest({ open, onClose }) {
                 throw new Error("Failed to fetch users")
             }
 
-            // sort endpoint responds with the list of users sorted with name or availability
-            const data = await response.json()
-            console.log(data)
+            //update friends list to show new friend and remove person from friend request list
+            await onAddFriend();
+            removePerson(userID)
             setSuccessMsg("Successfully Added Friend.")
             
-
         } catch (error) {
             console.error("Error fetching users:", error)
         }
     }
-
 
     function handleClose() {
         onClose();
@@ -127,6 +129,7 @@ export default function PUFriendRequest({ open, onClose }) {
                 <div style={{ display: "flex", gap: 8 }}>
                     <div className="fr-input-container">
                         {frError ? <p className="error-msg">{frError}</p> : ""}
+                        {successMsg ? <p className="success-msg">{successMsg}</p> : ""}
 
                     <div className="user-layout-fr">
                             {users.map((user) => (
@@ -149,11 +152,11 @@ export default function PUFriendRequest({ open, onClose }) {
                                             </div>
                                         </div>
             
-                                        <button className="acceptFR" onClick={() => {acceptFR(user.username);}}>
+                                        <button className="acceptFR" onClick={() => {acceptFR(user.id);}}>
                                             <img src={checkmark} className="accept-icon"/>
                                         </button>
             
-                                        <button class="unfriend" onClick={() => {rejectFR(user.username);}} >
+                                        <button class="unfriend" onClick={() => {rejectFR(user.id);}} >
                                             <img src={X}  className="unfriend-icon"/>
                                         </button>
                                     </div>
