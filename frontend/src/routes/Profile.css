@@ -63,7 +63,13 @@ h2 {
   justify-content: center;
 }
 
-.profile-edit-btn {
+.profile-button-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-btn {
   background-color: #B279F2;
   width: 120px;
   height: 50px;
@@ -72,7 +78,7 @@ h2 {
   font-size: 15px; 
 }
 
-.profile-edit-btn:hover {
+.profile-btn:hover {
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid;
   border-color: rgb(255, 255, 255);
@@ -123,7 +129,6 @@ h2 {
   overflow-x: auto;
   overflow-y: hidden;
   gap: 16px;
-  padding-bottom: 10px;
   scrollbar-color: rgba(255,255,255,0.45) rgba(255,255,255,0.10);
   scrollbar-width: thin;
 }
@@ -131,6 +136,8 @@ h2 {
 .profile-game-image-text-container {
   flex: 0 0 auto;
   text-align: center;
+  display: flex;
+  flex-direction: column;
 }
 
 .profile-game-image {
@@ -145,5 +152,8 @@ h2 {
 
 .profile-game-schedule { grid-area: schedule; }
 
+.btn-auto-height {
+  height: auto;
+}
 
 

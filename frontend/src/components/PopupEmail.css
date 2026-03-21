@@ -49,7 +49,11 @@
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
-.popup-email {
+.popup-email-popup-width {
+  width: 500px;
+}
+
+.popup-email-body-height {
   height: 220px;
 }
 

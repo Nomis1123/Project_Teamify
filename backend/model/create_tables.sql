@@ -1,19 +1,16 @@
--- is_verified is set to false by default when create a new user account
--- An email will be sent to the user; User should click the link in the email to verify
--- After the button in the email is clicked
-
-
 DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
+    steam_id VARCHAR(20) UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     profile_picture_url TEXT DEFAULT 'https://api.dicebear.com/7.x/avataaars/svg?seed=default',
     description VARCHAR(500),
     sub_class VARCHAR(50),
     is_verified BOOLEAN DEFAULT FALSE,
     verification_token VARCHAR(255),
+    roles VARCHAR(100) DEFAULT 'Any',
     availability JSONB DEFAULT '{
   "Monday": {"Morning": false, "Noon": false, "Evening": false},
   "Tuesday": {"Morning": false, "Noon": false, "Evening": false},
@@ -64,8 +61,27 @@ CREATE TABLE parties (
 );
 
 
+CREATE OR REPLACE FUNCTION calculate_harmony_score(
+    user_availability JSONB,
+    target_availability JSONB
+)
+RETURNS FLOAT AS $$
+DECLARE
+    day TEXT;
+    slot TEXT;
+    score FLOAT := 0;
+BEGIN
+    FOR day IN SELECT jsonb_object_keys(target_availability)
+    LOOP
+        FOR slot IN SELECT jsonb_object_keys(target_availability->day)
+        LOOP
+            IF (user_availability->day->>slot)::boolean
+               AND (target_availability->day->>slot)::boolean THEN
+                score := score + 1;
+            END IF;
+        END LOOP;
+    END LOOP;
 
-
-
-
-
+    RETURN score;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;

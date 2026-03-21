@@ -7,6 +7,7 @@
     backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(139, 92, 246, 0.3);
     padding: 12px 180px;
+    z-index: 50;
 
     position: sticky; /* fix header to stay in place when scroll*/
     top: 0;

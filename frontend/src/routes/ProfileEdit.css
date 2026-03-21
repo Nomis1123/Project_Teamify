@@ -102,12 +102,12 @@ h2 {
   margin-bottom: 16px;
 }
 
-.profile-description-header {
+.profile-section {
   display: flex;
   align-items: center;
 }
 
-.profile-description-text {
+.profile-text-right {
   flex: 1;
 }
 
@@ -132,7 +132,6 @@ h2 {
   overflow-x: auto;
   overflow-y: hidden;
   gap: 16px;
-  padding-bottom: 10px;
   scrollbar-color: rgba(255,255,255,0.45) rgba(255,255,255,0.10);
   scrollbar-width: thin;
 }

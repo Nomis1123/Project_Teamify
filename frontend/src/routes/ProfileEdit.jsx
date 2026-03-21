@@ -3,13 +3,15 @@ import { useEffect, useState } from "react";
 import "./ProfileEdit.css";
 import { useNavigate } from "react-router-dom";
 import "../components/GameScheduleBar.css";
-import "../components/PopupStarter.css";
 import GameScheduleBar from "../components/GameScheduleBar";
-import GamePicker from "../components/GamePicker";
 import PUUsername from '../components/PopupUsername';
 import PUEmail from '../components/PopupEmail';
 import PUPassword from '../components/PopupPassword';
 import PUDescription from '../components/PopupDescription';
+import PUGame from '../components/PopupGame';
+import PUSchedule from '../components/PopupSchedule';
+import PUGRR from '../components/PopupGRR';
+import PUPFImage from '../components/PopupImage';
 
 const ProfileEdit = () => {
     const navigate = useNavigate();
@@ -33,7 +35,16 @@ const ProfileEdit = () => {
         games: [],
         schedule: defaultWeeklySchedule,
     });
+    const [image, setImage] = useState("https://th.bing.com/th/id/OIP.BXIufrwgTFhg49ux6NTkiQHaQD?w=236")
+    const [username, setUsername] = useState("");
+    const [id, setID] = useState("");
+    const [email, setEmail] = useState("");
     const [description, setDescription] = useState("");
+    const [schedule, setSchedule] = useState(defaultWeeklySchedule);
+    // const [games, setGame] = useState([{'title': 'minecraft', 'url': 'src/gameImages/minecraft.webp'},
+    //     {'title': 'lol', 'url': 'src/gameImages/lol.webp', 'rank': 'Gold', 'role': 'Top'},
+    // ]);
+    const [games, setGame] = useState([]);
     const [loading, setLoading] = useState(true);
     // const [error, setError] = useState("");
 
@@ -41,12 +52,16 @@ const ProfileEdit = () => {
         const loadMe = async () => {
             try {
                 setLoading(true);
+                
+                // This is for testing only
+                // setUsername("TestUser");
+                // setDescription("TestDesc");
 
                 const res = await fetch("/api/user/me", {
                     method: "GET",
                     // If backend uses cookies/sessions, uncomment:
                     // credentials: "include",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
                 });
                 // console.log("fetch returned:", res.status, res.url);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -57,22 +72,29 @@ const ProfileEdit = () => {
                     username: data.user.username ?? "",
                     email: data.user.email ?? "",
                     description: data.user.description ?? "",
-                    profile_picture: data.user.profile_picture ?? "",
-                    // games: Array.isArray(data.user.games) ? data.games : [],
-                    // schedule: days.reduce((acc, day) => {
-                    //     // console.log("schedule:", day, data.schedule[day]);
-                    //     const d = data.user.schedule?.[day] ?? defaultDailySchedule;
-                    //     acc[day] = {
-                    //         morning: Boolean(d.morning),
-                    //         afternoon: Boolean(d.afternoon),
-                    //         night: Boolean(d.night),
-                    //     };
-                    //     return acc;
-                    // }, {}),
+                    profile_picture: data.user.pfp_url ?? "",
+                    games: Array.isArray(data.games) ? data.user.games : [],
+                    schedule: days.reduce((acc, day) => {
+                        // console.log("schedule:", day, data.schedule[day]);
+                        const d = data.user.schedule?.[day] ?? defaultDailySchedule;
+                        acc[day] = {
+                            morning: Boolean(d.morning),
+                            afternoon: Boolean(d.afternoon),
+                            night: Boolean(d.night),
+                        };
+                        return acc;
+                    }, {}),
                 };
                 console.log("setting user to:", normalized);
                 setUser(normalized);
+
+                setUsername(normalized.username);
+                setID(normalized.id);
+                setEmail(normalized.email);
                 setDescription(normalized.description);
+                setImage(normalized.profile_picture);
+                setSchedule(normalized.schedule);
+                setGame(normalized.games);
             } catch (e) {
                 console.log("error:", e);
             } finally {
@@ -82,23 +104,6 @@ const ProfileEdit = () => {
 
         loadMe();
     }, []);
-
-    const handleScheduleToggle = (day, timeSlot) => {
-        
-        setUser((prevUser) => {
-            const updatedSchedule = { ...prevUser.schedule };
-            const updatedDay = { ...(updatedSchedule[day] || defaultDailySchedule) };
-
-            updatedDay[timeSlot] = !updatedDay[timeSlot];
-            updatedSchedule[day] = updatedDay;
-
-            return {
-                ...prevUser,
-                schedule: updatedSchedule,
-                
-            };
-        });
-    };
 
     useEffect(() => {
         console.log("user state updated:", user.id);
@@ -129,16 +134,18 @@ const ProfileEdit = () => {
         <div className="profile-card profile-layout">
             
             <div className="profile-info-layout">
-                <img
-                    className="profile-image"
-                    // This image link is temporary. Replace it when we figure out a default profile image.
-                    src={user.profile_picture || "https://th.bing.com/th/id/OIP.BXIufrwgTFhg49ux6NTkiQHaQD?w=236"}
-                    alt="Profile"
-                />
+                <PUPFImage image={image} imageModifier={setImage} />
 
                 <div className='username'>
-                    <h1>{loading ? "Loading..." : user.username || "Unknown User"}</h1>
-                    <p>User ID: {user.id || "-"}</p>
+                    <h1>
+                        {loading ? "Loading..." : username || "Unknown User"}
+                    </h1>
+                    <p>
+                        User ID: {id ? id : "-"}
+                    </p>
+                    <p>
+                        Email: {email ? email : "-"}
+                    </p>
                 </div>
                 
                 <button className="profile-return-btn" onClick={() => navigate("/profile")}>
@@ -148,79 +155,82 @@ const ProfileEdit = () => {
             
             <div className='profile-scroll'>
                 <div>
-                    <PUUsername />
+                    <PUUsername username={username} usernameModifier={setUsername}/>
                 </div>
                 <div>
-                    <PUEmail />
+                    <PUEmail email={email} emailModifier={setEmail}/>
                 </div>
                 <div>
                     <PUPassword />
                 </div>
-                <div className='profile-description-header'>
-                    <h2 className='profile-description-text'>Description:</h2>
+                <div className='profile-section'>
+                    <h2 className='profile-text-right'>Description:</h2>
                     <div>
                         <PUDescription description={description} descriptionModifier={setDescription}/>
                     </div>
                 </div>
                 <div className="profile-description">
                     <p>
-                        {description ? description: "You have not set a description yet."}
+                        {description ? description : "You have not set a description yet."}
                     </p>
                 </div>
 
-                <h2>Games:</h2>
+                <div className='profile-section'>
+                    <h2 className='profile-text-right'>Games:</h2>
+                </div>
                 <div className='profile-game-section'>
                     <div className="profile-game-bar">
                         {/* The image sources are temporary. Replace with game icons and name after.
                             I still have to modify this so that it accept game image and name from db. */}
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                        ]} />
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                        ]} />
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                        ]} />
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                        ]} />
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                        ]} />
+
+                        {games.length >= 1 && 
+                            <div className='profile-game-image-text-container'>
+                                <PUGame games={games} gameModifier={setGame} which={0} isAdding={false}/>
+                                <PUGRR games={games} gameModifier={setGame} which={0}/>
+                            </div>
+                        }
+                        {games.length >= 2 && 
+                            <div className='profile-game-image-text-container'>
+                                <PUGame games={games} gameModifier={setGame} which={1} isAdding={false}/>
+                                <PUGRR games={games} gameModifier={setGame} which={1}/>
+                            </div>
+                        }
+                        {games.length >= 3 && 
+                            <div className='profile-game-image-text-container'>
+                                <PUGame games={games} gameModifier={setGame} which={2} isAdding={false}/>
+                                <PUGRR games={games} gameModifier={setGame} which={2}/>
+                            </div>
+                        }
+                        {games.length >= 4 && 
+                            <div className='profile-game-image-text-container'>
+                                <PUGame games={games} gameModifier={setGame} which={3} isAdding={false}/>
+                                <PUGRR games={games} gameModifier={setGame} which={3}/>
+                            </div>
+                        }
+                        {games.length === 5 && 
+                            <div className='profile-game-image-text-container'>
+                                <PUGame games={games} gameModifier={setGame} which={4} isAdding={false}/>
+                                <PUGRR games={games} gameModifier={setGame} which={4}/>
+                            </div>
+                        }
+
+                        {games.length < 5 && 
+                            <div>
+                                <PUGame games={games} gameModifier={setGame} which={null} isAdding={true}/>
+                            </div>
+                        }
                     </div>
                 </div>
-            
-                <h2>Game Schedule:</h2>
+
+                <div className='profile-section'>
+                    <h2 className='profile-text-right'>Game Schedule:</h2>
+                    <PUSchedule schedule={schedule} scheduleModifier={setSchedule}/>
+                </div>
+                
                 <div className='profile-game-schedule'>
                     <GameScheduleBar 
-                    schedule={user.schedule} 
-                    onClick={handleScheduleToggle}
+                    schedule={schedule} 
+                    onClick={() => {}}
                     />
                 </div>
             </div>

@@ -4,7 +4,6 @@ import "./Profile.css";
 import { useNavigate } from "react-router-dom";
 import "../components/GameScheduleBar.css"
 import GameScheduleBar from "../components/GameScheduleBar";
-import GamePicker from "../components/GamePicker";
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -21,10 +20,12 @@ const Profile = () => {
     };
     const [user, setUser] = useState({
         id: "",
+        steam_id: "",
         username: "",
         email: "",
         description: "",
         profileImageUrl: "",
+        // games: [{'title': 'lol', 'url': 'src/gameImages/lol.webp', 'role': 'Support', 'rank': 'Gold'}],
         games: [],
         schedule: defaultWeeklySchedule,
     });
@@ -35,12 +36,13 @@ const Profile = () => {
         const loadMe = async () => {
             try {
                 setLoading(true);
+                // console.log(localStorage.getItem("access_token"))
 
                 const res = await fetch("/api/user/me", {
                     method: "GET",
                     // If your backend uses cookies/sessions, uncomment:
                     // credentials: "include",
-                    headers: { "Content-Type": "application/json" },
+                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
                 });
                 // console.log("fetch returned:", res.status, res.url);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -48,21 +50,22 @@ const Profile = () => {
                 // console.log("response data:", data);
                 const normalized = {
                     id: data.user.id ?? "",
+                    steam_id: data.user.steam_id ?? "",
                     username: data.user.username ?? "",
                     email: data.user.email ?? "",
                     description: data.user.description ?? "",
-                    profile_picture: data.user.profile_picture ?? "",
-                    // games: Array.isArray(data.user.games) ? data.games : [],
-                    // schedule: days.reduce((acc, day) => {
-                    //     // console.log("schedule:", day, data.schedule[day]);
-                    //     const d = data.user.schedule?.[day] ?? defaultDailySchedule;
-                    //     acc[day] = {
-                    //         morning: Boolean(d.morning),
-                    //         afternoon: Boolean(d.afternoon),
-                    //         night: Boolean(d.night),
-                    //     };
-                    //     return acc;
-                    // }, {}),
+                    profile_picture: data.user.pfp_url ?? "",
+                    games: Array.isArray(data.user.games) ? data.games : [],
+                    schedule: days.reduce((acc, day) => {
+                        // console.log("schedule:", day, data.schedule[day]);
+                        const d = data.user.schedule?.[day] ?? defaultDailySchedule;
+                        acc[day] = {
+                            morning: Boolean(d.morning),
+                            afternoon: Boolean(d.afternoon),
+                            night: Boolean(d.night),
+                        };
+                        return acc;
+                    }, {}),
                 };
                 console.log("setting user to:", normalized);
                 setUser(normalized);
@@ -75,23 +78,6 @@ const Profile = () => {
 
         loadMe();
     }, []);
-
-    const handleScheduleToggle = (day, timeSlot) => {
-        
-        setUser((prevUser) => {
-            const updatedSchedule = { ...prevUser.schedule };
-            const updatedDay = { ...(updatedSchedule[day] || defaultDailySchedule) };
-
-            updatedDay[timeSlot] = !updatedDay[timeSlot];
-            updatedSchedule[day] = updatedDay;
-
-            return {
-                ...prevUser,
-                schedule: updatedSchedule,
-                
-            };
-        });
-    };
 
     useEffect(() => {
         console.log("user state updated:", user.id);
@@ -117,6 +103,34 @@ const Profile = () => {
     //     });
     // }, []);
 
+    async function sendToken() {
+        try {
+            const res = await fetch("/api/auth/steamlogin", {
+                method: "GET",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+            });
+            if (!res.ok) {
+                // backend might return JSON error { message: "..." }
+                let msg = "";
+                try {
+                    const data = await res.json();
+                    console.log(data);
+                if (data?.status) msg = data.status;
+                    console.log(msg);
+                } catch {}
+                throw new Error(msg);
+            }
+            const data = await res.json();
+
+            if (data.redirect_url) {
+                window.location.href = data.redirect_url;
+            }
+            // console.log("Token sent successfully");
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
     return (
     <div className="profile-page">
         <div className="profile-card profile-layout">
@@ -130,13 +144,29 @@ const Profile = () => {
                 />
 
                 <div className='username'>
-                    <h1>{loading ? "Loading..." : user.username || "Unknown User"}</h1>
-                    <p>User ID: {user.id || "-"}</p>
+                    <h1>
+                        {loading ? "Loading..." : user.username || "Unknown User"}
+                    </h1>
+                    <p>
+                        User ID: {user.id ? user.id : "-"}
+                        </p>
+                    <p>
+                        Email: {user.email ? user.email : "-"}
+                    </p>
+                    {user?.steam_id && <p>Linked to steam</p>}
+                </div>
+                <div className='profile-button-container'>
+                    <button className="profile-btn" onClick={() => navigate("/profile_editing")}>
+                        Edit Profile
+                    </button>
+                    {!user?.steam_id && 
+                        <button className="profile-btn" onClick={ () => sendToken() }>
+                            Link Steam
+                        </button>
+                    }
+                    
                 </div>
                 
-                <button className="profile-edit-btn" onClick={() => navigate("/profile_editing")}>
-                    Edit Profile
-                </button>
             </div>
             
             <div className='profile-scroll'>
@@ -154,46 +184,54 @@ const Profile = () => {
                     <div className="profile-game-bar">
                         {/* The image sources are temporary. Replace with game icons and name after.
                             I still have to modify this so that it accept game image and name from db. */}
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                        ]} />
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                        ]} />
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                        ]} />
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                        ]} />
-                        <GamePicker games={[
-                            { id: "", name: "Select Your Game", img: "src/gameImages/select.webp"},
-                            { id: "1", name: "Minecraft", img: "src/gameImages/minecraft.webp" },
-                            { id: "2", name: "Pubg", img: "src/gameImages/pubg.webp" },
-                            { id: "3", name: "Volerant", img: "src/gameImages/volerant.webp" },
-                            { id: "4", name: "League of Legends", img: "src/gameImages/lol.webp" },
-                            { id: "5", name: "7 days to die", img: "src/gameImages/7dtd.webp" },
-                        ]} />
+                        {user.games.length === 0 && 
+                            <div className='profile-section' style={{gap: 10}}>
+                                <h2>You haven't select a game yet! Add more games here:</h2>
+                                <button className="profile-btn btn-auto-height" onClick={() => navigate("/profile_editing")}>
+                                    Edit Profile
+                                </button> 
+                            </div>
+                        }
+                        {user.games.length >= 1 && 
+                            <div className='profile-game-image-text-container'>
+                                <img className='profile-game-image' src={user.games[0]['url']} alt={user.games[0]['title']} />
+                                <span>{user.games[0]['title']}</span>
+                                {'rank' in user.games[0] && <span>Rank: {user.games[0]['rank']}</span>}
+                                {'role' in user.games[0] && <span>Role: {user.games[0]['role']}</span>}
+                            </div>
+                        }
+                        {user.games.length >= 2 && 
+                            <div className='profile-game-image-text-container'>
+                                <img className='profile-game-image' src={user.games[1]['url']} alt={user.games[1]['title']} />
+                                <span>{user.games[1]['title']}</span>
+                                {'rank' in user.games[1] && <span>Rank: {user.games[1]['rank']}</span>}
+                                {'role' in user.games[1] && <span>Role: {user.games[1]['role']}</span>}
+                            </div>
+                        }
+                        {user.games.length >= 3 && 
+                            <div className='profile-game-image-text-container'>
+                                <img className='profile-game-image' src={user.games[2]['url']} alt={user.games[2]['title']} />
+                                <span>{user.games[2]['title']}</span>
+                                {'rank' in user.games[2] && <span>Rank: {user.games[2]['rank']}</span>}
+                                {'role' in user.games[2] && <span>Role: {user.games[2]['role']}</span>}
+                            </div>
+                        }
+                        {user.games.length >= 4 && 
+                            <div className='profile-game-image-text-container'>
+                                <img className='profile-game-image' src={user.games[3]['url']} alt={user.games[3]['title']} />
+                                <span>{user.games[3]['title']}</span>
+                                {'rank' in user.games[3] && <span>Rank: {user.games[3]['rank']}</span>}
+                                {'role' in user.games[3] && <span>Role: {user.games[3]['role']}</span>}
+                            </div>
+                        }
+                        {user.games.length === 5 && 
+                            <div className='profile-game-image-text-container'>
+                                <img className='profile-game-image' src={user.games[4]['url']} alt={user.games[4]['title']} />
+                                <span>{user.games[4]['title']}</span>
+                                {'rank' in user.games[4] && <span>Rank: {user.games[4]['rank']}</span>}
+                                {'role' in user.games[4] && <span>Role: {user.games[4]['role']}</span>}
+                            </div>
+                        }
                     </div>
                 </div>
             
@@ -201,7 +239,7 @@ const Profile = () => {
                 <div className='profile-game-schedule'>
                     <GameScheduleBar 
                     schedule={user.schedule} 
-                    onClick={handleScheduleToggle}
+                    onClick={() => {}}
                     />
                 </div>
             </div>

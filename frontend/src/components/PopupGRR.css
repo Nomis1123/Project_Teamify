@@ -1,0 +1,145 @@
+.element-grr {
+  padding: 5px;
+}
+
+.btn-grr {
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  flex: 0 0 auto;
+}
+
+.btn-grr-change {
+  background: rgb(255, 255, 255, 0.2);
+  color: white;
+  width: 100%;
+  padding: 10px 14px;
+}
+
+.btn-grr-rr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.btn-grr-image {
+  background: rgb(255, 255, 255, 0.2);
+  color: white;
+  width: 100%;
+  padding: 5px 5px;
+}
+
+.btn-grr-change:hover {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid;
+  border-color: rgb(255, 255, 255);
+}
+
+.btn-grr-save {
+  height: 50px;
+  width: 100px;
+  background: rgb(255, 255, 255, 0.2);
+  color: white;
+  margin-left: auto;
+}
+
+.btn-grr-save:hover {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid;
+  border-color: rgb(255, 255, 255);
+}
+
+.input-grr {
+  flex: 1;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+}
+
+.input-grr:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.popup-grr-popup-width {
+  width: 600px;
+}
+
+.popup-grr-body-height {
+  height: 240px;
+}
+
+.single-input-block-grr {
+  height: 100px;
+}
+
+.grr-image-container {
+  flex: 1;
+  gap: 8px;
+  width: 140px;
+  max-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grr-rr-container {
+  flex: 2;
+  gap: 8px;
+  width: 140px;
+  max-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-content: center;
+  gap: 20px;
+}
+
+.grr-save-container {
+  flex: 0 0 auto;
+  height: 200px;
+  display: flex;
+  align-items: center;  
+}
+
+.popup-grr-image {
+  grid-area: profile_game_image;
+  width: 140px;
+  height: 180px;
+  min-width: 140px;
+  border-radius: 10%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.2);
+}
+
+.popup-grr-selected {
+  border-color: rgb(80, 120, 255);
+  border-width: 3px;
+}
+
+.popup-grr-dropdown {
+  background: rgb(255, 255, 255, 0.2);
+  color: rgb(255, 255, 255);
+  width: 150px;
+  padding: 10px 14px;
+  border-radius: 5%;
+  font-weight: 500;
+}
+
+.popup-grr-dropdown option {
+    font-weight: 500;
+    border: 2px solid;
+    border-color: white;
+    background-color: #441E6D;
+}
+
+.popup-grr-dropdown-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
