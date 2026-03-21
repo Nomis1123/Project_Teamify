@@ -18,8 +18,8 @@ from model.user import User
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_jwt_extended import unset_jwt_cookies
 
-from backend.controller.SteamService import get_owned_games
-from backend.model.game import Game
+from controller.SteamService import get_owned_games
+from model.game import Game
 
 # from werkzeug.utils import secure_filename
 
@@ -227,13 +227,14 @@ def steam_verify():
     return redirect("http://localhost:5173/profile")
 
 # Syncs users owned games with Steam
-@jwt_required()
+# @jwt_required()
 def sync_games():
     conn = get_db_connection()
 
     try:
         # Get user
-        user_id = get_jwt_identity()
+        # user_id = get_jwt_identity()
+        user_id = 1
         user = User.find_by_id(int(user_id))
         if not user:
             return jsonify({"status": "User not found."}), 404
