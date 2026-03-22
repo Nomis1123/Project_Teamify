@@ -160,3 +160,22 @@ INSERT INTO user_games (user_id, game_id, current_rank)
 SELECT id, (SELECT id FROM games WHERE title = 'Valorant'), 'Platinum 1'
 FROM users
 WHERE id >= 16;
+
+
+-- The friendes relationship
+INSERT INTO friends (user_id_1, user_id_2, status) VALUES 
+(1, 2, 'accepted'), -- LunaVibes and ShadowStep
+(1, 6, 'accepted'), -- LunaVibes and FullTimeGamer
+(3, 4, 'accepted'), -- WeekendKing and OfficeWorker95
+(9, 10, 'accepted'), -- ArcticFox and CyberPunk
+(15, 16, 'accepted'), -- Glitch and HealerMain
+(6, 7, 'accepted');  -- FullTimeGamer and UniStudent
+
+-- Pending Requests (Sent to User 1 - LunaVibes)
+INSERT INTO friends (user_id_1, user_id_2, status) VALUES 
+(8, 1, 'accepted'),  -- LazyGamer requested LunaVibes
+(12, 1, 'accepted'); -- Zenith requested LunaVibes
+
+-- accepted Requests (Sent by User 1 - LunaVibes)
+INSERT INTO friends (user_id_1, user_id_2, status) VALUES 
+(1, 22, 'accepted'); -- LunaVibes requested NovaStar
