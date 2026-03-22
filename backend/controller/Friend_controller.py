@@ -35,3 +35,19 @@ def accept_friend():
         return jsonify({"status": "success", "message": "Friendship established"}), 200
     else:
         return jsonify({"status": "error", "message": "Database update failed"}), 500
+
+
+@jwt_required()
+def search_user():
+    user_id = get_jwt_identity()
+
+    search = request.args.get("search", "", type=str)
+    limit = request.args.get("limit", 10, type=int)   # how many to load, for now try out 10
+    offset = request.args.get("offset", 0, type=int)  # how far we've scrolled
+
+    try:
+        users = User.search_username(user_id, search, limit, offset)
+        return jsonify([u.to_dict() for u in users]), 200
+
+    except Exception as e:
+        return jsonify({"status": f"Database error: {str(e)}"}), 500

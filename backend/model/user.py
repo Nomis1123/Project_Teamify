@@ -243,6 +243,45 @@ class User:
         finally:
             if manage_conn:
                 conn.close()
+
+    @staticmethod
+    def search_username(user_id, search="", limit=10, offset=0):
+        # limit = how many users to display
+        # offset = how far we've scrolled down the list
+        conn = get_db_connection()
+        try:
+            with conn.cursor() as cur:
+                base_query = """
+                    SELECT id, username, email, steam_id, description, profile_picture_url, availability
+                    FROM users
+                    WHERE id != %s
+                """
+                params = [user_id]
+                # Handle substring search (case-insensitive)
+                search = search.strip()
+                if search:
+                    base_query += " AND username ILIKE %s"
+                    params.append(f"%{search.strip()}%")
+
+                # Default ordering
+                base_query += " ORDER BY username"
+                # Pagination
+                base_query += " LIMIT %s OFFSET %s"
+                params.extend([limit, offset])
+                
+                cur.execute(base_query, params)
+                rows = cur.fetchall()
+                return [User(*row) for row in rows]
+
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            raise e 
+
+        finally:
+            if conn:
+                conn.close()
+
         
 
 
