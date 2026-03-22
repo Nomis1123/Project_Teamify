@@ -3,7 +3,7 @@ from controller.extensions import jwt
 from dotenv import load_dotenv
 
 from flask import Flask
-from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image
+from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, sync_games, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image
 from controller.MatchmakingController import get_matches
 from controller.Friend_controller import get_user_friends, accept_friend
 
@@ -61,25 +61,24 @@ app.add_url_rule('/api/auth/login',view_func=login, methods=['POST'])
 #app.add_url_rule('/api/auth/verify/<token>', view_func=auth_verify, methods=['GET'])
 app.add_url_rule('/api/auth/steamlogin', view_func=steam_login, methods=['GET'])
 app.add_url_rule('/api/auth/steamverify', view_func=steam_verify, methods=['GET'])
-#
-#
+
 ## 2. Logout (Added to match Reference Sheet)
 app.add_url_rule('/api/auth/logout',  view_func=logout, methods=['POST'])
-#
+
 ## 3. User Info & Profile Update
 app.add_url_rule('/api/user/me',  view_func=get_me, methods=['GET'])
-#
-#
+app.add_url_rule('/api/user/me/sync', view_func=sync_games, methods=['POST'])
+
 ## 4. Update User Profile (Added to match Reference Sheet)
 app.add_url_rule('/api/user/me', view_func=update_me,  methods=['PATCH'])
-#
+
 ## 5. Availability
 app.add_url_rule('/api/user/availability', view_func=getOrUpdate_availability1, methods=['GET','PUT'])
-
 app.add_url_rule('/api/user/filters', view_func=get_matches, methods=["POST"])
-#
+
 ## 6. Uploads
 app.add_url_rule('/uploads/<filename>', view_func=retrieve_image, methods=['GET'])
+
 
 # Chat
 
