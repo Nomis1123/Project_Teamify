@@ -1,0 +1,251 @@
+/* Box shadows in this file are all taken from online */
+
+html {
+    font-size: clamp(12px, 1.5vw, 16px);
+}
+
+/* for filters + banners */
+.layout-friends {
+    font-family: 'Roboto', sans-serif; 
+}
+
+.title-friends {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-align: center;
+    background: linear-gradient(to right,
+    #60a5fa,
+    #c084fc,
+    #f472b6 );
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+/* the below css are for the search and friend request button */
+.top-bar {
+    display: flex;
+    align-items: center;
+    width: 80%; 
+    max-width: 1500px;
+    margin: 45px auto -5px auto;           
+    gap: 40px;
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    flex: 5;
+    border-radius: 10px;
+    border: 1px solid #8d62b6;
+
+    background: linear-gradient(
+        to right,
+        rgba(115, 56, 178, 0.2),
+        rgb(63, 52, 162, 0.15),
+        rgba(40, 88, 166, 0.15)
+    ); 
+
+    box-shadow:
+    0 5px 15px rgba(168, 85, 247, 0.2),
+    0 0 15px rgba(168, 85, 247, 0.15);
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    padding: 15px 18px 15px 18px;
+    gap: 10px;
+}
+
+.search-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+}
+
+.search-icon {
+    width: 18px;
+    height: 18px;
+}
+
+.requests-button {
+    flex: 1;
+    background: linear-gradient(to right, #3b82f6, #8b5cf6);
+    border: none;
+    border-radius: 15px;
+    box-shadow:
+    0 10px 25px rgba(168, 85, 247, 0.2),
+    0 0 25px rgba(168, 85, 247, 0.15);
+    padding: 15px 18px 15px 18px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.requests-button:hover {
+    background: linear-gradient(to right, #5566FF, #6A33E8, #9A33FF);
+    transform: scale(1.03); /* on hover, scale the button larger */
+}
+
+/* the below css are for user banners only */
+.user-layout-friends {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+
+    margin-top: 50px;
+}
+
+.friend-banners {
+    position: relative;
+    width: 80%;
+    aspect-ratio: 10 / 1; /* scale banner to look larger on larger screens */
+    min-height: 110px;
+    max-width: 1500px;
+    display: flex;
+    overflow: hidden;
+
+    border: 1px solid #8d62b6;
+    border-radius: 15px;
+    background: linear-gradient(to right, #562A86, #3f34a2, #7434a2); 
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+
+    color: white;
+
+    margin-bottom: 20px;
+    z-index: 1;
+}
+
+.friend-banners:hover {
+    border: 1px solid #b874da;
+    box-shadow:
+    0 10px 25px rgba(168, 85, 247, 0.2),
+    0 0 25px rgba(168, 85, 247, 0.15);
+    transition: 0.3s ease
+}
+
+.left-side-friends{
+    position: relative;
+    width: 4%;
+    min-height: 125px;
+}
+
+.user-content-friends {
+    position: absolute;
+    left: 10px;     /* distance from right edge */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+    gap: 8px;
+}
+
+.right-side-friends {
+    flex: 1;  /* take up the remaining width of banner */
+    display: flex;
+    align-items: center; 
+    justify-content: flex-end;
+}
+
+.top-row-friends {
+    display: flex;
+}
+
+.avatar-friends {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border-radius: 100%;
+}
+
+.username {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.user-info-friends {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.message-button-friends {
+    position: relative;
+    right: 50px;
+    width: 110px;
+    height: 45px;
+    border: 3px solid transparent;
+
+    /* added border animation effect */
+    background: 
+        linear-gradient(to right, #3b82f6, #8b5cf6) padding-box,
+        linear-gradient(90deg, #5090f7, #9369f6) border-box;
+    background-size: 100% 100%, 200% 200%;
+    animation: borderMove 4s linear infinite;
+
+    box-shadow:
+    0 10px 15px rgba(168, 85, 247, 0.2),
+    0 0 15px rgba(168, 85, 247, 0.15);
+
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+    padding: 6px 12px;
+}
+
+/* defining movement for the above linear infinite animation */
+@keyframes borderMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+.message-button-friends:hover {
+    background: linear-gradient(to right, #2563eb, #7c3aed);
+}
+
+.unfriend {
+    position: relative;
+    height: 45px;
+    aspect-ratio: 1/1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0px;
+
+    right: 30px;
+    border: 0.5px solid rgb(251, 102, 102);
+    border-radius: 10px;
+    background: rgba(254, 99, 99, 0.3);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.unfriend-icon {
+    width: 20px;
+    height: auto;
+}
+
+/* sets all user contents above the bg game image */
+.friend-banners > *:not(.bg-image) {
+    position: relative;
+    z-index: 1;
+}
+
+.empty-msg-friends {
+    text-align: center;
+    padding: 2.8rem 0;
+}
+
+.empty-msg-friends p{
+    color: #9CA3AF;
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+
