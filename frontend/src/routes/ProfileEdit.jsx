@@ -154,6 +154,49 @@ const ProfileEdit = () => {
             // console.log("Token sent successfully");
         } catch (e) {
             console.log(e);
+        } finally {
+            try {
+                const res = await fetch("/api/user/me", {
+                    method: "GET",
+                    // If backend uses cookies/sessions, uncomment:
+                    // credentials: "include",
+                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+                });
+                // console.log("fetch returned:", res.status, res.url);
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                // console.log("response data:", data);
+                const normalized = {
+                    id: data.user.id ?? "",
+                    username: data.user.username ?? "",
+                    email: data.user.email ?? "",
+                    description: data.user.description ?? "",
+                    profile_picture: data.user.pfp_url ?? "",
+                    games: Array.isArray(data.games) ? data.user.games : [],
+                    schedule: days.reduce((acc, day) => {
+                        // console.log("schedule:", day, data.schedule[day]);
+                        const d = data.user.schedule?.[day] ?? defaultDailySchedule;
+                        acc[day] = {
+                            morning: Boolean(d.morning),
+                            afternoon: Boolean(d.afternoon),
+                            night: Boolean(d.night),
+                        };
+                        return acc;
+                    }, {}),
+                };
+                console.log("setting user to:", normalized);
+                setUser(normalized);
+
+                setUsername(normalized.username);
+                setID(normalized.id);
+                setEmail(normalized.email);
+                setDescription(normalized.description);
+                setImage(normalized.profile_picture);
+                setSchedule(normalized.schedule);
+                setGame(normalized.games);
+            } catch (e) {
+                console.log("error:", e);
+            }
         }
     };
 
