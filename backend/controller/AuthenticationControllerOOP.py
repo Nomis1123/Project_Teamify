@@ -227,14 +227,13 @@ def steam_verify():
     return redirect("http://localhost:5173/profile")
 
 # Syncs users owned games with Steam
-# @jwt_required()
+@jwt_required()
 def sync_games():
     conn = get_db_connection()
 
     try:
         # Get user
-        # user_id = get_jwt_identity()
-        user_id = 1
+        user_id = get_jwt_identity()
         user = User.find_by_id(int(user_id))
         if not user:
             return jsonify({"status": "User not found."}), 404
