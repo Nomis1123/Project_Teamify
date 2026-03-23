@@ -129,6 +129,34 @@ const ProfileEdit = () => {
     //     });
     // }, []);
 
+    async function linkSteamGames() {
+        try {
+            const res = await fetch("/api/user/me/sync", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+            });
+            if (!res.ok) {
+                // backend might return JSON error { message: "..." }
+                let msg = "";
+                try {
+                    const data = await res.json();
+                    console.log(data);
+                    if (data?.status) msg = data.status;
+                    console.log(msg);
+                } catch {}
+                throw new Error(msg);
+            }
+            const data = await res.json();
+
+            if (data.redirect_url) {
+                window.location.href = data.redirect_url;
+            }
+            // console.log("Token sent successfully");
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
     return (
     <div className="profile-page">
         <div className="profile-card profile-layout">
@@ -177,6 +205,9 @@ const ProfileEdit = () => {
 
                 <div className='profile-section'>
                     <h2 className='profile-text-right'>Games:</h2>
+                    <button className="profile-btn-steam-games" onClick={ () => linkSteamGames() }>
+                            Link Steam Games
+                    </button>
                 </div>
                 <div className='profile-game-section'>
                     <div className="profile-game-bar">

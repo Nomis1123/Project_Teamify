@@ -17,6 +17,10 @@ import uuid
 from model.user import User
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_jwt_extended import unset_jwt_cookies
+
+from controller.SteamService import get_owned_games
+from model.game import Game
+
 # from werkzeug.utils import secure_filename
 
 """
@@ -187,7 +191,7 @@ def steam_verify():
     # Get user object by UserID
     user = User.find_by_id(int(user_id))
     if not user:
-        return jsonify({"status:" "User not found."}), 404
+        return jsonify({"status": "User not found."}), 404
 
     # Verify response with Steam
     params = dict(request.args)
@@ -221,6 +225,44 @@ def steam_verify():
 
     # Redirect back to profile page
     return redirect("http://localhost:5173/profile")
+
+# Syncs users owned games with Steam
+@jwt_required()
+def sync_games():
+    conn = get_db_connection()
+
+    try:
+        # Get user
+        user_id = get_jwt_identity()
+        user = User.find_by_id(int(user_id))
+        if not user:
+            return jsonify({"status": "User not found."}), 404
+
+        # Check if Steam is linked
+        steam_id = user.steam_id
+        if not steam_id:
+            return jsonify({"status": "Steam account not linked"}), 400
+
+        # Fetch games from SteamAPI and sync DB
+        steam_games = get_owned_games(steam_id)
+        for game in steam_games:
+            title = game["name"]
+
+            # Create or get game from DB
+            db_game = Game.get(conn, title=title, ranks=[], roles=[])
+
+            # Add game to user's list of owned games
+            Game.add_game_to_user(conn, user_id=int(user_id), game_id=db_game.id)
+
+        return jsonify({"status": "success"}), 200
+
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"status": "Sync failed"}), 500
+
+    finally:
+        conn.close()
+
 
 #def auth_verify(token):
 #    result = User.verify1(token)
@@ -517,4 +559,3 @@ def check_extension(filename):
     # File name must also contain a period . otherwise they aren't telling us the extension
     IMAGE_EXTENSIONS = {"png", "jpg", "jpeg"}
     return "." in filename and filename.rsplit(".", 1)[1].lower() in IMAGE_EXTENSIONS
-

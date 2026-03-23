@@ -25,6 +25,21 @@ class Game:
         for key, default in GAME_RELATION_DEFAULTS.items():
             setattr(self, key, kwargs.get(key, default))
 
+    # Used for SteamAPI
+    # Add game to DB if it is not in DB already
+    @classmethod
+    def get(cls, conn, title: str, ranks: list, roles: list, **kwargs):
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            # Check if game exists in DB (not case-sensitive)
+            cur.execute(f"SELECT {GAME_FIELDS} FROM games WHERE LOWER(title) = LOWER(%s)", (title,))
+            row = cur.fetchone()
+
+            if row:
+                return cls._build(cur, row)
+
+            # Add game to DB if not exist
+            return cls.create(conn, title, ranks, roles, **kwargs)
+
     @classmethod
     def create(cls, conn, title: str, ranks: list, roles: list, **kwargs):
         fields = ["title"] + list(kwargs.keys())
@@ -100,3 +115,14 @@ class Game:
                 for key, value in self.__dict__.items()
                 if key not in exclude
                 }
+
+    # Used for Sync Games
+    # Add game to user's list of owned games
+    @staticmethod
+    def add_game_to_user(conn, user_id: int, game_id: int):
+        with conn.cursor() as cur:
+            cur.execute("INSERT INTO user_games "
+                        "VALUES (%s, %s, %s, %s, %s) "
+                        "ON CONFLICT (user_id, game_id) DO NOTHING",
+                        (user_id, game_id, None, None, False))
+            conn.commit()

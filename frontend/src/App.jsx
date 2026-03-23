@@ -8,6 +8,7 @@ import { useState, useEffect } from "react"
 import Register from './routes/Register.jsx'
 import Matchmaking from './routes/Matchmaking.jsx'
 import Chat from './routes/Chat.jsx'
+import Friends from './routes/Friends.jsx'
 
 // npm run dev http://localhost:5173/ 
 
@@ -52,6 +53,7 @@ function App() {
             <Route path="/chat" element={<Chat/>} />
             <Route path="/register" element={<Register/>} />
             <Route path="/matchmaking" element={<Matchmaking/>} />
+            <Route path="/friends" element={<Friends/>} />
           </Routes>
       </div>
     </>
