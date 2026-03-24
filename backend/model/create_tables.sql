@@ -34,6 +34,7 @@ CREATE TABLE friends (
     -- Ensure we don't have duplicate rows for the same pair (1-2 and 2-1)
     CONSTRAINT unique_friendship UNIQUE (user_id_1, user_id_2)
 );
+ALTER TABLE friends ADD COLUMN action_user_id INTEGER;
 
 -- Index for faster lookups when checking a specific user's friend list
 CREATE INDEX idx_friends_user_1 ON friends(user_id_1);
