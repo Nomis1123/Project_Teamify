@@ -70,7 +70,26 @@ class Friend:
         finally:
             conn.close()
 
-
+    @staticmethod
+    def get_relationship_status(user_id, target_id):
+        """
+        [Helper] Checks the current database status of a relationship.
+        Returns: 'accepted', 'pending', or None
+        """
+        conn = get_db_connection()
+        u1, u2 = (user_id, target_id) if user_id < target_id else (target_id, user_id)
+        
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT status FROM friends 
+                    WHERE user_id_1 = %s AND user_id_2 = %s
+                """, (u1, u2))
+                result = cur.fetchone()
+                return result[0] if result else None
+        finally:
+            conn.close()
+            
     
     @staticmethod
     def send_request(sender_id, receiver_id):

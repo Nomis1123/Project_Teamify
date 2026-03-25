@@ -41,22 +41,26 @@ def accept_friend():
 
 @jwt_required()
 def send_friend_request():
-    """
-    POST /api/friends/request
-    Body: {"target_id": 25}
-    """
     current_user_id = get_jwt_identity()
     data = request.json
     target_id = data.get("target_id")
 
+    # 1. Self-friend check
     if not target_id or int(current_user_id) == int(target_id):
-        return jsonify({"status": "error", "message": "Invalid target user"}), 400
+        return jsonify({"status": "error", "message": "Invalid target"}), 400
 
-    success = Friend.send_request(int(current_user_id), int(target_id))
+    # 2. State validation (Using your new Model method)
+    status = Friend.get_relationship_status(int(current_user_id), int(target_id))
+    
+    if status == 'accepted':
+        return jsonify({"status": "error", "message": "Already friends"}), 400
+    if status == 'pending':
+        return jsonify({"status": "error", "message": "Request already exists"}), 400
 
-    if success:
-        return jsonify({"status": "success", "message": "Request sent"}), 201
-    return jsonify({"status": "error", "message": "Failed to send request"}), 500
+    # 3. Execution
+    if Friend.send_request(int(current_user_id), int(target_id)):
+        return jsonify({"status": "success", "message": "Sent"}), 201
+    return jsonify({"status": "error", "message": "DB Error"}), 500
 
 @jwt_required()
 def reject_friend_request(sender_id):
