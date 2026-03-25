@@ -39,6 +39,10 @@ def accept_friend():
 
 @jwt_required()
 def search_user():
+    """
+    GET /api/friends/search?search=<search>
+    Returns a list of users that matches the substring <search>
+    """
     user_id = get_jwt_identity()
 
     search = request.args.get("search", "", type=str)
@@ -47,7 +51,8 @@ def search_user():
 
     try:
         users = User.search_username(user_id, search, limit, offset)
-        return jsonify([u.to_dict() for u in users]), 200
+        # User to_public_dict(), we dont need emails or steam_id
+        return jsonify([u.to_public_dict() for u in users]), 200
 
     except Exception as e:
         return jsonify({"status": f"Database error: {str(e)}"}), 500

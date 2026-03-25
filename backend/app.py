@@ -99,6 +99,10 @@ app.add_url_rule('/api/friends', view_func=get_user_friends, methods=['GET'])
 # Accept or Decline a request
 app.add_url_rule('/api/friends/accept', view_func=accept_friend, methods=['POST'])
 
+# Search users
+app.add_url_rule('/api/friends/search', view_func=search_user, methods=['GET'])
+
+
 
 if __name__ == '__main__':
     # Start a local web server on Port 8000

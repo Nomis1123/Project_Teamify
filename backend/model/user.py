@@ -204,6 +204,25 @@ class User:
                 "pfp_url": self.pfp_url,
                 "availability": self.availability
                 }
+
+
+    def to_public_dict(self):
+        """
+        Return a public dictionary representation of the User object.
+
+        Returns:
+            Dictionary representation of user object.
+
+        """
+
+        return {
+                "id": self.id,
+                "username": self.username,
+                "description": self.description,
+                "pfp_url": self.pfp_url,
+                "availability": self.availability
+                }
+    
     
     @staticmethod
     def get_availability(user_id, conn=None):

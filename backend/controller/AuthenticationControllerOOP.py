@@ -486,7 +486,9 @@ def upload_image(image_file):
             filepath = os.path.join(upload_folder, filename)
             image_file.save(filepath)
             # we may want separate directories in the future for different users for scalability
-            public_url = f"http://localhost:8000/uploads/{filename}"
+            public_url = f"http://138.197.132.126:8000/uploads/{filename}"
+            # use this for dev:
+            # public_url = f"http://localhost:8000/uploads/{filename}"
             user.update({"profile_picture_url": public_url}, conn=conn)
             conn.commit()
             
