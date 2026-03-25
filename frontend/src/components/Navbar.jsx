@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import './Navbar.css'
 import { useNavigate } from "react-router-dom";
 
-const Navbar = ( {user, setUser} ) => {
+const Navbar = ( {user, isAdmin, setUser} ) => {
 
     const navigate = useNavigate();
 
@@ -34,6 +34,11 @@ const Navbar = ( {user, setUser} ) => {
             </Link>
             <div className="nav-center-right">
                 <div className="nav-center">
+                    {isAdmin? 
+                        <Link to="/adminPage" className="admin_page">
+                            Admin Page
+                        </Link> : null 
+                    }
                     <Link to="/profile" className="profile">
                         Profile
                     </Link>

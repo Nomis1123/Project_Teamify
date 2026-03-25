@@ -8,12 +8,14 @@ import Register from './routes/Register.jsx'
 import { useState, useEffect } from "react"
 import Matchmaking from './routes/Matchmaking.jsx'
 import Friends from './routes/Friends.jsx'
+import AdminPage from './routes/AdminPage.jsx'
 
 // npm run dev http://localhost:5173/ 
 
 function App() {  
 
-  const [user, setUser] = useState("")
+  const [user, setUser] = useState("");
+  const [isAdmin, setIsAdmin] = useState(true);
 
   // restores the user login state if they have not logged out yet
   useEffect(() => {
@@ -31,6 +33,7 @@ function App() {
 
       const data = await res.json()
       setUser(data.user.username)
+      setIsAdmin(data.user.isAdmin);
     } catch (err) { // remove the user from their login state if user does not exist in backend
       localStorage.removeItem("access_token")
       localStorage.removeItem("refresh_token")
@@ -44,7 +47,7 @@ function App() {
   return (
     <>
       <div className="body">
-          <Navbar user={user} setUser={setUser}/>
+          <Navbar user={user} isAdmin={isAdmin} setUser={setUser}/>
           <Routes>
             <Route path="/login" element={<Login setUser={setUser}/>} />
             <Route path="/profile" element={<Profile/>} />
@@ -52,6 +55,7 @@ function App() {
             <Route path="/register" element={<Register/>} />
             <Route path="/matchmaking" element={<Matchmaking/>} />
             <Route path="/friends" element={<Friends/>} />
+            <Route path="/adminPage" element={<AdminPage/>} />
           </Routes>
       </div>
     </>
