@@ -51,6 +51,7 @@ const Friends = () => {
     const [showPU1, setShowPU1] = useState(false)
     const [showPU2, setShowPU2] = useState(false)
     const [selectedUser, setSelectedUser] = useState(null)
+    const [selectedId, setSelectedId] = useState(null)
 
     // fetch the list of friends from backend upon page load
     useEffect(() => {
@@ -61,6 +62,7 @@ const Friends = () => {
         init();
     }, []);
 
+    // handleUnfriend and handleAddFriend are unused for now, keeping them here just in case
     const handleUnfriend = (username) => {
         setUsers(prev => prev.filter(user => user.username !== username));
     };
@@ -156,7 +158,7 @@ const Friends = () => {
             {/* For each returned user, map its attributes to a banner*/}
             <div className="user-layout-friends">
 
-                <PURemoveFriend user={selectedUser} open={showPU1} onClose={() => setShowPU1(false)} />
+                <PURemoveFriend user={selectedUser} user_id={selectedId} open={showPU1} onClose={() => setShowPU1(false)} onUnfriend={getFriendsAndRequests} />
                 
                 {users.map((user) => (
                     <div className="friend-banners">
@@ -182,7 +184,7 @@ const Friends = () => {
                                 <button className="message-button-friends">Message</button>
                             </div>
 
-                            <button className="unfriend"   onClick={() => {setSelectedUser(user.username); setShowPU1(true);}}>
+                            <button className="unfriend"   onClick={() => {setSelectedUser(user.username); setShowPU1(true); setSelectedId(user.id);}}>
                                 <img src={unfriendIcon} className="unfriend-icon"/>
                             </button>
                         </div>

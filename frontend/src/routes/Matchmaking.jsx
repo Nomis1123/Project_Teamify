@@ -85,6 +85,7 @@ const Matchmaking = () => {
     const [showPU1, setShowPU1] = useState(false)
     const [selectedUsername, setSelectedUsername] = useState(null)
     const [selectedUserid, setSelectedUserid] = useState(null)
+    const [successMessage, setSuccessMessage] = useState("");
 
     //const [showAvailability, setShowAvailability] = useState(false);
 
@@ -134,6 +135,14 @@ const Matchmaking = () => {
         }
         init();
     }, []);
+
+    // render the success message for friend request
+    useEffect(() => {
+        if (successMessage) {
+            const timer = setTimeout(() => setSuccessMessage(""), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [successMessage]);
 
     const handleApplyFilters = async () =>  {
         const filters = await buildFilterObj();
@@ -206,6 +215,13 @@ const Matchmaking = () => {
     return (
         <div className="layout">
             <h1 className="title">Connect with Others</h1>
+            
+            {successMessage && (
+                <div className="success-msg">
+                    {successMessage}
+                </div>
+            )}
+
             <div className="filters-layout">
 
                 {/* filter components */}
@@ -281,7 +297,7 @@ const Matchmaking = () => {
             </div>
             
             {/* For each returned user, map its attributes to a banner*/}
-            <PUAddFriend user={selectedUsername} user_id={selectedUserid} open={showPU1} onClose={() => setShowPU1(false)} />
+            <PUAddFriend user={selectedUsername} user_id={selectedUserid} open={showPU1} onClose={() => setShowPU1(false)} onSuccess={(msg) => setSuccessMessage(msg)} />
 
             <div className="user-layout">
                 {users.map((user) => (

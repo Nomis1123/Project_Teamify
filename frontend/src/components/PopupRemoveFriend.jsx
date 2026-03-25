@@ -2,7 +2,7 @@ import { useState } from "react";
 import "../components/PopupRemoveFriend.css";
 import Popup from "./Popup"
 
-export default function PURemoveFriend({ user, open, onClose, onUnfriend }) {
+export default function PURemoveFriend({ user, user_id, open, onClose, onUnfriend }) {
     const [isSaving, setIsSaving] = useState(false);
     const [desc, setDesc] = useState("");
     const [descriptionError, setDescriptionError] = useState("");
@@ -15,10 +15,9 @@ export default function PURemoveFriend({ user, open, onClose, onUnfriend }) {
         setDescriptionError("");
 
         try {
-            const res = await fetch("/api/users/unfriend", { // fake endpoint 
-                method: "PATCH",
+            const res = await fetch(`/api/friends/${user_id}`, { 
+                method: "DELETE",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
-                body: JSON.stringify({ description: desc }),
             });
 
             if (!res.ok) {
@@ -29,7 +28,7 @@ export default function PURemoveFriend({ user, open, onClose, onUnfriend }) {
 
             const data = await res.json();
             console.log(data);
-            onUnfriend(user); // remove friend from friends list
+            await onUnfriend(); // remove friend from friends list
             handleClose();
 
         } catch (e) {

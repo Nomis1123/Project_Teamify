@@ -2,7 +2,7 @@ import { useState } from "react";
 import "../components/PopupRemoveFriend.css";
 import Popup from "./Popup"
 
-export default function PUAddFriend({ user, user_id, open, onClose }) {
+export default function PUAddFriend({ user, user_id, open, onClose, onSuccess}) {
     const [isSaving, setIsSaving] = useState(false);
     const [desc, setDesc] = useState("");
     const [descriptionError, setDescriptionError] = useState("");
@@ -15,10 +15,10 @@ export default function PUAddFriend({ user, user_id, open, onClose }) {
         setDescriptionError("");
 
         try {
-            const res = await fetch("/api/friends/accept", {
+            const res = await fetch("/api/friends/request", {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
-                body: JSON.stringify({ friend_id: user_id }),
+                body: JSON.stringify({ target_id: user_id }),
             });
 
             if (!res.ok) {
@@ -29,10 +29,11 @@ export default function PUAddFriend({ user, user_id, open, onClose }) {
 
             const data = await res.json();
             console.log(data);
+            onSuccess && onSuccess("Friend request sent!");
             handleClose();
 
         } catch (e) {
-            setFail(`Something went wrong. Please try again later. (${e.message})`);
+            setFail(`You already have this user as a friend, or you already sent a friend request.`);
         } finally {
             setIsSaving(false);
         }
