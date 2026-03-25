@@ -4,6 +4,7 @@ import "./Chat.css";
 import { useNavigate } from "react-router-dom";
 import ChatFriendsList from "../components/ChatFriendsList"
 import ChatWindow from '../components/ChatWindow';
+import { io } from "socket.io-client";
 
 const Chat = ({ target = null }) => {
     const [friends_list, setFriendsList] = useState([
@@ -56,70 +57,91 @@ const Chat = ({ target = null }) => {
         loadMe();
     }, []);
 
-    // Get the user information and setup live chat
     useEffect(() => {
+        let socket;
+
         const loadMe = async () => {
             try {
-                // Get user info
                 const res = await fetch("/api/user/me", {
                     method: "GET",
-                    headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                    },
                 });
-                // console.log("fetch returned:", res.status, res.url);
+
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
                 const data = await res.json();
-                // console.log("response data:", data);
+
                 const normalized_user = {
                     id: data.user.id ?? "",
                     username: data.user.username ?? "",
                     profile_picture: data.user.profile_picture ?? "",
                 };
+
                 setUser(normalized_user);
 
-                // Setup the live chat connection
-                const ws = new WebSocket(`ws://localhost:8000/ws/${user.id}`);
-                socketRef.current = ws;
+                socket = io("138.197.132.126:8000", {
+                    autoConnect: false,
+                    auth: {
+                        token: localStorage.getItem("access_token"),
+                        user_id: normalized_user.id,
+                    },
+                    transports: ["websocket"],
+                });
 
-                ws.onopen = () => {
+                socketRef.current = socket;
+
+                socket.on("connect", () => {
                     setConnected(true);
-                    console.log("WebSocket Connection ON");
-                };
+                    console.log("Socket.IO Connection ON");
+                });
 
-                ws.onmessage = (event) => {
-                    const msg = JSON.parse(event.data);
-
+                socket.on("message", (msg) => {
                     const income_conversation_id = msg.conversation_id;
 
                     const newMsg = {
                         message: msg.message,
                         sender: msg.sender,
                         timestamp: msg.timestamp,
-                    }
+                    };
 
                     if (income_conversation_id === conversation_id) {
-                        setMessages((prevMessages) => [
-                            newMsg,
-                            ...prevMessages,
-                        ]);
+                        setMessages((prevMessages) => [newMsg, ...prevMessages]);
                     } else {
-                        const target_friend = friends_list.find((f) => f.conversation_id === income_conversation_id);
-                        target_friend.unread = newMsg.message;
+                        setFriendsList((prevFriends) =>
+                            prevFriends.map((friend) =>
+                                friend.conversation_id === income_conversation_id
+                                    ? { ...friend, unread: newMsg.message }
+                                    : friend
+                            )
+                        );
                     }
-                };
+                });
 
-                ws.onclose = () => {
+                socket.on("disconnect", (reason) => {
                     setConnected(false);
-                    console.log("WebSocket Connection OFF");
-                };
+                    console.log("Socket.IO Connection OFF:", reason);
+                });
 
-                ws.onerror = (err) => {
-                    console.log(`WebSocket Error: ${err}`)
-                }
+                socket.on("connect_error", (err) => {
+                    console.log("Socket.IO connect error:", err.message);
+                });
+
+                socket.connect();
             } catch (e) {
                 console.log("error:", e);
-            } 
+            }
         };
+
         loadMe();
+
+        return () => {
+            if (socket) {
+                socket.disconnect();
+            }
+        };
     }, []);
 
     // Reset the unread messages of current user and set conversation id
