@@ -25,6 +25,22 @@ class Game:
         for key, default in GAME_RELATION_DEFAULTS.items():
             setattr(self, key, kwargs.get(key, default))
 
+    # Return list of all games
+    # Used for matchmaking, admin account
+    @classmethod
+    def get_all(cls, conn):
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute(f"SELECT {GAME_FIELDS} FROM games ORDER BY title ASC") # add thumbnail_url after philip
+            rows = cur.fetchall()
+
+            games = []
+            for row in rows:
+
+                games.append(cls._build(cur, row))
+
+            return games
+
+    # Get a single game
     # Used for SteamAPI
     # Add game to DB if it is not in DB already
     @classmethod
