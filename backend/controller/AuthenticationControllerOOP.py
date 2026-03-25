@@ -487,7 +487,7 @@ def upload_image(image_file):
             image_file.save(filepath)
             # we may want separate directories in the future for different users for scalability
             public_url = f"http://138.197.132.126:8000/uploads/{filename}"
-            # use this for dev:
+            # use this for local dev testing:
             # public_url = f"http://localhost:8000/uploads/{filename}"
             user.update({"profile_picture_url": public_url}, conn=conn)
             conn.commit()
