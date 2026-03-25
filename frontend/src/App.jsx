@@ -15,7 +15,7 @@ import AdminPage from './routes/AdminPage.jsx'
 function App() {  
 
   const [user, setUser] = useState("");
-  const [isAdmin, setIsAdmin] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // restores the user login state if they have not logged out yet
   useEffect(() => {
