@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from flask import Flask
 from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image
 from controller.MatchmakingController import get_matches
-from controller.Friend_controller import get_user_friends, accept_friend
+from controller.Friend_controller import get_user_friends, accept_friend, search_user
 
 from controller.ChatController import init_conversation, get_messages
 #, login, auth_verify, logout, getOrUpdate_availability

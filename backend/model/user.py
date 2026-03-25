@@ -219,7 +219,7 @@ class User:
                 "id": self.id,
                 "username": self.username,
                 "description": self.description,
-                "pfp_url": self.pfp_url,
+                "avatar": self.pfp_url,
                 "availability": self.availability
                 }
     

@@ -1,6 +1,7 @@
 from flask import jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from friends import Friend # Import the new model we discussed
+from model.user import User
 
 @jwt_required()
 def get_user_friends():
@@ -46,6 +47,9 @@ def search_user():
     user_id = get_jwt_identity()
 
     search = request.args.get("search", "", type=str)
+    if not search:
+        return jsonify([]), 200
+    
     limit = request.args.get("limit", 10, type=int)   # how many to load, for now try out 10
     offset = request.args.get("offset", 0, type=int)  # how far we've scrolled
 
