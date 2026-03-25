@@ -103,7 +103,7 @@ def get_messages(conversation_id):
         raw_messages = cursor.fetchall()
 
         # 2. Reverse the list so the UI renders chronologically top-to-bottom
-        raw_messages.reverse()
+        #raw_messages.reverse()
 
         # 3. Format into a clean JSON array
         formatted_messages = []
