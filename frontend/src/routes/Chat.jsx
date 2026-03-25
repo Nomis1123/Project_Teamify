@@ -98,22 +98,30 @@ const Chat = ({ target = null }) => {
                     console.log("Socket.IO Connection ON");
                 });
 
-                socket.on("message", (msg) => {
+                // 1. Listen for the exact event name from the backend
+                socket.on("receive_message", (msg) => {
                     const income_conversation_id = msg.conversation_id;
 
+                    // 2. Map the payload to match the database schema that ChatWindow expects
                     const newMsg = {
-                        message: msg.message,
-                        sender: msg.sender,
-                        timestamp: msg.timestamp,
+                        content: msg.message,
+                        sender_id: msg.sender,
+                        created_at: new Date(msg.timestamp).toLocaleString([], {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: '2-digit',
+                        }),
                     };
 
                     if (income_conversation_id === conversation_id) {
-                        setMessages((prevMessages) => [newMsg, ...prevMessages]);
+                        // 3. Put newMsg at the END of the array so it shows up at the bottom
+                        setMessages((prevMessages) => [...prevMessages, newMsg]);
                     } else {
                         setFriendsList((prevFriends) =>
                             prevFriends.map((friend) =>
                                 friend.conversation_id === income_conversation_id
-                                    ? { ...friend, unread: newMsg.message }
+                                    ? { ...friend, unread: newMsg.content } // Update to use newMsg.content
                                     : friend
                             )
                         );
@@ -173,6 +181,9 @@ const Chat = ({ target = null }) => {
             try {
                 setLoadingCH(true);
                 if (conversation_id != null) {
+                    if (socketRef.current && socketRef.current.connected) {
+                        socketRef.current.emit("join_conversation", { conversation_id: conversation_id });
+                    }
                     console.log(`Attempt to get messages from /api/conversations/${conversation_id}/messages`)
                     const res = await fetch(`/api/conversations/${conversation_id}/messages`, {
                         method: "GET",
@@ -206,18 +217,19 @@ const Chat = ({ target = null }) => {
     const sendMessage = (input) => {
         const trimmed = input.trim();
         if (!trimmed) return;
-        if (!socketRef.current || socketRef.current.readyState !== WebSocket.OPEN) {
+        
+        // 1. Use Socket.IO's .connected property
+        if (!socketRef.current || !socketRef.current.connected) {
             console.log("Socket not open");
             return false;
         }
 
-        socketRef.current.send(
-            JSON.stringify({
-                sender: user.userid,
-                message: trimmed,
-                conversation_id: conversation_id,
-            })
-        );
+        // 2. Use .emit() and match the exact event name your Python backend expects
+        socketRef.current.emit("send_message", {
+            sender: user.id, // Fixed from user.userid
+            message: trimmed,
+            conversation_id: conversation_id,
+        });
         return true;
     };
 
