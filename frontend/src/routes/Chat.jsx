@@ -57,19 +57,11 @@ const Chat = ({ target = null }) => {
         loadMe();
     }, []);
 
-<<<<<<< HEAD
     useEffect(() => {
         let socket;
 
         const loadMe = async () => {
             try {
-=======
-    // Get the user information and setup live chat
-    useEffect(() => {
-        const loadMe = async () => {
-            try {
-                // Get user info
->>>>>>> origin/feature/FE82-US8.1
                 const res = await fetch("/api/user/me", {
                     method: "GET",
                     headers: {
@@ -79,14 +71,9 @@ const Chat = ({ target = null }) => {
                 });
 
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
-<<<<<<< HEAD
 
                 const data = await res.json();
 
-=======
-                const data = await res.json();
-
->>>>>>> origin/feature/FE82-US8.1
                 const normalized_user = {
                     id: data.user.id ?? "",
                     username: data.user.username ?? "",
