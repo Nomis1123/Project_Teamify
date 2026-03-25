@@ -93,27 +93,17 @@ class Friend:
                     ORDER BY u.username
                     LIMIT %s OFFSET %s
                 """
-                # Order by username
-                # params = [user_id]
-                # # Handle substring search (case-insensitive)
-                # search = search.strip()
-                # if search:
-                #     base_query += " AND username ILIKE %s"
-                #     params.append(f"%{search.strip()}%")
-
-                # # Default ordering
-                # base_query += " ORDER BY username"
-                # # Pagination
-                # base_query += " LIMIT %s OFFSET %s"
-                # params.extend([limit, offset])
+                # Default ordering sorts by username
+                # " ORDER BY username"
+                # Pagination
+                # " LIMIT %s OFFSET %s"
                 search = search.strip()
                 params = [user_id, user_id, user_id, f"%{search}%", limit, offset]
                 cur.execute(base_query, params)
                 columns = ['id', 'username', 'email', 'steam_id', 'description', 'avatar', 'friend']
                 rows = cur.fetchall()
-                friends = [dict(zip(columns, row)) for row in rows]
-                # return [User(*row) for row in rows]
-                return friends
+                users = [dict(zip(columns, row)) for row in rows]
+                return users
 
         except Exception as e:
             if conn:
@@ -124,4 +114,3 @@ class Friend:
             if conn:
                 conn.close()
 
-                
