@@ -5,7 +5,10 @@ from dotenv import load_dotenv
 from flask import Flask
 from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, sync_games, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image
 from controller.MatchmakingController import get_matches
-from controller.Friend_controller import get_user_friends, accept_friend
+from controller.Friend_controller import (
+    get_user_friends, accept_friend, send_friend_request, 
+    reject_friend_request, remove_friend
+)
 
 from controller.ChatController import init_conversation, get_messages, register_chat_socket_events
 from flask_socketio import SocketIO
@@ -104,9 +107,14 @@ app.add_url_rule('/api/conversations/<int:conversation_id>/messages',
 # Get friends and requests
 app.add_url_rule('/api/friends', view_func=get_user_friends, methods=['GET'])
 
-# Accept or Decline a request
+# Accept a request
 app.add_url_rule('/api/friends/accept', view_func=accept_friend, methods=['POST'])
+# Send a friend request
+app.add_url_rule('/api/friends/request', view_func=send_friend_request, methods=['POST'])
+# Reject friend request
+app.add_url_rule('/api/friends/requests/<int:sender_id>', view_func=reject_friend_request, methods=['DELETE'])
 
+app.add_url_rule('/api/friends/<int:friend_id>', view_func=remove_friend, methods=['DELETE'])
 
 if __name__ == '__main__':
     # Start a local web server on Port 8000
