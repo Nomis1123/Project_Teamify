@@ -66,3 +66,62 @@ class Friend:
             return False # Return False so the controller knows it failed
         finally:
             conn.close()
+
+    @staticmethod
+    def search_username(user_id, search="", limit=10, offset=0):
+        # limit = how many users to display
+        # offset = how far we've scrolled down the list for pagination
+        conn = get_db_connection()
+        
+        try:
+            with conn.cursor() as cur:
+                base_query = """
+                    SELECT u.id, u.username, u.email, u.steam_id, u.description, u.profile_picture_url,
+                        CASE
+                            WHEN f.status = 'accepted' THEN TRUE
+                            ELSE FALSE
+                        END AS friend
+                    FROM users u
+                    LEFT JOIN friends f
+                        ON (
+                            (f.user_id_1 = %s AND f.user_id_2 = u.id) OR
+                            (f.user_id_2 = %s AND f.user_id_1 = u.id)
+                        )
+                        AND f.status = 'accepted'
+                    WHERE u.id != %s
+                        AND u.username ILIKE %s
+                    ORDER BY u.username
+                    LIMIT %s OFFSET %s
+                """
+                # Order by username
+                # params = [user_id]
+                # # Handle substring search (case-insensitive)
+                # search = search.strip()
+                # if search:
+                #     base_query += " AND username ILIKE %s"
+                #     params.append(f"%{search.strip()}%")
+
+                # # Default ordering
+                # base_query += " ORDER BY username"
+                # # Pagination
+                # base_query += " LIMIT %s OFFSET %s"
+                # params.extend([limit, offset])
+                search = search.strip()
+                params = [user_id, user_id, user_id, f"%{search}%", limit, offset]
+                cur.execute(base_query, params)
+                columns = ['id', 'username', 'email', 'steam_id', 'description', 'avatar', 'friend']
+                rows = cur.fetchall()
+                friends = [dict(zip(columns, row)) for row in rows]
+                # return [User(*row) for row in rows]
+                return friends
+
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            raise e 
+
+        finally:
+            if conn:
+                conn.close()
+
+                

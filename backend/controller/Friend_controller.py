@@ -1,7 +1,6 @@
 from flask import jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from friends import Friend # Import the new model we discussed
-from model.user import User
 
 @jwt_required()
 def get_user_friends():
@@ -46,17 +45,18 @@ def search_user():
     """
     user_id = get_jwt_identity()
 
-    search = request.args.get("search", "", type=str)
+    search = request.args.get("search", "", type=str).strip()
     if not search:
         return jsonify([]), 200
+    
+    # print("searched for:",search)
     
     limit = request.args.get("limit", 10, type=int)   # how many to load, for now try out 10
     offset = request.args.get("offset", 0, type=int)  # how far we've scrolled
 
     try:
-        users = User.search_username(user_id, search, limit, offset)
-        # User to_public_dict(), we dont need emails or steam_id
-        return jsonify([u.to_public_dict() for u in users]), 200
+        users = Friend.search_username(user_id, search, limit, offset)
+        return jsonify(users), 200
 
     except Exception as e:
         return jsonify({"status": f"Database error: {str(e)}"}), 500

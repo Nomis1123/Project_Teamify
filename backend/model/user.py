@@ -206,22 +206,22 @@ class User:
                 }
 
 
-    def to_public_dict(self):
-        """
-        Return a public dictionary representation of the User object.
+    # def to_public_dict(self):
+    #     """
+    #     Return a public dictionary representation of the User object.
 
-        Returns:
-            Dictionary representation of user object.
+    #     Returns:
+    #         Dictionary representation of user object.
 
-        """
+    #     """
 
-        return {
-                "id": self.id,
-                "username": self.username,
-                "description": self.description,
-                "avatar": self.pfp_url,
-                "availability": self.availability
-                }
+    #     return {
+    #             "id": self.id,
+    #             "username": self.username,
+    #             "description": self.description,
+    #             "avatar": self.pfp_url,
+    #             "availability": self.availability
+    #             }
     
     
     @staticmethod
@@ -263,43 +263,43 @@ class User:
             if manage_conn:
                 conn.close()
 
-    @staticmethod
-    def search_username(user_id, search="", limit=10, offset=0):
-        # limit = how many users to display
-        # offset = how far we've scrolled down the list
-        conn = get_db_connection()
-        try:
-            with conn.cursor() as cur:
-                base_query = """
-                    SELECT id, username, email, steam_id, description, profile_picture_url, availability
-                    FROM users
-                    WHERE id != %s
-                """
-                params = [user_id]
-                # Handle substring search (case-insensitive)
-                search = search.strip()
-                if search:
-                    base_query += " AND username ILIKE %s"
-                    params.append(f"%{search.strip()}%")
+    # @staticmethod
+    # def search_username(user_id, search="", limit=10, offset=0):
+    #     # limit = how many users to display
+    #     # offset = how far we've scrolled down the list
+    #     conn = get_db_connection()
+    #     try:
+    #         with conn.cursor() as cur:
+    #             base_query = """
+    #                 SELECT id, username, email, steam_id, description, profile_picture_url
+    #                 FROM users
+    #                 WHERE id != %s
+    #             """
+    #             params = [user_id]
+    #             # Handle substring search (case-insensitive)
+    #             search = search.strip()
+    #             if search:
+    #                 base_query += " AND username ILIKE %s"
+    #                 params.append(f"%{search.strip()}%")
 
-                # Default ordering
-                base_query += " ORDER BY username"
-                # Pagination
-                base_query += " LIMIT %s OFFSET %s"
-                params.extend([limit, offset])
+    #             # Default ordering
+    #             base_query += " ORDER BY username"
+    #             # Pagination
+    #             base_query += " LIMIT %s OFFSET %s"
+    #             params.extend([limit, offset])
                 
-                cur.execute(base_query, params)
-                rows = cur.fetchall()
-                return [User(*row) for row in rows]
+    #             cur.execute(base_query, params)
+    #             rows = cur.fetchall()
+    #             return [User(*row) for row in rows]
 
-        except Exception as e:
-            if conn:
-                conn.rollback()
-            raise e 
+    #     except Exception as e:
+    #         if conn:
+    #             conn.rollback()
+    #         raise e 
 
-        finally:
-            if conn:
-                conn.close()
+    #     finally:
+    #         if conn:
+    #             conn.close()
 
         
 
