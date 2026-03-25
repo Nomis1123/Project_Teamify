@@ -74,14 +74,14 @@ class Game:
     def _build(cls, cur, row, ranks=None, roles=None):
         data = dict(row)
 
-        if ranks is None:
+        if ranks is not None:
             cur.execute(
                 "SELECT name FROM game_ranks WHERE game_id = %s ORDER BY rank_order",
                 (data["id"],)
             )
             ranks = [r["name"] for r in cur.fetchall()]
 
-        if roles is None:
+        if roles is not None:
             cur.execute(
                 "SELECT name FROM game_roles WHERE game_id = %s",
                 (data["id"],)
