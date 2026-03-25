@@ -153,5 +153,10 @@ h2 {
 
 .profile-game-schedule { grid-area: schedule; }
 
-
+.profile-btn-steam-games {
+  background-color: rgb(255, 255, 255, 0.2);
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px; 
+}
 
