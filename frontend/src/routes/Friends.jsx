@@ -55,8 +55,8 @@ const Friends = () => {
     // fetch the list of friends from backend upon page load
     useEffect(() => {
         const init = async () => {
-            //const data = await getFriendsAndRequests();
-            setUsers(placeboUsers); // switch to data later
+            await getFriendsAndRequests();
+            //setUsers(placeboUsers); // switch to data later
         }
         init();
     }, []);
@@ -71,8 +71,8 @@ const Friends = () => {
 
     const getFriendsAndRequests = async () =>  {
          try {
-            const response = await fetch("...", {
-                method: "POST",
+            const response = await fetch("/api/friends", {
+                method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${localStorage.getItem("access_token")}`,
@@ -99,14 +99,13 @@ const Friends = () => {
     const onSearchSubmit = async (text) => {
        try {
             console.log(text)
-            const response = await fetch("...", {
-                method: "POST",
+            const response = await fetch(`/api/friends/search?search=${encodeURIComponent(text)}`, {
+                method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${localStorage.getItem("access_token")}`,
                 },
                 credentials: "include",
-                body: JSON.stringify({ text }),
             });
 
             if (!response.ok) {
@@ -138,6 +137,9 @@ const Friends = () => {
                         placeholder="Search players..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") {onSearchSubmit();}
+                        }}
                         className="search-input"
                     />
                 </div>
@@ -180,7 +182,7 @@ const Friends = () => {
                                 <button className="message-button-friends">Message</button>
                             </div>
 
-                            <button class="unfriend"   onClick={() => {setSelectedUser(user.username); setShowPU1(true);}}>
+                            <button className="unfriend"   onClick={() => {setSelectedUser(user.username); setShowPU1(true);}}>
                                 <img src={unfriendIcon} className="unfriend-icon"/>
                             </button>
                         </div>
