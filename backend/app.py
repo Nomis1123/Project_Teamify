@@ -7,7 +7,9 @@ from controller.AuthenticationControllerOOP import register, login, steam_login,
 from controller.MatchmakingController import get_matches
 from controller.Friend_controller import get_user_friends, accept_friend
 
-from controller.ChatController import init_conversation, get_messages
+from controller.ChatController import init_conversation, get_messages, register_chat_socket_events
+from flask_socketio import SocketIO
+
 #, login, auth_verify, logout, getOrUpdate_availability
 #from controller.AuthenticationController import logout
 
@@ -22,6 +24,13 @@ app = Flask(__name__)
 # set the secret key
 
 jwt.init_app(app)
+
+# inititialize socket for chatting
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+# register the chat socket events
+register_chat_socket_events(socketio)
+
 #
 #"The configuration for cookie"
 #app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
@@ -101,4 +110,7 @@ app.add_url_rule('/api/friends/accept', view_func=accept_friend, methods=['POST'
 
 if __name__ == '__main__':
     # Start a local web server on Port 8000
-    app.run(debug=True, port=8000)
+    #app.run(debug=True, port=8000)
+
+    # replace app.run with socketio.run for chatting
+    socketio.run(app, debug=True, port=8000)
