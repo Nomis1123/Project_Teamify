@@ -104,7 +104,7 @@ const Chat = ({ target = null }) => {
 
                     // 2. Map the payload to match the database schema that ChatWindow expects
                     const newMsg = {
-                        content: msg.message,
+                        content: msg.content,
                         sender_id: msg.sender,
                         created_at: new Date(msg.timestamp).toLocaleString([], {
                             month: 'short',
@@ -116,7 +116,7 @@ const Chat = ({ target = null }) => {
 
                     if (income_conversation_id === conversation_id) {
                         // 3. Put newMsg at the END of the array so it shows up at the bottom
-                        setMessages((prevMessages) => [...prevMessages, newMsg]);
+                        setMessages((prevMessages) => [newMsg, ...prevMessages]);
                     } else {
                         setFriendsList((prevFriends) =>
                             prevFriends.map((friend) =>
