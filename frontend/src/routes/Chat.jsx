@@ -82,7 +82,7 @@ const Chat = ({ target = null }) => {
 
                 setUser(normalized_user);
 
-                socket = io("localhost:8000", {
+                socket = io("138.197.132.126:8000", {
                     autoConnect: false,
                     auth: {
                         token: localStorage.getItem("access_token"),
