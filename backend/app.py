@@ -3,11 +3,13 @@ from controller.extensions import jwt
 from dotenv import load_dotenv
 
 from flask import Flask
+from controller.AdminController import update_game
 from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, sync_games, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image
-from controller.MatchmakingController import get_matches
-from controller.Friend_controller import get_user_friends, accept_friend
-
 from controller.ChatController import init_conversation, get_messages
+from controller.Friend_controller import get_user_friends, accept_friend
+from controller.GamesController import get_games
+from controller.MatchmakingController import get_matches
+
 #, login, auth_verify, logout, getOrUpdate_availability
 #from controller.AuthenticationController import logout
 
@@ -78,6 +80,12 @@ app.add_url_rule('/api/user/filters', view_func=get_matches, methods=["POST"])
 
 ## 6. Uploads
 app.add_url_rule('/uploads/<filename>', view_func=retrieve_image, methods=['GET'])
+
+## 7. Admin
+app.add_url_rule('/api/admin/games', view_func=update_game, methods=['PATCH'])
+
+## 8. Return list of all games in db
+app.add_url_rule('/api/games', view_func=get_games, methods=['GET'])
 
 
 # Chat
