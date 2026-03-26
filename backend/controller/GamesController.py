@@ -10,8 +10,6 @@ def get_games():
     try:
         games = Game.get_all(conn)
 
-        print((games))
-
         return jsonify({
             "games": [{"id": g.id,
                        "title": g.title,}
