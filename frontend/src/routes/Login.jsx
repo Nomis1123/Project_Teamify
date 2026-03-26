@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
-const Login = ( { setUser }) => {
+const Login = ( { setUser, setIsAdmin }) => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [emailError, setEmailError] = useState("")
@@ -75,6 +75,7 @@ const Login = ( { setUser }) => {
             }
 
             setUser(data.user.username);
+            setIsAdmin(data.user.setIsAdmin)
             localStorage.setItem("access_token", data.access_token);
             localStorage.setItem("refresh_token", data.refresh_token);
             return true;
