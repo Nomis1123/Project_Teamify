@@ -1,5 +1,7 @@
+import os
+
 from controller.extensions import get_db_connection
-from flask import jsonify
+from flask import jsonify, send_from_directory, current_app
 from model.game import Game
 
 
@@ -24,3 +26,7 @@ def get_games():
 
     finally:
         conn.close()
+
+# Used to view photo from browser
+def retrieve_game_image(filename):
+    return send_from_directory(os.path.join(current_app.config["UPLOAD_FOLDER"], "games"), filename)
