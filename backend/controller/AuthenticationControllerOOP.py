@@ -258,7 +258,7 @@ def sync_games():
 
     except Exception as e:
         conn.rollback()
-        return jsonify({"status": "Sync failed"}), 500
+        return jsonify({"status": {str(e)}}), 500
 
     finally:
         conn.close()
