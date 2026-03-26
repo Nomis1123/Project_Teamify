@@ -181,7 +181,9 @@ const Friends = () => {
                             </div>
 
                             <div className="message-wrapper-friends">
-                                <button className="message-button-friends">Message</button>
+                                <Link to="/chat" className="message-button-friends" target={user.id}>
+                                      Message
+                                </Link>
                             </div>
 
                             <button className="unfriend"   onClick={() => {setSelectedUser(user.username); setShowPU1(true); setSelectedId(user.id);}}>
