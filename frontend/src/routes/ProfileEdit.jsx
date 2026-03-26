@@ -18,13 +18,13 @@ const ProfileEdit = () => {
     const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
     const defaultDailySchedule = { morning: false, afternoon: false, night: false };
     const defaultWeeklySchedule = {
-            Monday: { ...defaultDailySchedule },
-            Tuesday: { ...defaultDailySchedule },
-            Wednesday: { ...defaultDailySchedule },
-            Thursday: { ...defaultDailySchedule },
-            Friday: { ...defaultDailySchedule },
-            Saturday: { ...defaultDailySchedule },
-            Sunday: { ...defaultDailySchedule },
+            monday: { ...defaultDailySchedule },
+            tuesday: { ...defaultDailySchedule },
+            wednesday: { ...defaultDailySchedule },
+            thursday: { ...defaultDailySchedule },
+            friday: { ...defaultDailySchedule },
+            saturday: { ...defaultDailySchedule },
+            sunday: { ...defaultDailySchedule },
     };
     const [user, setUser] = useState({
         id: "",
@@ -76,7 +76,7 @@ const ProfileEdit = () => {
                     games: Array.isArray(data.games) ? data.user.games : [],
                     schedule: days.reduce((acc, day) => {
                         // console.log("schedule:", day, data.schedule[day]);
-                        const d = data.user.schedule?.[day] ?? defaultDailySchedule;
+                        const d = data.user.availability?.[day] ?? defaultDailySchedule;
                         acc[day] = {
                             morning: Boolean(d.morning),
                             afternoon: Boolean(d.afternoon),

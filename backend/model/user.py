@@ -1,9 +1,10 @@
 from controller.extensions import get_db_connection
+from model.availability import Availability
 
 
 
 class User:
-    def __init__(self, id, username, email, steam_id=None, description=None, pfp_url=None, availability=None):
+    def __init__(self, id, username, email, steam_id=None, description=None, pfp_url=None, availability: int=0):
 
         self.id = id
         self.username = username
@@ -12,7 +13,6 @@ class User:
         self.description = description
         self.pfp_url = pfp_url
         self.availability = availability
-
 
 
     def get_password_hash(self) -> str:
@@ -119,7 +119,7 @@ class User:
             raise ValueError("No valid fields provided.")
 
         # these are the fields which will use this update() function
-        allowed = {"username", "description", "profile_picture_url", "steam_id"}
+        allowed = {"username", "description", "profile_picture_url", "steam_id", "availability"}
         # pfp_url is NOT a parameter in the db, profile_picture_url
         manage_conn = conn is None
 
@@ -202,7 +202,7 @@ class User:
                 "email": self.email,
                 "description": self.description,
                 "pfp_url": self.pfp_url,
-                "availability": self.availability
+                "availability": Availability(bits=self.availability).to_dict()
                 }
     
     @staticmethod
@@ -243,12 +243,3 @@ class User:
         finally:
             if manage_conn:
                 conn.close()
-        
-
-
-'''
-username
-old email new email
-old password new password
-description
-'''

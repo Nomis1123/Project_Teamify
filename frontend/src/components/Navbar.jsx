@@ -34,14 +34,17 @@ const Navbar = ( {user, setUser} ) => {
             </Link>
             <div className="nav-center-right">
                 <div className="nav-center">
+                    <Link to="/" className="home">
+                        Home
+                    </Link>
                     <Link to="/profile" className="profile">
                         Profile
                     </Link>
                     <Link to="/matchmaking" className="matchmaking">
                         Matchmaking
                     </Link>
-                    <Link to="/guides" className="guides">
-                        Guides
+                    <Link to="/chat" className="chat">
+                        Chat
                     </Link>
                     <Link to="/friends" className="friends">
                         Friends
