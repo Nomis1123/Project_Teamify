@@ -274,4 +274,28 @@
     font-weight: 500;
 }
 
+.success-msg {
+  position: fixed;   /* float above content */
+  bottom: 20px;      
+  right: 20px;     
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  z-index: 1000;   
+}
 
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.pagination button{
+    background: rgb(169, 84, 234);
+}
