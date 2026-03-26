@@ -7,7 +7,7 @@ from controller.AdminController import update_game
 from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, sync_games, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image
 from controller.ChatController import init_conversation, get_messages
 from controller.Friend_controller import get_user_friends, accept_friend
-from controller.GamesController import get_games
+from controller.GamesController import get_games, retrieve_game_image
 from controller.MatchmakingController import get_matches
 
 #, login, auth_verify, logout, getOrUpdate_availability
@@ -80,6 +80,7 @@ app.add_url_rule('/api/user/filters', view_func=get_matches, methods=["POST"])
 
 ## 6. Uploads
 app.add_url_rule('/uploads/<filename>', view_func=retrieve_image, methods=['GET'])
+app.add_url_rule('/uploads/games/<filename>', view_func=retrieve_game_image, methods=['GET'])
 
 ## 7. Admin
 app.add_url_rule('/api/admin/games', view_func=update_game, methods=['PATCH'])
