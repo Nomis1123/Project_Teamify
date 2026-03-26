@@ -52,3 +52,4 @@ class Availability:
         Return a string representation of the bits.
         '''
         return f"Availability(bits={self.bits:021b})"
+
