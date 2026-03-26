@@ -7,7 +7,7 @@ from controller.AuthenticationControllerOOP import register, login, steam_login,
 from controller.MatchmakingController import get_matches
 from controller.Friend_controller import get_user_friends, accept_friend
 
-from controller.ChatController import init_conversation, get_messages, register_chat_socket_events
+from controller.ChatController import init_conversation, get_messages, register_chat_socket_events, get_all_friends_conversations
 from flask_socketio import SocketIO
 
 #, login, auth_verify, logout, getOrUpdate_availability
@@ -99,6 +99,11 @@ app.add_url_rule('/api/conversations',
 # get messages
 app.add_url_rule('/api/conversations/<int:conversation_id>/messages',
                  view_func=get_messages,
+                 methods=['GET'])
+
+# get all conversations with friends
+app.add_url_rule('/api/conversations/friends',
+                 view_func=get_all_friends_conversations,
                  methods=['GET'])
 
 # Get friends and requests

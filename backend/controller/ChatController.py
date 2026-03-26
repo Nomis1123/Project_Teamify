@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_socketio import emit, join_room
 
 from controller.extensions import get_db_connection
+from friends import Friend
 
 '''
 Create or find a conversations between two users.
@@ -12,6 +13,9 @@ Input:
 
 Returns:
     conversation_id belonging to conversation between two users.
+
+
+    I wrote this function for an endpoint and we didn't end up using it. T_T
 '''
 @jwt_required()
 def init_conversation():
@@ -66,6 +70,67 @@ def init_conversation():
     except Exception as e:
         conn.rollback()
         return jsonify({"status": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()
+'''
+Get the conversation id between two users.
+
+Input:
+    user1: int,             id of user1
+    user2: int,             id of user2
+
+Returns:
+    conversation_id: int,   conversation id between those two users
+'''
+def get_conversation_id(user1, user2):
+    """
+    Finds or creates a conversation ID between two users.
+    Returns the positive integer conversation_id if successful, or -1 if an error occurs.
+    """
+    try:
+        current_user_id = int(user1)
+        target_user_id = int(user2)
+    except (ValueError, TypeError):
+        print("Error: User IDs must be valid numbers.")
+        return -1
+
+    # 1. Enforce your SQL Schema Rule (Smaller ID goes first)
+    user1_id = min(current_user_id, target_user_id)
+    user2_id = max(current_user_id, target_user_id)
+
+    # 2. Open database connection
+    conn = get_db_connection() 
+    cursor = conn.cursor()
+
+    try:
+        # 3. Check if the room already exists
+        check_query = """
+            SELECT id FROM conversations 
+            WHERE user1_id = %s AND user2_id = %s;
+        """
+        cursor.execute(check_query, (user1_id, user2_id))
+        existing_room = cursor.fetchone()
+
+        if existing_room:
+            # Room exists, return the ID directly
+            return existing_room[0]
+
+        # 4. If it doesn't exist, create it and return the new ID
+        insert_query = """
+            INSERT INTO conversations (user1_id, user2_id) 
+            VALUES (%s, %s) RETURNING id;
+        """
+        cursor.execute(insert_query, (user1_id, user2_id))
+        new_room_id = cursor.fetchone()[0]
+        conn.commit()
+
+        return new_room_id
+
+    except Exception as e:
+        conn.rollback()
+        print(f"Database error in get_conversation_id: {e}")
+        return -1
     finally:
         cursor.close()
         conn.close()
@@ -189,3 +254,29 @@ def register_chat_socket_events(socketio):
         finally:
             cursor.close()
             conn.close()
+
+@jwt_required()
+def get_all_friends_conversations():
+
+    current_user_id = get_jwt_identity()
+
+    try:
+        current_user_id = int(current_user_id)
+
+    except ValueError:
+        return jsonify({"status": "Error extracting user id from JWT."}), 400
+
+    friends_list = Friend.get_all_for_user(current_user_id)
+    friends_conversations = []
+
+    for f in friends_list:
+        friends_conversations.append({
+            'userid': int(f['id']),
+            'username': f['username'],
+            'pfp_url': f['avatar'],
+            'conversation_id': get_conversation_id(current_user_id, int(f['id'])),
+            'unread': ""
+            })
+
+    return jsonify(friends_conversations), 200
+
