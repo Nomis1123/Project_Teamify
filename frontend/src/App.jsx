@@ -47,9 +47,9 @@ function App() {
   return (
     <>
       <div className="body">
-          <Navbar user={user} isAdmin={isAdmin} setUser={setUser}/>
+          <Navbar user={user} isAdmin={isAdmin} setUser={setUser} setIsAdmin={setIsAdmin}/>
           <Routes>
-            <Route path="/login" element={<Login setUser={setUser}/>} />
+            <Route path="/login" element={<Login setUser={setUser} setIsAdmin={setIsAdmin}/>} />
             <Route path="/profile" element={<Profile/>} />
             <Route path="/profile_editing" element={<ProfileEdit/>} />
             <Route path="/register" element={<Register/>} />

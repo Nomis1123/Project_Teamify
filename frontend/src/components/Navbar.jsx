@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import './Navbar.css'
 import { useNavigate } from "react-router-dom";
 
-const Navbar = ( {user, isAdmin, setUser} ) => {
+const Navbar = ( {user, isAdmin, setUser, setIsAdmin} ) => {
 
     const navigate = useNavigate();
 
@@ -22,6 +22,7 @@ const Navbar = ( {user, isAdmin, setUser} ) => {
         localStorage.removeItem("refresh_token")
         navigate("/login") 
         setUser(null)
+        setIsAdmin(false);
     }
 
     return (
