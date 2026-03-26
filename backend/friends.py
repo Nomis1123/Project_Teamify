@@ -101,7 +101,7 @@ class Friend:
                 # " LIMIT %s OFFSET %s"
                 params = [user_id, user_id, user_id, f"%{search}%", limit, offset]
                 cur.execute(base_query, params)
-                columns = ['id', 'username', 'email', 'steam_id', 'description', 'avatar', "friend"]
+                columns = ['id', 'username', 'email', 'steam_id', 'description', 'avatar', 'friend']
                 rows = cur.fetchall()
                 users = [dict(zip(columns, row)) for row in rows]
                 return users
