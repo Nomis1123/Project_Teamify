@@ -4,11 +4,10 @@ import uuid
 from flask import jsonify, request, current_app
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
+from controller.AuthenticationControllerOOP import check_extension
 from controller.extensions import get_db_connection
 from model.user import User
 from model.game import Game
-
-from controller.AuthenticationControllerOOP import check_extension
 
 MAX_IMAGE_SIZE = 5 * 1024 * 1024
 
@@ -27,7 +26,7 @@ def update_game():
         if not user.is_admin:
             return jsonify({"status": "Unauthorized"}), 403
 
-        # Detect request type
+        # Check if text fields or photo upload
         is_multipart = request.content_type and request.content_type.startswith('multipart/form-data')
 
         if is_multipart:
@@ -40,12 +39,13 @@ def update_game():
         if not data:
             return jsonify({"status": "No data provided"}), 400
 
-        # Validate gameId
+        # Extract gameID
         try:
             game_id = int(data.get("gameId"))
         except (TypeError, ValueError):
             return jsonify({"status": "gameId must be an integer"}), 400
 
+        # Map the fields to be changed
         update_fields = {}
 
         if "genre" in data:
@@ -60,14 +60,14 @@ def update_game():
 
         if image:
             try:
-                # Delete old image (optional but good)
-                game = Game.find_by_id(conn, game_id)
-                if game and game.thumbnail_url:
-                    upload_folder = os.path.join(current_app.config["UPLOAD_FOLDER"], "games")
-                    old_filename = game.thumbnail_url.split("/")[-1]
-                    old_path = os.path.join(upload_folder, old_filename)
-                    if os.path.exists(old_path):
-                        os.remove(old_path)
+                # # Delete old image (optional but good)
+                # game = Game.find_by_id(conn, game_id)
+                # if game and game.thumbnail_url:
+                #     upload_folder = os.path.join(current_app.config["UPLOAD_FOLDER"], "games")
+                #     old_filename = game.thumbnail_url.split("/")[-1]
+                #     old_path = os.path.join(upload_folder, old_filename)
+                #     if os.path.exists(old_path):
+                #         os.remove(old_path)
 
                 image_url = save_image(image)
                 update_fields["thumbnail_url"] = image_url
@@ -101,6 +101,7 @@ def update_game():
 
 # Helper for saving image
 def save_image(image_file):
+    # Save all game images under uploads/games
     upload_folder = os.path.join(current_app.config["UPLOAD_FOLDER"], "games")
     os.makedirs(upload_folder, exist_ok=True)
 
