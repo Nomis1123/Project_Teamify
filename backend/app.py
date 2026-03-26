@@ -5,17 +5,13 @@ from dotenv import load_dotenv
 from flask import Flask
 from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image
 from controller.MatchmakingController import get_matches
-<<<<<<< HEAD
-from controller.Friend_controller import get_user_friends, accept_friend, search_user
-=======
 from controller.Friend_controller import (
     get_user_friends, accept_friend, send_friend_request, 
-    reject_friend_request, remove_friend
+    reject_friend_request, remove_friend, search_user
 )
 
 from controller.ChatController import init_conversation, get_messages, register_chat_socket_events
 from flask_socketio import SocketIO
->>>>>>> refs/remotes/origin/dev
 
 #, login, auth_verify, logout, getOrUpdate_availability
 #from controller.AuthenticationController import logout
