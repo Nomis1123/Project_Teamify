@@ -21,7 +21,7 @@ def accept_friend():
     POST /api/friends/accept
     Body: {"friend_id": 10}
     """
-    current_user_id = get_jwt_identity() # Taken from the Secure Token
+    current_user_id = get_jwt_identity() 
     data = request.json
     friend_id = data.get("friend_id")
 
@@ -35,3 +35,57 @@ def accept_friend():
         return jsonify({"status": "success", "message": "Friendship established"}), 200
     else:
         return jsonify({"status": "error", "message": "Database update failed"}), 500
+    
+
+
+
+@jwt_required()
+def send_friend_request():
+    current_user_id = get_jwt_identity()
+    data = request.json
+    target_id = data.get("target_id")
+
+    # 1. Self-friend check
+    if not target_id or int(current_user_id) == int(target_id):
+        return jsonify({"status": "error", "message": "Invalid target"}), 400
+
+    # 2. State validation (Using your new Model method)
+    status = Friend.get_relationship_status(int(current_user_id), int(target_id))
+    
+    if status == 'accepted':
+        return jsonify({"status": "error", "message": "Already friends"}), 400
+    if status == 'pending':
+        return jsonify({"status": "error", "message": "Request already exists"}), 400
+
+    # 3. Execution
+    if Friend.send_request(int(current_user_id), int(target_id)):
+        return jsonify({"status": "success", "message": "Sent"}), 201
+    return jsonify({"status": "error", "message": "DB Error"}), 500
+
+@jwt_required()
+def reject_friend_request(sender_id):
+    """
+    DELETE /api/friends/requests/<sender_id>
+    Handles declining a pending invite.
+    """
+    current_user_id = get_jwt_identity()
+    
+    success = Friend.delete_relationship(int(current_user_id), int(sender_id))
+
+    if success:
+        return jsonify({"status": "success", "message": "Request declined"}), 200
+    return jsonify({"status": "error", "message": "Database deletion failed"}), 500
+
+@jwt_required()
+def remove_friend(friend_id):
+    """
+    DELETE /api/friends/<friend_id>
+    Handles unfriending an existing connection.
+    """
+    current_user_id = get_jwt_identity()
+    
+    success = Friend.delete_relationship(int(current_user_id), int(friend_id))
+
+    if success:
+        return jsonify({"status": "success", "message": "Friend removed"}), 200
+    return jsonify({"status": "error", "message": "Database deletion failed"}), 500

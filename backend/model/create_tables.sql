@@ -24,6 +24,10 @@ CREATE TABLE users (
 ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE;
 
 
+ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE;
+
+
+DROP TABLE IF EXISTS friends CASCADE;
 CREATE TABLE friends (
     id SERIAL PRIMARY KEY,
     user_id_1 INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -36,6 +40,7 @@ CREATE TABLE friends (
     -- Ensure we don't have duplicate rows for the same pair (1-2 and 2-1)
     CONSTRAINT unique_friendship UNIQUE (user_id_1, user_id_2)
 );
+ALTER TABLE friends ADD COLUMN action_user_id INTEGER;
 
 -- Index for faster lookups when checking a specific user's friend list
 CREATE INDEX idx_friends_user_1 ON friends(user_id_1);
@@ -51,6 +56,8 @@ CREATE TABLE games(
     thumbnail_url TEXT, -- a string of thext that stores a link to an image file
     developer VARCHAR (100)
 );
+ALTER TABLE games ADD COLUMN icon_url TEXT;
+
 ALTER TABLE games ADD COLUMN icon_url TEXT;
 
 -- Join table: likes Users to Games (Many-to-Many)

@@ -46,8 +46,8 @@ const Navbar = ( {user, isAdmin, setUser, setIsAdmin} ) => {
                     <Link to="/matchmaking" className="matchmaking">
                         Matchmaking
                     </Link>
-                    <Link to="/guides" className="guides">
-                        Guides
+                    <Link to="/chat" className="chat">
+                        Chat
                     </Link>
                     <Link to="/friends" className="friends">
                         Friends
