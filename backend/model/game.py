@@ -98,17 +98,17 @@ class Game:
             row = cur.fetchone()
             game_id = row["id"]
 
-            for order, rank in enumerate(ranks):
-                cur.execute(
-                    "INSERT INTO game_ranks (game_id, name, rank_order) VALUES (%s, %s, %s)",
-                    (game_id, rank, order)
-                )
+            # for order, rank in enumerate(ranks):
+            #     cur.execute(
+            #         "INSERT INTO game_ranks (game_id, name, rank_order) VALUES (%s, %s, %s)",
+            #         (game_id, rank, order)
+            #     )
 
-            for role in roles:
-                cur.execute(
-                    "INSERT INTO game_roles (game_id, name) VALUES (%s, %s)",
-                    (game_id, role)
-                )
+            # for role in roles:
+            #     cur.execute(
+            #         "INSERT INTO game_roles (game_id, name) VALUES (%s, %s)",
+            #         (game_id, role)
+            #     )
 
         conn.commit()
         return cls._build(cur, row, ranks, roles)
@@ -117,19 +117,19 @@ class Game:
     def _build(cls, cur, row, ranks=None, roles=None):
         data = dict(row)
 
-        if ranks is not None:
-            cur.execute(
-                "SELECT name FROM game_ranks WHERE game_id = %s ORDER BY rank_order",
-                (data["id"],)
-            )
-            ranks = [r["name"] for r in cur.fetchall()]
-
-        if roles is not None:
-            cur.execute(
-                "SELECT name FROM game_roles WHERE game_id = %s",
-                (data["id"],)
-            )
-            roles = [r["name"] for r in cur.fetchall()]
+        # if ranks is not None:
+        #     cur.execute(
+        #         "SELECT name FROM game_ranks WHERE game_id = %s ORDER BY rank_order",
+        #         (data["id"],)
+        #     )
+        #     ranks = [r["name"] for r in cur.fetchall()]
+        #
+        # if roles is not None:
+        #     cur.execute(
+        #         "SELECT name FROM game_roles WHERE game_id = %s",
+        #         (data["id"],)
+        #     )
+        #     roles = [r["name"] for r in cur.fetchall()]
 
         data["ranks"] = ranks
         data["roles"] = roles
