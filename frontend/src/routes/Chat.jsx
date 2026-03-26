@@ -24,6 +24,12 @@ const Chat = ({ target = null }) => {
         pfp_url: "https://motionbgs.com/media/474/arknights.jpg",
     });
     const socketRef = useRef(null);
+    const activeConvoRef = useRef(null); // <-- Add this new ref
+
+    // Keep the ref constantly updated with the live conversation_id
+    useEffect(() => {
+        activeConvoRef.current = conversation_id;
+    }, [conversation_id]);
 
     // Get the user's friend list and build live chat
     useEffect(() => {
@@ -104,7 +110,7 @@ const Chat = ({ target = null }) => {
 
                     // 2. Map the payload to match the database schema that ChatWindow expects
                     const newMsg = {
-                        content: msg.content,
+                        content: msg.message,
                         sender_id: msg.sender,
                         created_at: new Date(msg.timestamp).toLocaleString([], {
                             month: 'short',
@@ -114,7 +120,7 @@ const Chat = ({ target = null }) => {
                         }),
                     };
 
-                    if (income_conversation_id === conversation_id) {
+                    if (income_conversation_id === activeConvoRef.current) {
                         // 3. Put newMsg at the END of the array so it shows up at the bottom
                         setMessages((prevMessages) => [newMsg, ...prevMessages]);
                     } else {
