@@ -1,5 +1,5 @@
-DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
-TIMES = ["morning", "afternoon", "evening"]
+DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+TIMES = ["morning", "afternoon", "night"]
 BITS = 21
 
 class Availability:
@@ -8,8 +8,8 @@ class Availability:
         """
         Expects a dict like:
         {
-            "monday":    {"morning": True, "afternoon": False, "evening": True},
-            "tuesday":   {"morning": False, "afternoon": True, "evening": False},
+            "monday":    {"morning": True, "afternoon": False, "night": True},
+            "tuesday":   {"morning": False, "afternoon": True, "night": False},
             ...
         }
         Bit order: monday-morning is MSB, sunday-evening is LSB.
@@ -33,8 +33,8 @@ class Availability:
 
         Returns a dict like:
         {
-            "monday":    {"morning": True, "afternoon": False, "evening": True},
-            "tuesday":   {"morning": False, "afternoon": True, "evening": False},
+            "monday":    {"morning": True, "afternoon": False, "night": True},
+            "tuesday":   {"morning": False, "afternoon": True, "night": False},
             ...
         }
         '''
