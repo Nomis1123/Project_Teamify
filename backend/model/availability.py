@@ -4,7 +4,7 @@ BITS = 21
 
 class Availability:
 
-    def __init__(self, availability: dict):
+    def __init__(self, availability_dict: dict|None=None, bits: int|None=None):
         """
         Expects a dict like:
         {
@@ -16,11 +16,15 @@ class Availability:
         """
 
         self.bits: int = 0
-        for day in DAYS:
-            for time in TIMES:
-                self.bits <<= 1
-                if availability.get(day, {}).get(time, False):
-                    self.bits |= 1
+
+        if availability_dict is not None:
+            for day in DAYS:
+                for time in TIMES:
+                    self.bits <<= 1
+                    if availability_dict.get(day, {}).get(time, False):
+                        self.bits |= 1
+        elif bits is not None:
+            self.bits = bits
 
 
     def to_dict(self) -> dict:

@@ -243,12 +243,3 @@ class User:
         finally:
             if manage_conn:
                 conn.close()
-        
-
-
-'''
-username
-old email new email
-old password new password
-description
-'''
