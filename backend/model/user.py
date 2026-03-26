@@ -203,7 +203,8 @@ class User:
                 "email": self.email,
                 "description": self.description,
                 "pfp_url": self.pfp_url,
-                "availability": self.availability
+                "availability": self.availability,
+                "is_admin": self.is_admin
                 }
     
     @staticmethod
