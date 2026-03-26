@@ -7,7 +7,7 @@ from model.game import Game
 
 
 @jwt_required()
-def update_game(game_id):
+def update_game():
     conn = get_db_connection()
 
     try:
@@ -18,7 +18,7 @@ def update_game(game_id):
         if not user:
             return jsonify({"status": "User not found"}), 404
 
-        if user.is_admin:
+        if not user.is_admin:
             return jsonify({"status": "Unauthorized"}), 403
 
         # Parse the data
@@ -27,8 +27,22 @@ def update_game(game_id):
         if not data:
             return jsonify({"status": "No data provided"}), 400
 
-        allowed_fields = {"genre", "developer", "rank", "role"}
-        update_fields = {k: v for k, v in data.items() if k in allowed_fields}
+        game_id = data.get("gameId")
+        if not game_id:
+            return jsonify({"status": "gameId is required"}), 400
+
+        # Map the fields to be changed
+        update_fields = {}
+
+        if "genre" in data:
+            if not isinstance(data["genre"], str):
+                return jsonify({"status": "genre must be a string"}), 400
+            update_fields["genre"] = data["genre"]
+
+        if "developer" in data:
+            if not isinstance(data["developer"], str):
+                return jsonify({"status": "developer must be a string"}), 400
+            update_fields["developer"] = data["developer"]
 
         if not update_fields:
             return jsonify({"status": "No valid fields provided"}), 400
