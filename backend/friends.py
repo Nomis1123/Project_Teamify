@@ -24,11 +24,14 @@ class Friend:
 
                 # 2. Get Pending Requests (Users who sent a request TO the current user)
                 cur.execute("""
-                    SELECT u.id, u.username, u.email, u.steam_id, u.description, u.profile_picture_url
-                    FROM users u
-                    JOIN friends f ON f.user_id_1 = u.id
-                    WHERE f.user_id_2 = %s AND f.status = 'pending'
-                """, (user_id,))
+                SELECT u.id, u.username, u.email, u.steam_id, u.description, u.profile_picture_url
+                FROM users u
+                JOIN friends f ON (f.user_id_1 = u.id OR f.user_id_2 = u.id)
+                WHERE (f.user_id_1 = %s OR f.user_id_2 = %s) 
+                AND f.status = 'pending'
+                AND f.action_user_id != %s  -- <--- THIS IS THE KEY FIX
+                AND u.id != %s
+            """, (user_id, user_id, user_id, user_id))
                 
                 requests = [dict(zip(columns, row)) for row in cur.fetchall()]
 
@@ -54,10 +57,10 @@ class Friend:
                 # If the request already exists (as pending), it becomes 'accepted'.
                 # If it doesn't exist at all, it creates it as 'accepted'.
                 cur.execute("""
-                    INSERT INTO friends (user_id_1, user_id_2, status)
-                    VALUES (%s, %s, 'accepted')
+                    INSERT INTO friends (user_id_1, user_id_2, status, action_user_id)
+                    VALUES (%s, %s, 'accepted', NULL)
                     ON CONFLICT (user_id_1, user_id_2) 
-                    DO UPDATE SET status = 'accepted';
+                    DO UPDATE SET status = 'accepted', action_user_id = NULL;
                 """, (u1, u2))
             conn.commit()
             return True
@@ -112,3 +115,64 @@ class Friend:
             if conn:
                 conn.close()
 
+    def get_relationship_status(user_id, target_id):
+        """
+        [Helper] Checks the current database status of a relationship.
+        Returns: 'accepted', 'pending', or None
+        """
+        conn = get_db_connection()
+        u1, u2 = (user_id, target_id) if user_id < target_id else (target_id, user_id)
+        
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT status FROM friends 
+                    WHERE user_id_1 = %s AND user_id_2 = %s
+                """, (u1, u2))
+                result = cur.fetchone()
+                return result[0] if result else None
+        finally:
+            conn.close()
+            
+    
+    @staticmethod
+    def send_request(sender_id, receiver_id):
+        """
+        [Story 7.1] Inserts a new pending relationship.
+        """
+        conn = get_db_connection()
+        u1, u2 = (sender_id, receiver_id) if sender_id < receiver_id else (receiver_id, sender_id)
+        
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                INSERT INTO friends (user_id_1, user_id_2, status, action_user_id)
+                VALUES (%s, %s, 'pending', %s)
+                ON CONFLICT (user_id_1, user_id_2) DO NOTHING;
+            """, (u1, u2, sender_id))
+            conn.commit()
+            return True
+        except Exception:
+            conn.rollback()
+            return False
+        finally:
+            conn.close()
+
+    @staticmethod
+    def delete_relationship(user_id, target_id):
+        conn = get_db_connection()
+        u1, u2 = (user_id, target_id) if user_id < target_id else (target_id, user_id)
+        
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    DELETE FROM friends 
+                    WHERE user_id_1 = %s AND user_id_2 = %s
+                """, (u1, u2))
+            conn.commit()
+            return True
+        except Exception:
+            conn.rollback()
+            return False
+        finally:
+            conn.close()

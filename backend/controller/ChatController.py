@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_socketio import emit, join_room
 
 from controller.extensions import get_db_connection
 
@@ -102,7 +103,7 @@ def get_messages(conversation_id):
         raw_messages = cursor.fetchall()
 
         # 2. Reverse the list so the UI renders chronologically top-to-bottom
-        raw_messages.reverse()
+        #raw_messages.reverse()
 
         # 3. Format into a clean JSON array
         formatted_messages = []
@@ -121,3 +122,70 @@ def get_messages(conversation_id):
     finally:
         cursor.close()
         conn.close()
+
+'''
+Register Socket.IO events for live chat.
+We wrap this in a function so we can pass the socketio instance from app.py
+without causing circular imports.
+'''
+def register_chat_socket_events(socketio):
+    
+    @socketio.on('join_conversation')
+    def handle_join(data):
+        conversation_id = data.get('conversation_id')
+        if conversation_id:
+            # Cast to string to ensure consistent room naming
+            join_room(str(conversation_id))
+            # print(f"User joined room: {conversation_id}")
+
+    @socketio.on('send_message')
+    def handle_send_message(data):
+        sender_id = data.get('sender')
+        conversation_id = data.get('conversation_id')
+        content = data.get('message')
+        
+        if not sender_id or not conversation_id or not content:
+            print("Missing data for message sending")
+            return
+
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        try:
+            # 1. Insert and RETURN the new schema fields
+            insert_query = """
+                INSERT INTO messages (conversation_id, sender_id, content) 
+                VALUES (%s, %s, %s) 
+                RETURNING id, created_at, is_read, is_edited;
+            """
+            cursor.execute(insert_query, (conversation_id, sender_id, content))
+            new_msg = cursor.fetchone()
+            conn.commit()
+
+            # 2. Unpack the returned tuple
+            msg_id = new_msg[0]
+            created_at = new_msg[1]
+            is_read = new_msg[2]
+            is_edited = new_msg[3]
+
+            # 3. Format the payload to match the database exactly
+            emit_data = {
+                "id": msg_id,
+                "sender": sender_id,
+                "message": content,
+                "conversation_id": conversation_id,
+                "timestamp": created_at.isoformat(),
+                "is_read": is_read,
+                "is_edited": is_edited
+            }
+
+            # 4. Broadcast to everyone in this specific conversation room
+            emit('receive_message', emit_data, room=str(conversation_id))
+
+        except Exception as e:
+            conn.rollback()
+            print(f"Error saving socket message: {e}")
+            emit('message_error', {"error": "Failed to send message"}, to=request.sid)
+        finally:
+            cursor.close()
+            conn.close()
