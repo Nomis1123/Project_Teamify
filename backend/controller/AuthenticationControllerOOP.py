@@ -226,6 +226,7 @@ def steam_verify():
     # Redirect back to profile page
     return redirect("http://localhost:5173/profile")
 
+# Syncs users owned games with Steam
 @jwt_required()
 def sync_games():
     conn = get_db_connection()
