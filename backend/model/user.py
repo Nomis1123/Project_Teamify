@@ -203,7 +203,7 @@ class User:
                 "description": self.description,
                 "pfp_url": self.pfp_url,
                 "availability": self.availability
-                }    
+                }
     
     @staticmethod
     def get_availability(user_id, conn=None):
@@ -243,9 +243,6 @@ class User:
         finally:
             if manage_conn:
                 conn.close()
-
-
-        
 
 
 '''
