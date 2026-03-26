@@ -10,11 +10,12 @@ def get_matches():
     data = request.get_json() or {}
     print(data)
     filters = data.get('filters', {}) if data else {}
+    offset = data.get('offset', 0)
     try:
         users = UserGame.get_filtered_users(
             current_user_id,
             filters,
-            
+            offset=offset,
         )
         return jsonify(users), 200
     
