@@ -126,6 +126,6 @@ def save_image(image_file):
     filepath = os.path.join(upload_folder, filename)
     image_file.save(filepath)
 
-    public_url = f"http://138.197.132.126:8000/uploads/games/{filename}"
-
+    # public_url = f"http://138.197.132.126:8000/uploads/games/{filename}"
+    public_url = f"http://localhost:8000/uploads/games/{filename}"
     return public_url
