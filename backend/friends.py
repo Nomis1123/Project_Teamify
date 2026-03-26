@@ -72,17 +72,16 @@ class Friend:
         # limit = how many users to display
         # offset = how far we've scrolled down the list for pagination
         conn = get_db_connection()
+        search = search.strip()
+        if not search:
+            return []
         
         try:
             with conn.cursor() as cur:
                 base_query = """
-                    SELECT u.id, u.username, u.email, u.steam_id, u.description, u.profile_picture_url,
-                        CASE
-                            WHEN f.status = 'accepted' THEN TRUE
-                            ELSE FALSE
-                        END AS friend
+                    SELECT u.id, u.username, u.email, u.steam_id, u.description, u.profile_picture_url
                     FROM users u
-                    LEFT JOIN friends f
+                    JOIN friends f
                         ON (
                             (f.user_id_1 = %s AND f.user_id_2 = u.id) OR
                             (f.user_id_2 = %s AND f.user_id_1 = u.id)
@@ -97,10 +96,9 @@ class Friend:
                 # " ORDER BY username"
                 # Pagination
                 # " LIMIT %s OFFSET %s"
-                search = search.strip()
                 params = [user_id, user_id, user_id, f"%{search}%", limit, offset]
                 cur.execute(base_query, params)
-                columns = ['id', 'username', 'email', 'steam_id', 'description', 'avatar', 'friend']
+                columns = ['id', 'username', 'email', 'steam_id', 'description', 'avatar', "friend"]
                 rows = cur.fetchall()
                 users = [dict(zip(columns, row)) for row in rows]
                 return users
