@@ -3,7 +3,7 @@ from controller.extensions import get_db_connection
 
 
 class User:
-    def __init__(self, id, username, email, steam_id=None, description=None, pfp_url=None, availability=None):
+    def __init__(self, id, username, email, steam_id=None, description=None, pfp_url=None, availability=None, is_admin=False):
 
         self.id = id
         self.username = username
@@ -12,6 +12,7 @@ class User:
         self.description = description
         self.pfp_url = pfp_url
         self.availability = availability
+        self.is_admin = is_admin
 
 
 
@@ -77,7 +78,7 @@ class User:
         try:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT id, username, email, steam_id, description, profile_picture_url, availability FROM users WHERE id = %s",
+                    "SELECT id, username, email, steam_id, description, profile_picture_url, availability, is_admin FROM users WHERE id = %s",
                     (user_id,)
                 )
                 row = cur.fetchone()
@@ -101,7 +102,7 @@ class User:
         try:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT id, username, email, steam_id, description, profile_picture_url, availability FROM users WHERE email = %s",
+                    "SELECT id, username, email, steam_id, description, profile_picture_url, availability, is_admin FROM users WHERE email = %s",
                     (email,)
                 )
                 row = cur.fetchone()
