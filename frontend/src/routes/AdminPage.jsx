@@ -12,6 +12,7 @@ const Profile = () => {
     const [imageFile, setImageFile] = useState(null);
     const [preview, setPreview] = useState("");
     const [errMsg, setError] = useState("");
+    const [successMsg, setSuccess] = useState("");
     const [isSaving, setIsSaving] = useState(false);
     const MAX_IMAGE_SIZE = 5*1024*1024;
 
@@ -61,6 +62,7 @@ const Profile = () => {
                 } catch {}
                 throw new Error(msg);
             }
+            showSuccessMessage("Save Suceess!");
         } catch (e) {
             showErrorMessage(`Save failed. Please try again later.`);
         } finally {
@@ -96,6 +98,7 @@ const Profile = () => {
                 } catch {}
                 throw new Error(msg);
             }
+            showSuccessMessage("Save Suceess!");
         } catch (e) {
             showErrorMessage(`Save failed. Please try again later.`);
         } finally {
@@ -135,6 +138,14 @@ const Profile = () => {
         }, 1000);
     };
 
+    const showSuccessMessage = (message) => {
+        setSuccess(message);
+
+        setTimeout(() => {
+            setSuccess("");
+        }, 1000);
+    };
+
     useEffect(() => {
         console.log("Image URL changed!");
     }, [preview]);
@@ -142,8 +153,13 @@ const Profile = () => {
     return (
         <div className="admin-page">
             {errMsg && (
-                <div className="temp-popup">
+                <div className="temp-popup-err">
                     {errMsg}
+                </div>
+            )}
+            {successMsg && (
+                <div className="temp-popup-succ">
+                    {successMsg}
                 </div>
             )}
             <div className="admin-card">
