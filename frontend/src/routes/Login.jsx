@@ -75,7 +75,7 @@ const Login = ( { setUser, setIsAdmin }) => {
             }
 
             setUser(data.user.username);
-            setIsAdmin(data.user.setIsAdmin)
+            setIsAdmin(data.user.is_admin);
             localStorage.setItem("access_token", data.access_token);
             localStorage.setItem("refresh_token", data.refresh_token);
             return true;
