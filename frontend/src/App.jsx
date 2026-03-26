@@ -33,7 +33,7 @@ function App() {
 
       const data = await res.json()
       setUser(data.user.username)
-      setIsAdmin(data.user.isAdmin);
+      setIsAdmin(data.user.is_admin);
     } catch (err) { // remove the user from their login state if user does not exist in backend
       localStorage.removeItem("access_token")
       localStorage.removeItem("refresh_token")
