@@ -21,6 +21,8 @@ CREATE TABLE users (
   "Sunday": {"Morning": false, "Noon": false, "Evening": false}
 }'::JSONB
 );
+ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE;
+
 
 CREATE TABLE friends (
     id SERIAL PRIMARY KEY,
@@ -49,6 +51,7 @@ CREATE TABLE games(
     thumbnail_url TEXT, -- a string of thext that stores a link to an image file
     developer VARCHAR (100)
 );
+ALTER TABLE games ADD COLUMN icon_url TEXT;
 
 -- Join table: likes Users to Games (Many-to-Many)
 DROP TABLE IF EXISTS user_games CASCADE;
