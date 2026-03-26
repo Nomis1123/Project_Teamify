@@ -148,7 +148,7 @@ const Friends = () => {
                 
                  {/* Friend request button on the right */}
                 <button className="requests-button" onClick={() => {setShowPU2(true);}}>
-                    Friend Requests
+                    Friend Requests&nbsp;
                     {friendRequests.length > 0 && (
                         <span className="badge">{friendRequests.length}</span>
                     )}
