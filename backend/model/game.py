@@ -25,6 +25,33 @@ class Game:
         for key, default in GAME_RELATION_DEFAULTS.items():
             setattr(self, key, kwargs.get(key, default))
 
+    # Update missing field from Steam import
+    # Used for admin account
+    @classmethod
+    def update(cls, conn, game_id: int, **fields):
+        if not fields:
+            raise ValueError("No fields provided for update")
+
+        set_clause = ", ".join([f"{key} = %s" for key in fields.keys()])
+        values = list(fields.values()) + [game_id]
+
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute(
+                f"""
+                UPDATE games
+                SET {set_clause}
+                WHERE id = %s
+                RETURNING {GAME_FIELDS}
+                """,
+                values
+            )
+
+            row = cur.fetchone()
+            if not row:
+                raise ValueError("Game not found")
+
+            return cls._build(cur, row)
+
     # Return list of all games
     # Used for matchmaking, admin account
     @classmethod
