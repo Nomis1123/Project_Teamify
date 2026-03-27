@@ -171,15 +171,18 @@ const Chat = ({ target = null }) => {
         const loadMe = async () => {
             try {
                 setLoadingCH(true);
-                // Reset the unread message from this friend
+                // Reset the unread message from this friend safely
                 if (currTarget != null) {
+                    setFriendsList((prevFriends) =>
+                        prevFriends.map((f) =>
+                            f.userid === currTarget ? { ...f, unread: "" } : f
+                        )
+                    );
                     const target_friend = friends_list.find((f) => f.userid === currTarget);
-                    target_friend.unread = "";
-                    console.log("########## Successfully reset the unread message! ############")
-
-                    setConversationID(target_friend.conversation_id);
+                    if (target_friend) {
+                        setConversationID(target_friend.conversation_id);
+                    }
                 };
-                
             } catch (e) {
                 console.log("error:", e);
             } finally {
@@ -226,6 +229,19 @@ const Chat = ({ target = null }) => {
         };
         loadMe();
     }, [conversation_id]);
+
+    // NEW: Subscribe to all friend rooms for background notifications
+    useEffect(() => {
+        if (connected && friends_list.length > 0 && socketRef.current) {
+            friends_list.forEach((friend) => {
+                if (friend.conversation_id) {
+                    socketRef.current.emit("join_conversation", { 
+                        conversation_id: friend.conversation_id 
+                    });
+                }
+            });
+        }
+    }, [connected, friends_list]);
 
     // Send the user input to the socket
     const sendMessage = (input) => {
