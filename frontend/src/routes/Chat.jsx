@@ -7,22 +7,25 @@ import ChatWindow from '../components/ChatWindow';
 import { io } from "socket.io-client";
 
 const Chat = ({ target = null }) => {
-    const [friends_list, setFriendsList] = useState([
-        {username: "bbb", userid: 2, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: 1, unread: ""},
-        {username: "ccc", userid: 3, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: 2, unread: ""},
-        {username: "ddd", userid: 4, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: 3, unread: ""},
-    ]);
+    //const [friends_list, setFriendsList] = useState([
+    //    {username: "bbb", userid: 2, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: 1, unread: ""},
+    //    {username: "ccc", userid: 3, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: 2, unread: ""},
+    //    {username: "ddd", userid: 4, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: 3, unread: ""},
+    //]);
+
+    // REPLACE WITH THIS: 
+    const [friends_list, setFriendsList] = useState([]);
+
     const [conversation_id , setConversationID] = useState(null);
     const [messages, setMessages] = useState([]);
     const [loading_fl, setLoadingFL] = useState(false);
     const [loading_ch, setLoadingCH] = useState(false);
     const [connected, setConnected] = useState(false);
     const [currTarget, setCurrTarget] = useState(target);
-    const [user, setUser] = useState({
-        id: 12,
-        username: "Man!",
-        pfp_url: "https://motionbgs.com/media/474/arknights.jpg",
-    });
+
+    // WITH THIS:
+    const [user, setUser] = useState(null);
+
     const socketRef = useRef(null);
     const activeConvoRef = useRef(null); // <-- Add this new ref
 
@@ -37,22 +40,26 @@ const Chat = ({ target = null }) => {
             try {
                 setLoadingFL(true);
 
-                // Get the user's friends list
-                const res = await fetch("???", {
+                // 1. Hit the correct endpoint
+                const res = await fetch("/api/conversations/friends", {
                     method: "GET",
                     headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
                 });
-                // console.log("fetch returned:", res.status, res.url);
+                
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-                const normalized_friends = data.friends_list.map((friend) => ({
-                    id: friend.id ?? "",
+                
+                // 2. data is the array itself
+                const data = await res.json(); 
+                
+                // 3. Map keys to perfectly match what ChatController.py sends and what your dummy state used
+                const normalized_friends = data.map((friend) => ({
+                    userid: friend.userid ?? "", 
                     username: friend.username ?? "",
-                    profile_picture: friend.profile_picture ?? "",
+                    pfp_url: friend.pfp_url ?? "",
                     conversation_id: friend.conversation_id ?? "",
-                    unread: "",
+                    unread: friend.unread ?? "",
                 }));
-                // console.log("response data:", data);
+                
                 setFriendsList(normalized_friends);
             } catch (e) {
                 console.log("error:", e);
@@ -83,7 +90,7 @@ const Chat = ({ target = null }) => {
                 const normalized_user = {
                     id: data.user.id ?? "",
                     username: data.user.username ?? "",
-                    profile_picture: data.user.profile_picture ?? "",
+                    pfp_url: data.user.pfp_url ?? "",
                 };
 
                 setUser(normalized_user);

@@ -266,17 +266,18 @@ def get_all_friends_conversations():
     except ValueError:
         return jsonify({"status": "Error extracting user id from JWT."}), 400
 
-    friends_list = Friend.get_all_for_user(current_user_id)
+    friends_data = Friend.get_all_for_user(current_user_id)
     friends_conversations = []
 
-    for f in friends_list:
+    # Target the specific list inside the dictionary
+    for f in friends_data['friends']: 
         friends_conversations.append({
             'userid': int(f['id']),
             'username': f['username'],
             'pfp_url': f['avatar'],
             'conversation_id': get_conversation_id(current_user_id, int(f['id'])),
             'unread': ""
-            })
+        })
 
     return jsonify(friends_conversations), 200
 
