@@ -58,7 +58,7 @@ const Profile = () => {
                     games: Array.isArray(data.user.games) ? data.games : [],
                     schedule: days.reduce((acc, day) => {
                         // console.log("schedule:", day, data.schedule[day]);
-                        const d = data.user.schedule?.[day] ?? defaultDailySchedule;
+                        const d = data.user.availability?.[day] ?? defaultDailySchedule;
                         acc[day] = {
                             morning: Boolean(d.morning),
                             afternoon: Boolean(d.afternoon),

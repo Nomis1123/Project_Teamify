@@ -2,24 +2,6 @@
 TRUNCATE users, games, user_games RESTART IDENTITY CASCADE;
 
 
-
-CREATE OR REPLACE FUNCTION default_availability()
-RETURNS JSONB AS $$
-BEGIN
-    RETURN '{
-      "Monday": {"Morning": false, "Noon": false, "Evening": false},
-      "Tuesday": {"Morning": false, "Noon": false, "Evening": false},
-      "Wednesday": {"Morning": false, "Noon": false, "Evening": false},
-      "Thursday": {"Morning": false, "Noon": false, "Evening": false},
-      "Friday": {"Morning": false, "Noon": false, "Evening": false},
-      "Saturday": {"Morning": false, "Noon": false, "Evening": false},
-      "Sunday": {"Morning": false, "Noon": false, "Evening": false}
-    }'::jsonb;
-END;
-$$ LANGUAGE plpgsql IMMUTABLE;
-
-
-
 INSERT INTO games (title, genre, developer) VALUES 
 ('Valorant', 'FPS', 'Riot Games'),
 ('PUBG', 'Battle Royale', 'Krafton'),
@@ -32,9 +14,9 @@ INSERT INTO users (
     username, email, password_hash, steam_id,
     description, is_verified, roles
 ) VALUES 
-('LunaVibes', 'luna@test.com', '$2b$12$hash', '76561197960435101', 'Late night sessions only.', true, 'DPS'),
-('ShadowStep', 'shadow@test.com', '$2b$12$hash', '76561197960435102', 'I thrive in the dark.', true, 'DPS'),
-('WeekendKing', 'king@test.com', '$2b$12$hash', '76561197960435103', 'Work hard, play hard Saturday/Sunday.', true, 'Tank'),
+('LunaVibes', 'luna@test.com', '$2b$12$iyxGdsCmz0TqdyS9bkpGGuFN.GGDJ/Y8E2eDe8Y2t8/Zp4jqXLqEK', '76561197960435101', 'Late night sessions only.', true, 'DPS'),
+('ShadowStep', 'shadow@test.com', '$2b$12$iyxGdsCmz0TqdyS9bkpGGuFN.GGDJ/Y8E2eDe8Y2t8/Zp4jqXLqEK', '76561197960435102', 'I thrive in the dark.', true, 'DPS'),
+('AdminUser', 'king@test.com', '$2b$12$iyxGdsCmz0TqdyS9bkpGGuFN.GGDJ/Y8E2eDe8Y2t8/Zp4jqXLqEK', '76561197960435103', 'Work hard, play hard Saturday/Sunday.', true, 'Tank'),
 ('OfficeWorker95', 'office@test.com', '$2b$12$hash', '76561197960435104', 'Free on weekends!', true, 'Support'),
 ('EarlyBird99', 'bird@test.com', '$2b$12$hash', '76561197960435105', 'Gaming before work.', true, 'Support'),
 ('FullTimeGamer', 'pro@test.com', '$2b$12$hash', '76561197960435106', 'Always on.', true, 'DPS'),
@@ -56,70 +38,27 @@ INSERT INTO users (
 ('User21', 'u21@test.com', '$2b$12$hash', '76561197960435122', 'Test user 21', true, 'Support'),
 ('User22', 'u22@test.com', '$2b$12$hash', '76561197960435123', 'Test user 22', true, 'Tank');
 
+-- create an Admin user
+UPDATE users SET is_admin = true WHERE username = 'AdminUser';
 
 -- LunaVibes and ShadowStep (all evenings true)
 UPDATE users
-SET availability = '{
-  "Monday": {"Morning": false, "Noon": false, "Evening": true},
-  "Tuesday": {"Morning": false, "Noon": false, "Evening": true},
-  "Wednesday": {"Morning": false, "Noon": false, "Evening": true},
-  "Thursday": {"Morning": false, "Noon": false, "Evening": true},
-  "Friday": {"Morning": false, "Noon": false, "Evening": true},
-  "Saturday": {"Morning": false, "Noon": false, "Evening": true},
-  "Sunday": {"Morning": false, "Noon": false, "Evening": true}
-}'::jsonb
+SET availability = 299593
 WHERE username IN ('LunaVibes', 'ShadowStep');
 
 -- WeekendKing and OfficeWorker95 (weekend full)
 UPDATE users
-SET availability = '{
-  "Monday": {"Morning": false, "Noon": false, "Evening": false},
-  "Tuesday": {"Morning": false, "Noon": false, "Evening": false},
-  "Wednesday": {"Morning": false, "Noon": false, "Evening": false},
-  "Thursday": {"Morning": false, "Noon": false, "Evening": false},
-  "Friday": {"Morning": false, "Noon": false, "Evening": false},
-  "Saturday": {"Morning": true, "Noon": true, "Evening": true},
-  "Sunday": {"Morning": true, "Noon": true, "Evening": true}
-}'::jsonb
+SET availability = 63
 WHERE username IN ('WeekendKing', 'OfficeWorker95');
 
 -- EarlyBird99 (weekdays mornings)
 UPDATE users
-SET availability = '{
-  "Monday": {"Morning": true, "Noon": false, "Evening": false},
-  "Tuesday": {"Morning": true, "Noon": false, "Evening": false},
-  "Wednesday": {"Morning": true, "Noon": false, "Evening": false},
-  "Thursday": {"Morning": true, "Noon": false, "Evening": false},
-  "Friday": {"Morning": true, "Noon": false, "Evening": false},
-  "Saturday": {"Morning": false, "Noon": false, "Evening": false},
-  "Sunday": {"Morning": false, "Noon": false, "Evening": false}
-}'::jsonb
+SET availability = 1198336
 WHERE username = 'EarlyBird99';
-
--- UniStudent (after lectures)
-UPDATE users
-SET availability = '{
-  "Monday": {"Morning": false, "Noon": true, "Evening": true},
-  "Tuesday": {"Morning": false, "Noon": false, "Evening": false},
-  "Wednesday": {"Morning": false, "Noon": true, "Evening": true},
-  "Thursday": {"Morning": false, "Noon": false, "Evening": false},
-  "Friday": {"Morning": false, "Noon": true, "Evening": false},
-  "Saturday": {"Morning": false, "Noon": false, "Evening": false},
-  "Sunday": {"Morning": false, "Noon": false, "Evening": false}
-}'::jsonb
-WHERE username = 'UniStudent';
 
 -- FullTimeGamer (always available)
 UPDATE users
-SET availability = '{
-  "Monday": {"Morning": true, "Noon": true, "Evening": true},
-  "Tuesday": {"Morning": true, "Noon": true, "Evening": true},
-  "Wednesday": {"Morning": true, "Noon": true, "Evening": true},
-  "Thursday": {"Morning": true, "Noon": true, "Evening": true},
-  "Friday": {"Morning": true, "Noon": true, "Evening": true},
-  "Saturday": {"Morning": true, "Noon": true, "Evening": true},
-  "Sunday": {"Morning": true, "Noon": true, "Evening": true}
-}'::jsonb
+SET availability = 2097151
 WHERE username = 'FullTimeGamer';
 
 
@@ -162,20 +101,22 @@ FROM users
 WHERE id >= 16;
 
 
--- The friendes relationship
-INSERT INTO friends (user_id_1, user_id_2, status) VALUES 
-(1, 2, 'accepted'), -- LunaVibes and ShadowStep
-(1, 6, 'accepted'), -- LunaVibes and FullTimeGamer
-(3, 4, 'accepted'), -- WeekendKing and OfficeWorker95
-(9, 10, 'accepted'), -- ArcticFox and CyberPunk
-(15, 16, 'accepted'), -- Glitch and HealerMain
-(6, 7, 'accepted');  -- FullTimeGamer and UniStudent
+-- Accepted Friendships (Existing)
+INSERT INTO friends (user_id_1, user_id_2, status, action_user_id) VALUES 
+(1, 2, 'accepted', NULL), 
+(1, 6, 'accepted', NULL), 
+(3, 4, 'accepted', NULL), 
+(9, 10, 'accepted', NULL), 
+(15, 16, 'accepted', NULL), 
+(6, 7, 'accepted', NULL);
 
--- Pending Requests (Sent to User 1 - LunaVibes)
-INSERT INTO friends (user_id_1, user_id_2, status) VALUES 
-(8, 1, 'accepted'),  -- LazyGamer requested LunaVibes
-(12, 1, 'accepted'); -- Zenith requested LunaVibes
+-- Pending Requests (Sent TO User 1 - LunaVibes)
+-- Note: action_user_id is the person who CLICKED 'add', so f.action_user_id != 1
+INSERT INTO friends (user_id_1, user_id_2, status, action_user_id) VALUES 
+(1, 8, 'pending', 8),  -- LazyGamer (8) requested LunaVibes (1)
+(1, 11, 'pending', 11); -- Zenith (11) requested LunaVibes (1)
 
--- accepted Requests (Sent by User 1 - LunaVibes)
-INSERT INTO friends (user_id_1, user_id_2, status) VALUES 
-(1, 22, 'accepted'); -- LunaVibes requested NovaStar
+-- Pending Request (Sent BY User 1 - LunaVibes)
+-- Note: action_user_id is 1, so this will be hidden from LunaVibes' incoming list
+INSERT INTO friends (user_id_1, user_id_2, status, action_user_id) VALUES 
+(1, 22, 'pending', 1); -- LunaVibes (1) requested NovaStar (22)

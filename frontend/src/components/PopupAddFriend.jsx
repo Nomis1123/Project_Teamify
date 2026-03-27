@@ -2,22 +2,23 @@ import { useState } from "react";
 import "../components/PopupRemoveFriend.css";
 import Popup from "./Popup"
 
-export default function PURemoveFriend({ user, user_id, open, onClose, onUnfriend }) {
+export default function PUAddFriend({ user, user_id, open, onClose, onSuccess}) {
     const [isSaving, setIsSaving] = useState(false);
     const [desc, setDesc] = useState("");
     const [descriptionError, setDescriptionError] = useState("");
     const [descriptionFail, setFail] = useState("");
 
-    async function handleUnfriend() {
+    async function handleAddfriend() {
         //onUnfriend(user); // to test friend deleted from friends list 
         setFail("");
         setIsSaving(true);
         setDescriptionError("");
 
         try {
-            const res = await fetch(`/api/friends/${user_id}`, { 
-                method: "DELETE",
+            const res = await fetch("/api/friends/request", {
+                method: "POST",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
+                body: JSON.stringify({ target_id: user_id }),
             });
 
             if (!res.ok) {
@@ -28,11 +29,11 @@ export default function PURemoveFriend({ user, user_id, open, onClose, onUnfrien
 
             const data = await res.json();
             console.log(data);
-            await onUnfriend(); // remove friend from friends list
+            onSuccess && onSuccess("Friend request sent!");
             handleClose();
 
         } catch (e) {
-            setFail(`Something went wrong. Please try again later. (${e.message})`);
+            setFail(`You already have this user as a friend, or you already sent a friend request.`);
         } finally {
             setIsSaving(false);
         }
@@ -53,18 +54,18 @@ export default function PURemoveFriend({ user, user_id, open, onClose, onUnfrien
                 
                 <div style={{ display: "flex", gap: 8 }}>
                     <div className="friend-input-container">
-                        <h2 className="unfriend-title"> Are you sure you want to unfriend {user}? </h2>
+                        <h2 className="unfriend-title"> Do you want to send a friend request to {user}? </h2>
                         {descriptionError ? <p className="error-msg">{descriptionError}</p> : ""}
 
                     </div>
                     <div className="friend-save-container">
                         <button
                             className="btn-friend btn-friend-save"
-                            onClick={handleUnfriend}
+                            onClick={handleAddfriend}
                             disabled={isSaving}
                             type="button"
                         >
-                            {isSaving ? "Removing..." : "Unfriend"}
+                            {isSaving ? "Sending..." : "Add friend"}
                         </button>  
                     </div>
                 </div>

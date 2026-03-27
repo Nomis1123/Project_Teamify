@@ -14,6 +14,7 @@ import requests
 import json
 import uuid
 #from model.User import User
+from model.availability import Availability
 from model.user import User
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_jwt_extended import unset_jwt_cookies
@@ -327,6 +328,7 @@ def update_me():
 
     if not data:
         return jsonify({"status": "No data provided."}), 400
+    print (data)
 
 
     # these fields can not be null
@@ -384,6 +386,13 @@ def update_me():
         data.pop("new_email", None)
         data.pop("old_password", None)
         data.pop("new_password", None)
+
+        # convert the availability info from dict to bits
+        if "availability" in data:
+            print (data['availability'])
+            data['availability'] = Availability(availability_dict=data['availability']).bits
+            print (data['availability'])
+
 
         # if theres anything left to update
         if data:
@@ -528,7 +537,8 @@ def upload_image(image_file):
             filepath = os.path.join(upload_folder, filename)
             image_file.save(filepath)
             # we may want separate directories in the future for different users for scalability
-            public_url = f"http://localhost:8000/uploads/{filename}"
+            public_url = f"http://138.197.132.126:8000/uploads/{filename}"
+            #public_url = f"http://138.197.132.126:8000/root/Project\ Teamify/backend/uploads/{filename}"
             user.update({"profile_picture_url": public_url}, conn=conn)
             conn.commit()
             

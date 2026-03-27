@@ -4,8 +4,11 @@ from dotenv import load_dotenv
 
 from flask import Flask
 from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, sync_games, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image
-from controller.MatchmakingController import get_matches
-from controller.Friend_controller import get_user_friends, accept_friend
+from controller.Friend_controller import (
+    get_user_friends, accept_friend, send_friend_request, 
+    reject_friend_request, remove_friend
+)
+from controller.MatchmakingController import get_matches, sort_matches
 
 from controller.ChatController import init_conversation, get_messages, register_chat_socket_events, get_all_friends_conversations
 from flask_socketio import SocketIO
@@ -84,6 +87,7 @@ app.add_url_rule('/api/user/me', view_func=update_me,  methods=['PATCH'])
 ## 5. Availability
 app.add_url_rule('/api/user/availability', view_func=getOrUpdate_availability1, methods=['GET','PUT'])
 app.add_url_rule('/api/user/filters', view_func=get_matches, methods=["POST"])
+app.add_url_rule('/api/user/sort', view_func=sort_matches, methods=["POST"])
 
 ## 6. Uploads
 app.add_url_rule('/uploads/<filename>', view_func=retrieve_image, methods=['GET'])
@@ -109,9 +113,14 @@ app.add_url_rule('/api/conversations/friends',
 # Get friends and requests
 app.add_url_rule('/api/friends', view_func=get_user_friends, methods=['GET'])
 
-# Accept or Decline a request
+# Accept a request
 app.add_url_rule('/api/friends/accept', view_func=accept_friend, methods=['POST'])
+# Send a friend request
+app.add_url_rule('/api/friends/request', view_func=send_friend_request, methods=['POST'])
+# Reject friend request
+app.add_url_rule('/api/friends/requests/<int:sender_id>', view_func=reject_friend_request, methods=['DELETE'])
 
+app.add_url_rule('/api/friends/<int:friend_id>', view_func=remove_friend, methods=['DELETE'])
 
 if __name__ == '__main__':
     # Start a local web server on Port 8000
