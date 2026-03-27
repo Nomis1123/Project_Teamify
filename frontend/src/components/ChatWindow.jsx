@@ -10,7 +10,7 @@ export default function ChatWindow({messages, target, friends_list, user, sendMe
     }   const [input, setInput] = useState("");
 
     useEffect(() => {
-        console.log("############## Resetting input box ###############");
+        // console.log("############## Resetting input box ###############");
         setInput("");
     }, [target]);
 

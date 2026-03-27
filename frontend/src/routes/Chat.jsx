@@ -15,6 +15,7 @@ const Chat = ({ target = null }) => {
 
     // REPLACE WITH THIS: 
     const [friends_list, setFriendsList] = useState([]);
+    const [convid_list, setConvidList] = useState([]);
 
     const [conversation_id , setConversationID] = useState(null);
     const [messages, setMessages] = useState([]);
@@ -28,11 +29,6 @@ const Chat = ({ target = null }) => {
 
     const socketRef = useRef(null);
     const activeConvoRef = useRef(null); // <-- Add this new ref
-
-    // Keep the ref constantly updated with the live conversation_id
-    useEffect(() => {
-        activeConvoRef.current = conversation_id;
-    }, [conversation_id]);
 
     // Get the user's friend list and build live chat
     useEffect(() => {
@@ -131,7 +127,6 @@ const Chat = ({ target = null }) => {
                         // 3. Put newMsg at the END of the array so it shows up at the bottom
                         setMessages((prevMessages) => [newMsg, ...prevMessages]);
                     } else {
-                        console.log('setting on read message')
                         setFriendsList((prevFriends) =>
                             prevFriends.map((friend) =>
                                 friend.conversation_id === income_conversation_id
@@ -166,6 +161,18 @@ const Chat = ({ target = null }) => {
         };
     }, []);
 
+    useEffect(() => {
+        if (friends_list != []) {
+            setConvidList(friends_list.map(friend => friend.conversation_id));
+        }
+    }, [friends_list]);
+
+    useEffect(() => {
+        if (connected && convid_list.length > 0) {
+            socketRef.current.emit("join_conversation", { conversation_id_lst: convid_list });
+        }
+    }, [connected, convid_list]);
+                    
     // Reset the unread messages of current user and set conversation id
     useEffect(() => {
         const loadMe = async () => {
@@ -175,7 +182,7 @@ const Chat = ({ target = null }) => {
                 if (currTarget != null) {
                     const target_friend = friends_list.find((f) => f.userid === currTarget);
                     target_friend.unread = "";
-                    console.log("########## Successfully reset the unread message! ############")
+                    // console.log("########## Successfully reset the unread message! ############")
 
                     setConversationID(target_friend.conversation_id);
                 };
@@ -195,10 +202,7 @@ const Chat = ({ target = null }) => {
             try {
                 setLoadingCH(true);
                 if (conversation_id != null) {
-                    if (socketRef.current && socketRef.current.connected) {
-                        socketRef.current.emit("join_conversation", { conversation_id: conversation_id });
-                    }
-                    console.log(`Attempt to get messages from /api/conversations/${conversation_id}/messages`)
+                    // console.log(`Attempt to get messages from /api/conversations/${conversation_id}/messages`)
                     const res = await fetch(`/api/conversations/${conversation_id}/messages`, {
                         method: "GET",
                         headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
@@ -221,6 +225,7 @@ const Chat = ({ target = null }) => {
             } catch (e) {
                 console.log("error:", e);
             } finally {
+                activeConvoRef.current = conversation_id;
                 setLoadingCH(false);
             }
         };

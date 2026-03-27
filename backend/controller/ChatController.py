@@ -197,10 +197,11 @@ def register_chat_socket_events(socketio):
     
     @socketio.on('join_conversation')
     def handle_join(data):
-        conversation_id = data.get('conversation_id')
-        if conversation_id:
+        conversation_id_lst = data.get('conversation_id_lst')
+        if conversation_id_lst != []:
             # Cast to string to ensure consistent room naming
-            join_room(str(conversation_id))
+            for conversation_id in conversation_id_lst:
+                join_room(str(conversation_id))
             # print(f"User joined room: {conversation_id}")
 
     @socketio.on('send_message')
