@@ -131,6 +131,7 @@ const Chat = ({ target = null }) => {
                         // 3. Put newMsg at the END of the array so it shows up at the bottom
                         setMessages((prevMessages) => [newMsg, ...prevMessages]);
                     } else {
+                        console.log('setting on read message')
                         setFriendsList((prevFriends) =>
                             prevFriends.map((friend) =>
                                 friend.conversation_id === income_conversation_id
