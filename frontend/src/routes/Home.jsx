@@ -1,4 +1,4 @@
-import "./home.css";
+import "./Home.css";
 import controllerImg from "../assets/controller.png"
 import teamify_title from "../assets/Teamify.png"
 import { useNavigate } from "react-router-dom"
