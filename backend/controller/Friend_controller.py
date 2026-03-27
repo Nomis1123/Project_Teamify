@@ -15,7 +15,7 @@ def get_user_friends():
     try:
         data = Friend.get_all_for_user(int(current_user_id))
         friends = data.get("friends", [])
-        pending_requests = data.get("requests", [])
+        pending_requests = data.get("pending_requests", [])
         # Apply pagination by splicing list
         paginated_friends = friends[offset:offset + limit]
         return jsonify({
