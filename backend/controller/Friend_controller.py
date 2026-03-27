@@ -50,7 +50,7 @@ def accept_friend():
 @jwt_required()
 def search_user():
     """
-    GET /api/friends/search?search=<search>
+    GET /api/friends/search?search=<search>&limit=<limit>&offset=<offset>
     Returns a list of users that matches the substring <search>
     """
     user_id = get_jwt_identity()
