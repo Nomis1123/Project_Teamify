@@ -76,12 +76,11 @@ class Friend:
         # offset = how far we've scrolled down the list for pagination
         conn = get_db_connection()
         search = search.strip()
-        if not search:
-            return []
-        
+            
         try:
             with conn.cursor() as cur:
-                base_query = """
+                # Base query
+                query = """
                     SELECT u.id, u.username, u.email, u.steam_id, u.description, u.profile_picture_url
                     FROM users u
                     JOIN friends f
@@ -89,19 +88,22 @@ class Friend:
                             (f.user_id_1 = %s AND f.user_id_2 = u.id) OR
                             (f.user_id_2 = %s AND f.user_id_1 = u.id)
                         )
-                        AND f.status = 'accepted'
-                    WHERE u.id != %s
-                        AND u.username ILIKE %s
-                    ORDER BY u.username
-                    LIMIT %s OFFSET %s
+                    WHERE f.status = 'accepted' AND u.id != %s
                 """
-                # Default ordering sorts by username
-                # " ORDER BY username"
-                # Pagination
-                # " LIMIT %s OFFSET %s"
-                params = [user_id, user_id, user_id, f"%{search}%", limit, offset]
-                cur.execute(base_query, params)
-                columns = ['id', 'username', 'email', 'steam_id', 'description', 'avatar', 'friend']
+
+                params = [user_id, user_id, user_id]
+
+                # Add search condition only if search is provided
+                if search:
+                    query += " AND u.username ILIKE %s"
+                    params.append(f"%{search}%")
+
+                # Always order in alphabetical order and paginate
+                query += " ORDER BY u.username LIMIT %s OFFSET %s"
+                params.extend([limit, offset])
+
+                cur.execute(query, params)
+                columns = ['id', 'username', 'email', 'steam_id', 'description', 'avatar']
                 rows = cur.fetchall()
                 users = [dict(zip(columns, row)) for row in rows]
                 return users

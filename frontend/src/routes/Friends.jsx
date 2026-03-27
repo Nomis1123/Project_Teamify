@@ -52,11 +52,13 @@ const Friends = () => {
     const [showPU2, setShowPU2] = useState(false)
     const [selectedUser, setSelectedUser] = useState(null)
     const [selectedId, setSelectedId] = useState(null)
+    const [page, setPage] = useState(0);  
+    const PAGE_SIZE = 10;
 
     // fetch the list of friends from backend upon page load
     useEffect(() => {
         const init = async () => {
-            await getFriendsAndRequests();
+            await getFriendsAndRequests(page);
             //setUsers(placeboUsers); // switch to data later
         }
         init();
@@ -71,9 +73,10 @@ const Friends = () => {
         setUsers(prev => [...prev, newUser]);
     };
 
-    const getFriendsAndRequests = async () =>  {
+    const getFriendsAndRequests = async (pageNum = 0) =>  {
          try {
-            const response = await fetch("/api/friends", {
+            const offset = pageNum * PAGE_SIZE;
+            const response = await fetch(`/api/friends?limit=${PAGE_SIZE}&offset=${offset}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -98,10 +101,13 @@ const Friends = () => {
     }
 
     // sends a text obj as username and receives the matching user(s)
-    const onSearchSubmit = async (text) => {
-       try {
-            console.log(text)
-            const response = await fetch(`/api/friends/search?search=${encodeURIComponent(text)}`, {
+    const onSearchSubmit = async (text, pageNum = 0) => {
+        const trimmed = text.trim();
+        if (!trimmed) return; // ignore empty space or spaces only
+        try {
+            console.log(trimmed)
+            const offset = pageNum * PAGE_SIZE;
+            const response = await fetch(`/api/friends/search?search=${encodeURIComponent(trimmed)}&limit=${PAGE_SIZE}&offset=${offset}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -122,10 +128,16 @@ const Friends = () => {
             console.error("Error fetching users:", error)
         }
     }
+
+    const handleSearch = (pageNum = 0) => {
+        // Deals with empty space inputs
+        const trimmed = search.trim();
+        trimmed ? onSearchSubmit(trimmed, pageNum) : getFriendsAndRequests(pageNum);
+    };
     
     return (
         <div className="layout-friends">
-            <PUFriendRequest user={selectedUser} open={showPU2} onClose={() => setShowPU2(false)} onAddFriend={getFriendsAndRequests} />
+            <PUFriendRequest user={selectedUser} open={showPU2} onClose={() => setShowPU2(false)} onAddFriend={() => getFriendsAndRequests(page)} />
             <h1 className="title-friends">Player Connections</h1>
             <div className="top-bar">
 
@@ -140,7 +152,10 @@ const Friends = () => {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         onKeyDown={(e) => {
-                            if (e.key === "Enter") {onSearchSubmit();}
+                            if (e.key === "Enter") {
+                                setPage(0); // Reset to first page after search
+                                handleSearch(0);
+                            }
                         }}
                         className="search-input"
                     />
@@ -199,6 +214,31 @@ const Friends = () => {
                     <p>No friends found, visit the matchmaking page for more!</p>
                 </div>
             )}
+
+            <div className="pagination">
+                <button
+                    onClick={() => {
+                        /* Use Math.max because react does something funny if page becomes negative */
+                        const newPage = Math.max(0, page - 1);
+                        setPage(newPage);
+                        handleSearch(newPage)
+                    }}
+                    disabled={page === 0}
+                >
+                    Previous
+                </button>
+                <span>Page {page + 1}</span>
+                <button
+                    onClick={() => {
+                        const newPage = page + 1;
+                        setPage(newPage);
+                        handleSearch(newPage);
+                    }}
+                    disabled={users.length < PAGE_SIZE}
+                >
+                    {users.length < PAGE_SIZE ? "End" : "Next"}
+                </button>
+            </div>
         </div>
     )
 }
