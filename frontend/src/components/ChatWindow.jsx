@@ -44,7 +44,7 @@ export default function ChatWindow({messages, target, friends_list, user, sendMe
                                     <div className="chat-username-target">
                                         {targetUser.username}
                                     </div>
-                                    <div className="chat-message">
+                                    <div className="chat-message chat-message-target">
                                         {message.content}
                                     </div>
                                 </div>
@@ -60,7 +60,7 @@ export default function ChatWindow({messages, target, friends_list, user, sendMe
                                     <div className="chat-username-user">
                                         {user.username}
                                     </div>
-                                    <div className="chat-message">
+                                    <div className="chat-message chat-message-user">
                                         {message.content}
                                     </div>
                                 </div>
