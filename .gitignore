@@ -1,4 +1,5 @@
 frontend/node_modules/*
+backend/web-backend-dev
 
 .DS_Store
 
