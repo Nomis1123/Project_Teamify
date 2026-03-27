@@ -34,6 +34,9 @@ const Navbar = ( {user, setUser} ) => {
             </Link>
             <div className="nav-center-right">
                 <div className="nav-center">
+                    <Link to="/" className="home">
+                        Home
+                    </Link>
                     <Link to="/profile" className="profile">
                         Profile
                     </Link>

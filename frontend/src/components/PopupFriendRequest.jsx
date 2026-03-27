@@ -48,11 +48,36 @@ export default function PUFriendRequest({ open, onClose, onAddFriend}) {
     //when popup loads, call the list of friend requests
     useEffect(() => {
         const init = async () => {
-            //const data = await getFriends();
-            setUsers(placeboUsers); // switch to data later
+            await getFriendsAndRequests();
+            //setUsers(placeboUsers); // switch to data later
         }
         init();
     }, []);
+
+    const getFriendsAndRequests = async () =>  {
+         try {
+            const response = await fetch("/api/friends", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                },
+                credentials: "include",
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to fetch users")
+            }
+
+            const data = await response.json()
+            setUsers(data.pending_requests);        
+            console.log(data)
+            return data
+        
+        } catch (error) {
+            console.error("Error fetching users:", error)
+        }
+    }
 
     // remove user from friend request list
     async function removePerson(userID){
@@ -64,8 +89,8 @@ export default function PUFriendRequest({ open, onClose, onAddFriend}) {
         setFail("");
         setFrError("");
         try {
-            const res = await fetch("/api/users/reject", { // fake endpoint 
-                method: "PATCH",
+            const res = await fetch(`/api/friends/requests/${userID}`, {
+                method: "DELETE",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
             });
 
@@ -156,7 +181,7 @@ export default function PUFriendRequest({ open, onClose, onAddFriend}) {
                                             <img src={checkmark} className="accept-icon"/>
                                         </button>
             
-                                        <button class="unfriend" onClick={() => {rejectFR(user.id);}} >
+                                        <button className="unfriend" onClick={() => {rejectFR(user.id);}} >
                                             <img src={X}  className="unfriend-icon"/>
                                         </button>
                                     </div>
