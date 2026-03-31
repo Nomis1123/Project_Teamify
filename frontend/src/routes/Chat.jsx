@@ -67,6 +67,7 @@ const Chat = ({ target = null }) => {
     }, []);
 
     useEffect(() => {
+        let isMounted = true; // <-- 1. Add this flag
         let socket;
 
         const loadMe = async () => {
@@ -113,6 +114,7 @@ const Chat = ({ target = null }) => {
 
                     // 2. Map the payload to match the database schema that ChatWindow expects
                     const newMsg = {
+                        id: msg.id,
                         content: msg.message,
                         sender_id: msg.sender,
                         created_at: new Date(msg.timestamp).toLocaleString([], {
@@ -124,8 +126,11 @@ const Chat = ({ target = null }) => {
                     };
 
                     if (income_conversation_id === activeConvoRef.current) {
-                        // 3. Put newMsg at the END of the array so it shows up at the bottom
-                        setMessages((prevMessages) => [newMsg, ...prevMessages]);
+                        setMessages((prevMessages) => {
+                            // <-- ADD THE SHIELD: If the message ID is already on screen, ignore it!
+                            if (prevMessages.some(m => m.id === newMsg.id)) return prevMessages;
+                            return [newMsg, ...prevMessages];
+                        });
                     } else {
                         setFriendsList((prevFriends) =>
                             prevFriends.map((friend) =>
@@ -155,6 +160,7 @@ const Chat = ({ target = null }) => {
         loadMe();
 
         return () => {
+            isMounted = false; // <-- 3. Trip the flag when the component unmounts
             if (socket) {
                 socket.disconnect();
             }
@@ -162,7 +168,7 @@ const Chat = ({ target = null }) => {
     }, []);
 
     useEffect(() => {
-        if (friends_list != []) {
+        if (friends_list.length > 0) {
             setConvidList(friends_list.map(friend => friend.conversation_id));
         }
     }, [friends_list]);
@@ -211,6 +217,7 @@ const Chat = ({ target = null }) => {
                     const data = await res.json();
                     // console.log("########## message data:", data);
                     const normalized_messages = data.map((msg) => ({
+                        id: msg.id,
                         content: msg.content,
                         sender_id: msg.sender_id,
                         created_at: new Date(msg.created_at).toLocaleString([], {
