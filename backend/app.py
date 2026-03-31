@@ -3,7 +3,7 @@ from controller.extensions import jwt
 from dotenv import load_dotenv
 
 from flask import Flask
-from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, sync_games, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image
+from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, sync_games, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image, get_missing_games
 from controller.Friend_controller import (
     get_user_friends, accept_friend, send_friend_request, 
     reject_friend_request, remove_friend
@@ -92,6 +92,8 @@ app.add_url_rule('/api/user/sort', view_func=sort_matches, methods=["POST"])
 ## 6. Uploads
 app.add_url_rule('/uploads/<filename>', view_func=retrieve_image, methods=['GET'])
 
+# Games
+app.add_url_rule('/api/users/me/unowned', view_func=get_missing_games, methods=['GET'])
 
 # Chat
 
