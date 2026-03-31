@@ -4,8 +4,6 @@ import Popup from "./Popup"
 
 export default function PUGRR({games, gameModifier, which}) {
     const [open, setOpen] = useState(false);
-    // const [rank, setRank] = useState(['Iron', 'Silver', 'Gold']);
-    // const [role, setRole] = useState(['Top', 'Support', 'ADC']);
     const [rank, setRank] = useState([]);
     const [role, setRole] = useState([]);
     const [selectedRank, setSelectedRank] = useState('');
@@ -16,10 +14,9 @@ export default function PUGRR({games, gameModifier, which}) {
     async function handleGet() {
         setFail("");
         try {
-            const res = await fetch("/api/user/???", {
-                method: "POST",
+            const res = await fetch(`/api/games/?${games[which].id}`, {
+                method: "GET",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
-                body: { 'title': games[which]['title']},
             });
             if (!res.ok) {
                 setFail(`Failed to fetch game rank and role data. Please try again later.`);
