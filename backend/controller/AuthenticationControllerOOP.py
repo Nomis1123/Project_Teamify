@@ -714,3 +714,49 @@ def get_all_games():
             cur.close()
         if conn:
             conn.close()
+
+def get_game_details(game_id):
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        # We don't need RealDictCursor here since we just want flat strings
+        cur = conn.cursor()
+        
+        # 1. Fetch just the name, but still order by tier_level so they are sorted right
+        cur.execute("""
+            SELECT name 
+            FROM game_ranks 
+            WHERE game_id = %s 
+            ORDER BY tier_level ASC;
+        """, (game_id,))
+        
+        # cur.fetchall() returns a list of tuples like: [('Bronze 5',), ('Bronze 4',)]
+        # This list comprehension extracts just the string into a flat list
+        ranks = [row[0] for row in cur.fetchall()]
+        
+        # 2. Fetch just the name for roles
+        cur.execute("""
+            SELECT name 
+            FROM game_roles 
+            WHERE game_id = %s 
+            ORDER BY id ASC;
+        """, (game_id,))
+        
+        roles = [row[0] for row in cur.fetchall()]
+        
+        # 3. Combine and return
+        return jsonify({
+            "ranks": ranks,
+            "roles": roles
+        }), 200
+
+    except Exception as e:
+        print(f"Database error fetching game details for game {game_id}: {e}")
+        return jsonify({"status": "Failed to fetch game details"}), 500
+        
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()

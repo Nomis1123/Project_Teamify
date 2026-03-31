@@ -3,7 +3,7 @@ from controller.extensions import jwt
 from dotenv import load_dotenv
 
 from flask import Flask
-from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, sync_games, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image, get_missing_games, get_all_games
+from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, sync_games, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image, get_missing_games, get_all_games, get_game_details
 from controller.Friend_controller import (
     get_user_friends, accept_friend, send_friend_request, 
     reject_friend_request, remove_friend
@@ -99,6 +99,10 @@ app.add_url_rule('/api/users/me/unowned', view_func=get_missing_games, methods=[
 
 # get a list of all games
 app.add_url_rule('/api/games', view_func=get_all_games, methods=['GET'])
+
+
+# get ranks and roles of a game
+app.add_url_rule('/api/games/<int:game_id>', view_func=get_game_details, methods=['GET'])
 
 # Chat
 
