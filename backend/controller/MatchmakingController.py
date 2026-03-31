@@ -64,7 +64,8 @@ def sort_matches():
     sorted_data = []
 
     if data['sort'] == 'name':
-        sorted_data = sorted(data['users'], key=lambda x: x['username'])
+        print ('sorting by name')
+        sorted_data = sorted(data['users'], key=lambda x: x['username'].lower())
     elif data['sort'] == 'availability':
         sorted_data = sorted(data['users'], key=lambda x: x['matchmaking_score'], reverse=True)
     else:

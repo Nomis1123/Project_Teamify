@@ -41,12 +41,8 @@ const ProfileEdit = () => {
     const [email, setEmail] = useState("");
     const [description, setDescription] = useState("");
     const [schedule, setSchedule] = useState(defaultWeeklySchedule);
-    // const [games, setGame] = useState([{'title': 'minecraft', 'url': 'src/gameImages/minecraft.webp'},
-    //     {'title': 'lol', 'url': 'src/gameImages/lol.webp', 'rank': 'Gold', 'role': 'Top'},
-    // ]);
     const [games, setGame] = useState([]);
     const [loading, setLoading] = useState(true);
-    // const [error, setError] = useState("");
 
     useEffect(() => {
         const loadMe = async () => {
@@ -73,7 +69,7 @@ const ProfileEdit = () => {
                     email: data.user.email ?? "",
                     description: data.user.description ?? "",
                     profile_picture: data.user.pfp_url ?? "",
-                    games: Array.isArray(data.games) ? data.user.games : [],
+                    games: Array.isArray(data.user.owned_games) ? data.user.owned_games : [],
                     schedule: days.reduce((acc, day) => {
                         // console.log("schedule:", day, data.schedule[day]);
                         const d = data.user.availability?.[day] ?? defaultDailySchedule;
@@ -108,26 +104,6 @@ const ProfileEdit = () => {
     useEffect(() => {
         console.log("user state updated:", user.id);
     }, [user]);
-    // Test:
-    // useEffect(() => {
-    //     setUser({
-    //         uid: "user123",
-    //         username: "TestUser",
-    //         email: "testingemail@123.com"
-    //         description: "Hello I am a new user",
-    //         profileImageUrl: "",
-    //         games: [],
-    //         schedule: {
-    //         Monday: { morning: true, afternoon: false, night: true },
-    //         Tuesday: { morning: false, afternoon: false, night: false },
-    //         Wednesday: { morning: false, afternoon: true, night: false },
-    //         Thursday: { morning: true, afternoon: true, night: true },
-    //         Friday: { morning: false, afternoon: true, night: true },
-    //         Saturday: { morning: true, afternoon: false, night: false },
-    //         Sunday: { morning: false, afternoon: false, night: true },
-    //         },
-    //     });
-    // }, []);
 
     async function linkSteamGames() {
         try {

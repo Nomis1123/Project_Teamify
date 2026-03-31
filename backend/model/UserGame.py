@@ -44,7 +44,7 @@ class UserGame:
                     FROM users u
                     LEFT JOIN user_games ug ON u.id = ug.user_id
                     LEFT JOIN games g ON ug.game_id = g.id
-                    WHERE u.id != %s AND u.is_verified = TRUE
+                    WHERE u.id != %s
                 """
                 params.append(current_user_id)
 

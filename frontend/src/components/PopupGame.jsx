@@ -6,7 +6,6 @@ export default function PUGame({games, gameModifier, which, isAdding}) {
     const [open, setOpen] = useState(false);
     const [selected, setSelected] = useState(null);
     const [selectedIndex, setSelectedIndex] = useState(null);
-    // const [unselected, setUnselected] = useState([{'title': 'minecraft', 'url': 'src/gameImages/minecraft.webp'},]);
     const [unselected, setUnselected] = useState([]);
     const [isSaving, setIsSaving] = useState(false);
     const [gmeFail, setFail] = useState("");
@@ -14,7 +13,7 @@ export default function PUGame({games, gameModifier, which, isAdding}) {
     async function handleGet() {
         setFail("");
         try {
-            const res = await fetch("/api/user/???", {
+            const res = await fetch("/api/users/me/unowned", {
                 method: "GET",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
             });
@@ -22,8 +21,13 @@ export default function PUGame({games, gameModifier, which, isAdding}) {
                 setFail(`Failed to fetch game data. Please try again later.`);
             }
             const data = await res.json();
-            console.log(data);
-            setUnselected(data.unselected);
+            // console.log(data);
+            const normalized_games = data.map((game) => ({
+                id: game.id ?? "", 
+                title: game.title ?? "",
+                url: game.thumbnail_url ?? null,
+            }));
+            setUnselected(normalized_games);
         } catch (e) {
             setFail(`Failed to fetch game data. Please try again later.`);
         } finally {
@@ -50,11 +54,10 @@ export default function PUGame({games, gameModifier, which, isAdding}) {
             const res = await fetch("/api/user/me", {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
-                body: JSON.stringify({ games: update }),
+                body: JSON.stringify({ owned_games: update }),
             });
 
             if (!res.ok) {
-                // backend might return JSON error { message: "..." }
                 setFail(`Save failed. Please try again later. (${res.status})`);
                 let msg = "";
                 try {
@@ -68,7 +71,6 @@ export default function PUGame({games, gameModifier, which, isAdding}) {
             handleClose();
             gameModifier(update);
         } catch (e) {
-            // setFail(e instanceof Error ? e.message : "Save failed.");
             setFail(`Save failed. Please try again later. (${e.message})`);
         } finally {
             setIsSaving(false);
@@ -102,14 +104,14 @@ export default function PUGame({games, gameModifier, which, isAdding}) {
                 <div style={{ display: "flex", gap: 8 }}>
                     {unselected.length > 0 && (
                         <div className="game-input-container">
-                            {unselected.map(({ title, url }, index) => (
+                            {unselected.map(({ id, title, url }, index) => (
                                 <img
                                     key={`${title}-${index}`}
                                     className={`popup-game-image ${selectedIndex === index ? "popup-game-selected" : ""}`}
                                     src={url}
                                     alt={title}
                                     onClick={() => {
-                                        setSelected({ title, url });
+                                        setSelected({ id, title, url });
                                         setSelectedIndex(index);
                                     }}
                                 />
