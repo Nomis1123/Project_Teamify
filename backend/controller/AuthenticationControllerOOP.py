@@ -163,13 +163,19 @@ def login():
 def steam_login():
     # Get userID
     user_id = get_jwt_identity()
+    print(user_id)
+
+    # Construct url for redirect - Flask will automatically append user_id as a query parameter
+    return_url = url_for("steam_verify", user_id=user_id, _external=True)
+    realm = request.host_url
 
     # Store info to link SteamID to UserID later
-    session["Account_Link_Steam"] = user_id
+    #session["Account_Link_Steam"] = user_id
 
     # Construct url for redirect
-    return_url = url_for("steam_verify", _external=True)
-    realm = request.host_url
+   # return_url = url_for("steam_verify", _external=True)
+   # realm = request.host_url
+
     params = {"openid.ns": "http://specs.openid.net/auth/2.0",
               "openid.mode": "checkid_setup",
               "openid.return_to": return_url,
@@ -185,7 +191,11 @@ def steam_login():
 # Steam redirects users here after logging in to Steam
 def steam_verify():
     # Get UserID stored before linking
-    user_id = session.get("Account_Link_Steam")
+
+    user_id = request.args.get("user_id")
+    #user_id = session.get("Account_Link_Steam")
+
+    print (user_id)
     if not user_id:
         return jsonify({"status": "Steam link session expired"}), 400
 
@@ -222,7 +232,8 @@ def steam_verify():
         user.update({"steam_id": steam_id})
     except Exception as e:
         pass # temp placeholder
-    session.pop("Account_Link_Steam", None)
+
+    #session.pop("Account_Link_Steam", None)
 
     # Redirect back to profile page
     return redirect("http://localhost:5173/profile")
