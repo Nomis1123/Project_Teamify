@@ -89,6 +89,7 @@ const Matchmaking = () => {
     const [selectedUserid, setSelectedUserid] = useState(null)
     const [successMessage, setSuccessMessage] = useState("");
     const [page, setPage] = useState(0);  
+    const [games, setGames] = useState([])
     const PAGE_SIZE = 10;   
 
     //const [showAvailability, setShowAvailability] = useState(false);
@@ -152,6 +153,23 @@ const Matchmaking = () => {
             return () => clearTimeout(timer);
         }
     }, [successMessage]);
+
+    useEffect(() => {
+        const fetchGames = async () => {
+            try {
+                const response = await fetch("/api/games", {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+                    }
+                })
+                const data = await response.json()
+                setGames(data)
+            } catch (error) {
+                console.error("Error fetching games:", error)
+            }
+        }
+        fetchGames()
+    }, [])
 
     const handleApplyFilters = async () =>  {
         setPage(0);
@@ -247,12 +265,11 @@ const Matchmaking = () => {
 
                             <select value={game} onChange={(e) => setGame(e.target.value)}>
                                 <option value="all">All Games &#9662;</option>
-                                <option value="League">League of Legends</option>
-                                <option value="Valorant">Valorant</option>
-                                <option value="Minecraft">Minecraft</option>
-                                <option value="PUBG">PUBG</option>
-                                <option value="7dtd">7dtd</option>
-                                <option value="Apex">Apex Legends</option>
+                                {games.map((g) => (
+                                    <option key={g.id} value={g.title}>
+                                        {g.title}
+                                    </option>
+                                ))}
                             </select>
                         </div>
 
