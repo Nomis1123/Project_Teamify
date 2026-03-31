@@ -674,3 +674,33 @@ def get_missing_games():
             cur.close()
         if conn:
             conn.close()
+
+def get_all_games():
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        # Use RealDictCursor to return a list of dictionaries for JSON
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+
+        # Select just the fields you requested, ordered alphabetically
+        query = """
+            SELECT id, title, thumbnail_url 
+            FROM games 
+            ORDER BY title ASC;
+        """
+
+        cur.execute(query)
+        games = cur.fetchall()
+
+        return jsonify(games), 200
+
+    except Exception as e:
+        print(f"Database error fetching master game list: {e}")
+        return jsonify({"status": "Failed to fetch games"}), 500
+
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
