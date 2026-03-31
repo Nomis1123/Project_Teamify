@@ -5,7 +5,7 @@ TRUNCATE users, games, user_games RESTART IDENTITY CASCADE;
 INSERT INTO games (title, genre, developer) VALUES 
 ('Valorant', 'FPS', 'Riot Games'),
 ('PUBG', 'Battle Royale', 'Krafton'),
-('League', 'MOBA', 'Riot Games'),
+('League of Legends', 'MOBA', 'Riot Games'),
 ('Minecraft', 'Sandbox', 'Mojang'),
 ('Apex Legends', 'Battle Royale', 'Respawn');
 
