@@ -6,12 +6,22 @@ from friends import Friend # Import the new model we discussed
 def get_user_friends():
     """
     GET /api/friends
+    also needs to support /api/friends?limit=10&offset=0 for pagination with empty search
     Returns the user's friend list and pending requests.
     """
     current_user_id = get_jwt_identity()
+    limit = request.args.get("limit", 10, type=int) # Display limit of 10 users for now
+    offset = request.args.get("offset", 0, type=int) # For Pagination
     try:
         data = Friend.get_all_for_user(int(current_user_id))
-        return jsonify(data), 200
+        friends = data.get("friends", [])
+        pending_requests = data.get("pending_requests", [])
+        # Apply pagination by splicing list
+        paginated_friends = friends[offset:offset + limit]
+        return jsonify({
+            "friends": paginated_friends,
+            "pending_requests": pending_requests
+        }), 200
     except Exception as e:
         return jsonify({"status": f"Error fetching friends: {str(e)}"}), 500
 
@@ -35,6 +45,30 @@ def accept_friend():
         return jsonify({"status": "success", "message": "Friendship established"}), 200
     else:
         return jsonify({"status": "error", "message": "Database update failed"}), 500
+
+
+@jwt_required()
+def search_user():
+    """
+    GET /api/friends/search?search=<search>&limit=<limit>&offset=<offset>
+    Returns a list of users that matches the substring <search>
+    """
+    user_id = get_jwt_identity()
+
+    search = request.args.get("search", "", type=str).strip()
+    if not search:
+        return jsonify([]), 200
+    
+    # print("searched for:",search)
+    limit = request.args.get("limit", 10, type=int)   # how many to load, for now try out 10
+    offset = request.args.get("offset", 0, type=int)  # how far we've paginated
+
+    try:
+        users = Friend.search_username(user_id, search, limit, offset)
+        return jsonify(users), 200
+
+    except Exception as e:
+        return jsonify({"status": f"Database error: {str(e)}"}), 500
     
 
 

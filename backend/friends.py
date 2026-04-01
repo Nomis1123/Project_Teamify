@@ -71,6 +71,52 @@ class Friend:
             conn.close()
 
     @staticmethod
+    def search_username(user_id, search="", limit=10, offset=0):
+        # limit = how many users to display
+        # offset = how far we've scrolled down the list for pagination
+        conn = get_db_connection()
+        search = search.strip()
+            
+        try:
+            with conn.cursor() as cur:
+                # Base query
+                query = """
+                    SELECT u.id, u.username, u.email, u.steam_id, u.description, u.profile_picture_url
+                    FROM users u
+                    JOIN friends f
+                        ON (
+                            (f.user_id_1 = %s AND f.user_id_2 = u.id) OR
+                            (f.user_id_2 = %s AND f.user_id_1 = u.id)
+                        )
+                    WHERE f.status = 'accepted' AND u.id != %s
+                """
+
+                params = [user_id, user_id, user_id]
+
+                # Add search condition only if search is provided
+                if search:
+                    query += " AND u.username ILIKE %s"
+                    params.append(f"%{search}%")
+
+                # Always order in alphabetical order and paginate
+                query += " ORDER BY u.username LIMIT %s OFFSET %s"
+                params.extend([limit, offset])
+
+                cur.execute(query, params)
+                columns = ['id', 'username', 'email', 'steam_id', 'description', 'avatar']
+                rows = cur.fetchall()
+                users = [dict(zip(columns, row)) for row in rows]
+                return users
+
+        except Exception as e:
+            if conn:
+                conn.rollback()
+            raise e 
+
+        finally:
+            if conn:
+                conn.close()
+
     def get_relationship_status(user_id, target_id):
         """
         [Helper] Checks the current database status of a relationship.
