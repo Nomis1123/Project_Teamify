@@ -17,6 +17,6 @@ CREATE TABLE game_roles (
     icon_url TEXT
 );
 
---ALTER TABLE user_games 
+ALTER TABLE user_games 
 ADD COLUMN rank_id INT REFERENCES game_ranks(id) ON DELETE SET NULL,
 ADD COLUMN role_id INT REFERENCES game_roles(id) ON DELETE SET NULL;
