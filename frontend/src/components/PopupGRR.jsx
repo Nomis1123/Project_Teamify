@@ -14,7 +14,7 @@ export default function PUGRR({games, gameModifier, which}) {
     async function handleGet() {
         setFail("");
         try {
-            const res = await fetch(`/api/games/?${games[which].id}`, {
+            const res = await fetch(`/api/games/${games[which].id}`, {
                 method: "GET",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
             });
@@ -23,8 +23,8 @@ export default function PUGRR({games, gameModifier, which}) {
             }
             const data = await res.json();
             console.log(data);
-            setRank(data.rank);
-            setRole(data.role);
+            setRank(data.ranks);
+            setRole(data.roles);
         } catch (e) {
             setFail(`Failed to fetch game rank and role data. Please try again later.`);
         } finally {
@@ -41,7 +41,8 @@ export default function PUGRR({games, gameModifier, which}) {
                 const u = [...games];
                 const replacement = {}
                 replacement['title'] = u[which]['title'];
-                replacement['url'] = u[which]['url'];
+                replacement['thumbnail_url'] = u[which]['thumbnail_url'];
+                replacement['id'] = u[which]['id'];
 
                 if (selectedRank != '') {
                     replacement['rank'] = selectedRank;
@@ -58,7 +59,7 @@ export default function PUGRR({games, gameModifier, which}) {
             const res = await fetch("/api/user/me", {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
-                body: JSON.stringify({ games: update }),
+                body: JSON.stringify({ owned_games: update }),
             });
 
             if (!res.ok) {

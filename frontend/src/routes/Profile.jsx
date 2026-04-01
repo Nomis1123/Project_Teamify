@@ -173,45 +173,15 @@ const Profile = () => {
                             </div>
                         }
                         {user.games.length >= 1 && 
-                            <div className='profile-game-image-text-container'>
-                                <img className='profile-game-image' src={user.games[0]['url']} alt={user.games[0]['title']} />
-                                <span>{user.games[0]['title']}</span>
-                                {'rank' in user.games[0] && <span>Rank: {user.games[0]['rank']}</span>}
-                                {'role' in user.games[0] && <span>Role: {user.games[0]['role']}</span>}
-                            </div>
-                        }
-                        {user.games.length >= 2 && 
-                            <div className='profile-game-image-text-container'>
-                                <img className='profile-game-image' src={user.games[1]['url']} alt={user.games[1]['title']} />
-                                <span>{user.games[1]['title']}</span>
-                                {'rank' in user.games[1] && <span>Rank: {user.games[1]['rank']}</span>}
-                                {'role' in user.games[1] && <span>Role: {user.games[1]['role']}</span>}
-                            </div>
-                        }
-                        {user.games.length >= 3 && 
-                            <div className='profile-game-image-text-container'>
-                                <img className='profile-game-image' src={user.games[2]['url']} alt={user.games[2]['title']} />
-                                <span>{user.games[2]['title']}</span>
-                                {'rank' in user.games[2] && <span>Rank: {user.games[2]['rank']}</span>}
-                                {'role' in user.games[2] && <span>Role: {user.games[2]['role']}</span>}
-                            </div>
-                        }
-                        {user.games.length >= 4 && 
-                            <div className='profile-game-image-text-container'>
-                                <img className='profile-game-image' src={user.games[3]['url']} alt={user.games[3]['title']} />
-                                <span>{user.games[3]['title']}</span>
-                                {'rank' in user.games[3] && <span>Rank: {user.games[3]['rank']}</span>}
-                                {'role' in user.games[3] && <span>Role: {user.games[3]['role']}</span>}
-                            </div>
-                        }
-                        {user.games.length === 5 && 
-                            <div className='profile-game-image-text-container'>
-                                <img className='profile-game-image' src={user.games[4]['url']} alt={user.games[4]['title']} />
-                                <span>{user.games[4]['title']}</span>
-                                {'rank' in user.games[4] && <span>Rank: {user.games[4]['rank']}</span>}
-                                {'role' in user.games[4] && <span>Role: {user.games[4]['role']}</span>}
-                            </div>
-                        }
+                            user.games.map((game, index) => (
+                                <div className='profile-game-image-text-container' key={index}>
+                                    <img className='profile-game-image' src={game.thumbnail_url} alt={game.title} />
+                                    <div className='profile-game-text'>{game.title}</div>
+                                    {game.rank && <span>Rank: {game.rank}</span>}
+                                    {game.role && <span>Role: {game.role}</span>}
+                                </div>
+                            )
+                        )}
                     </div>
                 </div>
             

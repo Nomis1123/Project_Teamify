@@ -25,7 +25,7 @@ export default function PUGame({games, gameModifier, which, isAdding}) {
             const normalized_games = data.map((game) => ({
                 id: game.id ?? "", 
                 title: game.title ?? "",
-                url: game.thumbnail_url ?? null,
+                thumbnail_url: game.thumbnail_url ?? null,
             }));
             setUnselected(normalized_games);
         } catch (e) {
@@ -89,8 +89,8 @@ export default function PUGame({games, gameModifier, which, isAdding}) {
         <div className="element-game">
             {which != null? 
                 <button className="btn-game btn-game-image" onClick={() => {setOpen(true); handleGet();}}>
-                    <img className="popup-game-image" src={games[which]['url']} alt={games[which]['title']} />
-                    <span>{games[which]['title']}</span>
+                    <img className="popup-game-image" src={games[which]['thumbnail_url']} alt={games[which]['title']} />
+                    <div className="popup-game-text">{games[which]['title']}</div>
                 </button> :
                 <button className="btn-game btn-game-image" onClick={() => {setOpen(true); handleGet();}}>
                     <img className="popup-game-image" src={"src/gameImages/select.webp"} alt={"Select Your Game"} />
@@ -104,14 +104,14 @@ export default function PUGame({games, gameModifier, which, isAdding}) {
                 <div style={{ display: "flex", gap: 8 }}>
                     {unselected.length > 0 && (
                         <div className="game-input-container">
-                            {unselected.map(({ id, title, url }, index) => (
+                            {unselected.map(({ id, title, thumbnail_url }, index) => (
                                 <img
                                     key={`${title}-${index}`}
                                     className={`popup-game-image ${selectedIndex === index ? "popup-game-selected" : ""}`}
-                                    src={url}
+                                    src={thumbnail_url}
                                     alt={title}
                                     onClick={() => {
-                                        setSelected({ id, title, url });
+                                        setSelected({ id, title, thumbnail_url });
                                         setSelectedIndex(index);
                                     }}
                                 />

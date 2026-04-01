@@ -97,6 +97,13 @@
   border: 2px solid rgba(255,255,255,0.2);
 }
 
+.popup-game-text {
+  width: 140px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
 .popup-game-selected {
   border-color: rgb(80, 120, 255);
   border-width: 3px;

@@ -4,15 +4,17 @@ import "./ChatWindow.css";
 export default function ChatWindow({messages, target, friends_list, user, sendMessage}) {
     const targetUser = friends_list.find((u) => u.userid === target);
 
-     // ADD THIS GUARD:
-    if (!user || !targetUser) {
-        return <div style={{ color: "white", padding: "20px" }}>Loading chat data...</div>;
-    }   const [input, setInput] = useState("");
+    const [input, setInput] = useState("");
 
     useEffect(() => {
         // console.log("############## Resetting input box ###############");
         setInput("");
     }, [target]);
+
+     // ADD THIS GUARD:
+    if (!user || !targetUser) {
+        return <div style={{ color: "white", padding: "20px" }}>Loading chat data...</div>;
+    }   
 
     return (
         <div className="chat-window-section">

@@ -189,37 +189,14 @@ const ProfileEdit = () => {
                     <div className="profile-game-bar">
                         {/* The image sources are temporary. Replace with game icons and name after.
                             I still have to modify this so that it accept game image and name from db. */}
-
                         {games.length >= 1 && 
-                            <div className='profile-game-image-text-container'>
-                                <PUGame games={games} gameModifier={setGame} which={0} isAdding={false}/>
-                                <PUGRR games={games} gameModifier={setGame} which={0}/>
-                            </div>
-                        }
-                        {games.length >= 2 && 
-                            <div className='profile-game-image-text-container'>
-                                <PUGame games={games} gameModifier={setGame} which={1} isAdding={false}/>
-                                <PUGRR games={games} gameModifier={setGame} which={1}/>
-                            </div>
-                        }
-                        {games.length >= 3 && 
-                            <div className='profile-game-image-text-container'>
-                                <PUGame games={games} gameModifier={setGame} which={2} isAdding={false}/>
-                                <PUGRR games={games} gameModifier={setGame} which={2}/>
-                            </div>
-                        }
-                        {games.length >= 4 && 
-                            <div className='profile-game-image-text-container'>
-                                <PUGame games={games} gameModifier={setGame} which={3} isAdding={false}/>
-                                <PUGRR games={games} gameModifier={setGame} which={3}/>
-                            </div>
-                        }
-                        {games.length === 5 && 
-                            <div className='profile-game-image-text-container'>
-                                <PUGame games={games} gameModifier={setGame} which={4} isAdding={false}/>
-                                <PUGRR games={games} gameModifier={setGame} which={4}/>
-                            </div>
-                        }
+                            games.map((game, index) => (
+                                <div className='profile-game-image-text-container' key={index}>
+                                    <PUGame games={games} gameModifier={setGame} which={index} isAdding={false}/>
+                                    <PUGRR games={games} gameModifier={setGame} which={index}/>
+                                </div>
+                            )
+                        )}
 
                         {games.length < 5 && 
                             <div>
