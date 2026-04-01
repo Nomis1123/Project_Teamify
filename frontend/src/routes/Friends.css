@@ -249,3 +249,15 @@ html {
 }
 
 
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.pagination button{
+    background: rgb(169, 84, 234);
+}

@@ -5,8 +5,10 @@ import { useNavigate } from "react-router-dom";
 import ChatFriendsList from "../components/ChatFriendsList"
 import ChatWindow from '../components/ChatWindow';
 import { io } from "socket.io-client";
+import useRequireAuth from "../components/RequireAuth.jsx";
 
 const Chat = ({ target = null }) => {
+    useRequireAuth();
     //const [friends_list, setFriendsList] = useState([
     //    {username: "bbb", userid: 2, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: 1, unread: ""},
     //    {username: "ccc", userid: 3, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: 2, unread: ""},
