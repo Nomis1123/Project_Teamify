@@ -98,6 +98,8 @@ const Matchmaking = () => {
     const [successMessage, setSuccessMessage] = useState("");
     const [page, setPage] = useState(0);  
     const [games, setGames] = useState([])
+    const [ranks, setRanks] = useState([])
+    const [roles, setRoles] = useState([])
     const PAGE_SIZE = 10;   
 
     //const [showAvailability, setShowAvailability] = useState(false);
@@ -179,6 +181,31 @@ const Matchmaking = () => {
         fetchGames()
     }, [])
 
+    useEffect(() => {
+        if (game === "all") {
+            setRanks([])
+            setRoles([])
+            setRank("all")   // reset
+            setRole("all") 
+            return
+        }
+        // Find the selected game's id from the games array
+        const selectedGame = games.find(g => g.title === game)
+        if (!selectedGame) return
+
+        fetch(`/api/games/${selectedGame.id}`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem("access_token")}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+            setRanks(data.ranks)
+            setRoles(data.roles)
+            setRank("all")  // reset rank/role when game changes
+            setRole("all")
+        })
+        .catch(err => console.error("Error fetching game details:", err))
+    }, [game, games])
+
     const handleApplyFilters = async () =>  {
         setPage(0);
         const filters = await buildFilterObj(0);
@@ -197,7 +224,7 @@ const Matchmaking = () => {
     const onFilterSubmit = async (filters) => {
        try {
             console.log(filters)
-            const response = await fetch("/api/user/filters", {
+            const response = await fetch("/api/user/filters2", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -213,7 +240,7 @@ const Matchmaking = () => {
 
             const data = await response.json()
             user_list = data
-            console.log(data)
+            console.log("returned data", data)
             return data
         
         } catch (error) {
@@ -281,21 +308,18 @@ const Matchmaking = () => {
                             </select>
                         </div>
 
-                        <select value={rank} onChange={(e) => setRank(e.target.value)}>
+                       <select value={rank} onChange={(e) => setRank(e.target.value)}>
                             <option value="all">All Ranks &#9662;</option>
-                            <option value="Bronze">Bronze</option>
-                            <option value="Silver">Silver</option>
-                            <option value="Gold">Gold</option>
-                            <option value="Platinum">Platinum</option>
-                            <option value="Diamond">Diamond</option>
-                            <option value="Master">Master</option>
+                            {ranks.map((r) => (
+                                <option key={r} value={r}>{r}</option>
+                            ))}
                         </select>
 
                         <select value={role} onChange={(e) => setRole(e.target.value)}>
-                            <option value="all">All Roles &#9662; </option>
-                            <option value="Support">Support</option>
-                            <option value="DPS">DPS</option>
-                            <option value="Tank">Tank</option>
+                            <option value="all">All Roles &#9662;</option>
+                            {roles.map((r) => (
+                                <option key={r} value={r}>{r}</option>
+                            ))}
                         </select>
                         
                         <div className="header">
