@@ -3,18 +3,23 @@ from controller.extensions import jwt
 from dotenv import load_dotenv
 
 from flask import Flask
-from controller.AdminController import update_game
-from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, sync_games, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image
+from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, sync_games, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image, get_missing_games, get_all_games, get_game_details
 from controller.Friend_controller import (
     get_user_friends, accept_friend, send_friend_request,
     reject_friend_request, remove_friend
 )
 from controller.GamesController import get_games, retrieve_game_image
 from controller.MatchmakingController import get_matches, sort_matches
-from controller.ChatController import init_conversation, get_messages, register_chat_socket_events
 
+from controller.ChatController import init_conversation, get_messages, register_chat_socket_events, get_all_friends_conversations
 from flask_socketio import SocketIO
 
+from controller.AdminController import update_game
+from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, sync_games, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image
+from controller.ChatController import init_conversation, get_messages
+from controller.Friend_controller import get_user_friends, accept_friend
+from controller.GamesController import get_games, retrieve_game_image
+from controller.MatchmakingController import get_matches
 
 #, login, auth_verify, logout, getOrUpdate_availability
 #from controller.AuthenticationController import logout
@@ -102,6 +107,17 @@ app.add_url_rule('/api/admin/games', view_func=update_game, methods=['PATCH'])
 ## 8. Return list of all games in db
 app.add_url_rule('/api/games', view_func=get_games, methods=['GET'])
 
+# Games
+
+# get the games a user does not have in their profile
+app.add_url_rule('/api/users/me/unowned', view_func=get_missing_games, methods=['GET'])
+
+# get a list of all games
+app.add_url_rule('/api/games', view_func=get_all_games, methods=['GET'])
+
+
+# get ranks and roles of a game
+app.add_url_rule('/api/games/<int:game_id>', view_func=get_game_details, methods=['GET'])
 
 # Chat
 
@@ -113,6 +129,11 @@ app.add_url_rule('/api/conversations',
 # get messages
 app.add_url_rule('/api/conversations/<int:conversation_id>/messages',
                  view_func=get_messages,
+                 methods=['GET'])
+
+# get all conversations with friends
+app.add_url_rule('/api/conversations/friends',
+                 view_func=get_all_friends_conversations,
                  methods=['GET'])
 
 # Get friends and requests

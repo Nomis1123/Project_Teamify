@@ -1,6 +1,3 @@
--- Reset the primary key sequence for users if you are using SERIAL
-SELECT setval('users_id_seq', 5, true);
-
 -- 3. Seed Conversations
 -- Remember your CHECK constraint: user1_id must be < user2_id
 INSERT INTO conversations (id, user1_id, user2_id) VALUES

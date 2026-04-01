@@ -12,3 +12,5 @@ CREATE TABLE users (
     roles VARCHAR(100) DEFAULT 'Any',
     availability INTEGER NOT NULL DEFAULT 0
 );
+
+ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE;

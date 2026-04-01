@@ -10,6 +10,7 @@ import Matchmaking from './routes/Matchmaking.jsx'
 import Chat from './routes/Chat.jsx'
 import Friends from './routes/Friends.jsx'
 import AdminPage from './routes/AdminPage.jsx'
+import Home from './routes/Home.jsx'
 
 // npm run dev http://localhost:5173/ 
 
@@ -34,7 +35,6 @@ function App() {
 
       const data = await res.json()
       setUser(data.user.username)
-      setIsAdmin(data.user.is_admin);
     } catch (err) { // remove the user from their login state if user does not exist in backend
       localStorage.removeItem("access_token")
       localStorage.removeItem("refresh_token")
@@ -58,6 +58,7 @@ function App() {
             <Route path="/matchmaking" element={<Matchmaking/>} />
             <Route path="/friends" element={<Friends/>} />
             <Route path="/adminPage" element={<AdminPage/>} />
+            <Route path="/" element={<Home/>} />
           </Routes>
       </div>
     </>

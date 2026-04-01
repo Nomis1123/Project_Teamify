@@ -95,10 +95,19 @@
 
 .chat-message {
     min-width: 0px;
+    width: fit-content;
     background-color: rgb(255, 255, 255, 0.1);
     border-radius: 10px;
     padding: 10px;
     flex: 1;
+}
+
+.chat-message-target {
+    align-self: flex-start;
+}
+
+.chat-message-user {
+    align-self: flex-end;
 }
 
 .chat-username-target {

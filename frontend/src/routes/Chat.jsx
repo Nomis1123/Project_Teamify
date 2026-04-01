@@ -7,23 +7,28 @@ import ChatWindow from '../components/ChatWindow';
 import { io } from "socket.io-client";
 
 const Chat = ({ target = null }) => {
-    const [friends_list, setFriendsList] = useState([
-        {username: "bbb", userid: 2, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: 1, unread: ""},
-        {username: "ccc", userid: 3, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: 2, unread: ""},
-        {username: "ddd", userid: 4, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: 3, unread: ""},
-    ]);
+    //const [friends_list, setFriendsList] = useState([
+    //    {username: "bbb", userid: 2, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: 1, unread: ""},
+    //    {username: "ccc", userid: 3, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: 2, unread: ""},
+    //    {username: "ddd", userid: 4, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: 3, unread: ""},
+    //]);
+
+    // REPLACE WITH THIS: 
+    const [friends_list, setFriendsList] = useState([]);
+    const [convid_list, setConvidList] = useState([]);
+
     const [conversation_id , setConversationID] = useState(null);
     const [messages, setMessages] = useState([]);
     const [loading_fl, setLoadingFL] = useState(false);
     const [loading_ch, setLoadingCH] = useState(false);
     const [connected, setConnected] = useState(false);
     const [currTarget, setCurrTarget] = useState(target);
-    const [user, setUser] = useState({
-        id: 12,
-        username: "Man!",
-        pfp_url: "https://motionbgs.com/media/474/arknights.jpg",
-    });
+
+    // WITH THIS:
+    const [user, setUser] = useState(null);
+
     const socketRef = useRef(null);
+    const activeConvoRef = useRef(null); // <-- Add this new ref
 
     // Get the user's friend list and build live chat
     useEffect(() => {
@@ -31,22 +36,26 @@ const Chat = ({ target = null }) => {
             try {
                 setLoadingFL(true);
 
-                // Get the user's friends list
-                const res = await fetch("???", {
+                // 1. Hit the correct endpoint
+                const res = await fetch("/api/conversations/friends", {
                     method: "GET",
                     headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
                 });
-                // console.log("fetch returned:", res.status, res.url);
+                
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-                const normalized_friends = data.friends_list.map((friend) => ({
-                    id: friend.id ?? "",
+                
+                // 2. data is the array itself
+                const data = await res.json(); 
+                
+                // 3. Map keys to perfectly match what ChatController.py sends and what your dummy state used
+                const normalized_friends = data.map((friend) => ({
+                    userid: friend.userid ?? "", 
                     username: friend.username ?? "",
-                    profile_picture: friend.profile_picture ?? "",
+                    pfp_url: friend.pfp_url ?? "",
                     conversation_id: friend.conversation_id ?? "",
-                    unread: "",
+                    unread: friend.unread ?? "",
                 }));
-                // console.log("response data:", data);
+                
                 setFriendsList(normalized_friends);
             } catch (e) {
                 console.log("error:", e);
@@ -58,6 +67,7 @@ const Chat = ({ target = null }) => {
     }, []);
 
     useEffect(() => {
+        let isMounted = true; // <-- 1. Add this flag
         let socket;
 
         const loadMe = async () => {
@@ -77,7 +87,7 @@ const Chat = ({ target = null }) => {
                 const normalized_user = {
                     id: data.user.id ?? "",
                     username: data.user.username ?? "",
-                    profile_picture: data.user.profile_picture ?? "",
+                    pfp_url: data.user.pfp_url ?? "",
                 };
 
                 setUser(normalized_user);
@@ -104,7 +114,8 @@ const Chat = ({ target = null }) => {
 
                     // 2. Map the payload to match the database schema that ChatWindow expects
                     const newMsg = {
-                        content: msg.content,
+                        id: msg.id,
+                        content: msg.message,
                         sender_id: msg.sender,
                         created_at: new Date(msg.timestamp).toLocaleString([], {
                             month: 'short',
@@ -114,9 +125,12 @@ const Chat = ({ target = null }) => {
                         }),
                     };
 
-                    if (income_conversation_id === conversation_id) {
-                        // 3. Put newMsg at the END of the array so it shows up at the bottom
-                        setMessages((prevMessages) => [newMsg, ...prevMessages]);
+                    if (income_conversation_id === activeConvoRef.current) {
+                        setMessages((prevMessages) => {
+                            // <-- ADD THE SHIELD: If the message ID is already on screen, ignore it!
+                            if (prevMessages.some(m => m.id === newMsg.id)) return prevMessages;
+                            return [newMsg, ...prevMessages];
+                        });
                     } else {
                         setFriendsList((prevFriends) =>
                             prevFriends.map((friend) =>
@@ -146,12 +160,25 @@ const Chat = ({ target = null }) => {
         loadMe();
 
         return () => {
+            isMounted = false; // <-- 3. Trip the flag when the component unmounts
             if (socket) {
                 socket.disconnect();
             }
         };
     }, []);
 
+    useEffect(() => {
+        if (friends_list.length > 0) {
+            setConvidList(friends_list.map(friend => friend.conversation_id));
+        }
+    }, [friends_list]);
+
+    useEffect(() => {
+        if (connected && convid_list.length > 0) {
+            socketRef.current.emit("join_conversation", { conversation_id_lst: convid_list });
+        }
+    }, [connected, convid_list]);
+                    
     // Reset the unread messages of current user and set conversation id
     useEffect(() => {
         const loadMe = async () => {
@@ -161,7 +188,7 @@ const Chat = ({ target = null }) => {
                 if (currTarget != null) {
                     const target_friend = friends_list.find((f) => f.userid === currTarget);
                     target_friend.unread = "";
-                    console.log("########## Successfully reset the unread message! ############")
+                    // console.log("########## Successfully reset the unread message! ############")
 
                     setConversationID(target_friend.conversation_id);
                 };
@@ -181,10 +208,7 @@ const Chat = ({ target = null }) => {
             try {
                 setLoadingCH(true);
                 if (conversation_id != null) {
-                    if (socketRef.current && socketRef.current.connected) {
-                        socketRef.current.emit("join_conversation", { conversation_id: conversation_id });
-                    }
-                    console.log(`Attempt to get messages from /api/conversations/${conversation_id}/messages`)
+                    // console.log(`Attempt to get messages from /api/conversations/${conversation_id}/messages`)
                     const res = await fetch(`/api/conversations/${conversation_id}/messages`, {
                         method: "GET",
                         headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
@@ -193,6 +217,7 @@ const Chat = ({ target = null }) => {
                     const data = await res.json();
                     // console.log("########## message data:", data);
                     const normalized_messages = data.map((msg) => ({
+                        id: msg.id,
                         content: msg.content,
                         sender_id: msg.sender_id,
                         created_at: new Date(msg.created_at).toLocaleString([], {
@@ -207,6 +232,7 @@ const Chat = ({ target = null }) => {
             } catch (e) {
                 console.log("error:", e);
             } finally {
+                activeConvoRef.current = conversation_id;
                 setLoadingCH(false);
             }
         };

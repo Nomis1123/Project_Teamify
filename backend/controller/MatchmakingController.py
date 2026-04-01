@@ -12,10 +12,12 @@ def get_matches():
     data = request.get_json() or {}
     print(data)
     filters = data.get('filters', {}) if data else {}
+    offset = data.get('offset', 0)
     try:
         users = UserGame.get_filtered_users(
             current_user_id,
             filters,
+            offset=offset,
         )
         return jsonify(users), 200
     except Exception as e:
@@ -62,7 +64,8 @@ def sort_matches():
     sorted_data = []
 
     if data['sort'] == 'name':
-        sorted_data = sorted(data['users'], key=lambda x: x['username'])
+        print ('sorting by name')
+        sorted_data = sorted(data['users'], key=lambda x: x['username'].lower())
     elif data['sort'] == 'availability':
         sorted_data = sorted(data['users'], key=lambda x: x['matchmaking_score'], reverse=True)
     else:
