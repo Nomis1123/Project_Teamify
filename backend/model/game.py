@@ -25,6 +25,49 @@ class Game:
         for key, default in GAME_RELATION_DEFAULTS.items():
             setattr(self, key, kwargs.get(key, default))
 
+    # Update missing field from Steam import
+    # Used for admin account
+    @classmethod
+    def update(cls, conn, game_id: int, **fields):
+        if not fields:
+            raise ValueError("No fields provided for update")
+
+        set_clause = ", ".join([f"{key} = %s" for key in fields.keys()])
+        values = list(fields.values()) + [game_id]
+
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute(
+                f"""
+                UPDATE games
+                SET {set_clause}
+                WHERE id = %s
+                RETURNING {GAME_FIELDS}
+                """,
+                values
+            )
+
+            row = cur.fetchone()
+            if not row:
+                raise ValueError("Game not found")
+
+            return cls._build(cur, row)
+
+    # Return list of all games
+    # Used for matchmaking, admin account
+    @classmethod
+    def get_all(cls, conn):
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            cur.execute(f"SELECT {GAME_FIELDS} FROM games ORDER BY title ASC") # add thumbnail_url after philip
+            rows = cur.fetchall()
+
+            games = []
+            for row in rows:
+
+                games.append(cls._build(cur, row))
+
+            return games
+
+    # Get a single game
     # Used for SteamAPI
     # Add game to DB if it is not in DB already
     @classmethod
@@ -55,17 +98,17 @@ class Game:
             row = cur.fetchone()
             game_id = row["id"]
 
-            #for order, rank in enumerate(ranks):
-            #    cur.execute(
-            #        "INSERT INTO game_ranks (game_id, name, rank_order) VALUES (%s, %s, %s)",
-            #        (game_id, rank, order)
-            #    )
+            # for order, rank in enumerate(ranks):
+            #     cur.execute(
+            #         "INSERT INTO game_ranks (game_id, name, rank_order) VALUES (%s, %s, %s)",
+            #         (game_id, rank, order)
+            #     )
 
-            #for role in roles:
-            #    cur.execute(
-            #        "INSERT INTO game_roles (game_id, name) VALUES (%s, %s)",
-            #        (game_id, role)
-            #    )
+            # for role in roles:
+            #     cur.execute(
+            #         "INSERT INTO game_roles (game_id, name) VALUES (%s, %s)",
+            #         (game_id, role)
+            #     )
 
         conn.commit()
         return cls._build(cur, row, ranks, roles)
@@ -74,19 +117,19 @@ class Game:
     def _build(cls, cur, row, ranks=None, roles=None):
         data = dict(row)
 
-        #if ranks is None:
-        #    cur.execute(
-        #        "SELECT name FROM game_ranks WHERE game_id = %s ORDER BY rank_order",
-        #        (data["id"],)
-        #    )
-        #    ranks = [r["name"] for r in cur.fetchall()]
-
-        #if roles is None:
-        #    cur.execute(
-        #        "SELECT name FROM game_roles WHERE game_id = %s",
-        #        (data["id"],)
-        #    )
-        #    roles = [r["name"] for r in cur.fetchall()]
+        # if ranks is not None:
+        #     cur.execute(
+        #         "SELECT name FROM game_ranks WHERE game_id = %s ORDER BY rank_order",
+        #         (data["id"],)
+        #     )
+        #     ranks = [r["name"] for r in cur.fetchall()]
+        #
+        # if roles is not None:
+        #     cur.execute(
+        #         "SELECT name FROM game_roles WHERE game_id = %s",
+        #         (data["id"],)
+        #     )
+        #     roles = [r["name"] for r in cur.fetchall()]
 
         data["ranks"] = ranks
         data["roles"] = roles
