@@ -2,7 +2,7 @@
 TRUNCATE users, games, user_games RESTART IDENTITY CASCADE;
 
 
-INSERT INTO games (title, genre, developer) VALUES 
+INSERT INTO games (title, genre, developer) VALUES
 ('Valorant', 'FPS', 'Riot Games'),
 ('PUBG', 'Battle Royale', 'Krafton'),
 ('League of Legends', 'MOBA', 'Riot Games'),
@@ -102,21 +102,21 @@ WHERE id >= 16;
 
 
 -- Accepted Friendships (Existing)
-INSERT INTO friends (user_id_1, user_id_2, status, action_user_id) VALUES 
-(1, 2, 'accepted', NULL), 
-(1, 6, 'accepted', NULL), 
-(3, 4, 'accepted', NULL), 
-(9, 10, 'accepted', NULL), 
-(15, 16, 'accepted', NULL), 
+INSERT INTO friends (user_id_1, user_id_2, status, action_user_id) VALUES
+(1, 2, 'accepted', NULL),
+(1, 6, 'accepted', NULL),
+(3, 4, 'accepted', NULL),
+(9, 10, 'accepted', NULL),
+(15, 16, 'accepted', NULL),
 (6, 7, 'accepted', NULL);
 
 -- Pending Requests (Sent TO User 1 - LunaVibes)
 -- Note: action_user_id is the person who CLICKED 'add', so f.action_user_id != 1
-INSERT INTO friends (user_id_1, user_id_2, status, action_user_id) VALUES 
+INSERT INTO friends (user_id_1, user_id_2, status, action_user_id) VALUES
 (1, 8, 'pending', 8),  -- LazyGamer (8) requested LunaVibes (1)
 (1, 11, 'pending', 11); -- Zenith (11) requested LunaVibes (1)
 
 -- Pending Request (Sent BY User 1 - LunaVibes)
 -- Note: action_user_id is 1, so this will be hidden from LunaVibes' incoming list
-INSERT INTO friends (user_id_1, user_id_2, status, action_user_id) VALUES 
+INSERT INTO friends (user_id_1, user_id_2, status, action_user_id) VALUES
 (1, 22, 'pending', 1); -- LunaVibes (1) requested NovaStar (22)

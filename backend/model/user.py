@@ -4,8 +4,7 @@ from model.availability import Availability
 
 
 class User:
-    def __init__(self, id, username, email, steam_id=None, description=None, pfp_url=None, availability: int=0):
-
+    def __init__(self, id, username, email, steam_id=None, description=None, pfp_url=None, availability: int=0, is_admin=False):
         self.id = id
         self.username = username
         self.email = email
@@ -13,7 +12,7 @@ class User:
         self.description = description
         self.pfp_url = pfp_url
         self.availability = availability
-
+        self.is_admin = is_admin
 
     def get_password_hash(self) -> str:
 
@@ -77,7 +76,7 @@ class User:
         try:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT id, username, email, steam_id, description, profile_picture_url, availability FROM users WHERE id = %s",
+                    "SELECT id, username, email, steam_id, description, profile_picture_url, availability, is_admin FROM users WHERE id = %s",
                     (user_id,)
                 )
                 row = cur.fetchone()
@@ -101,7 +100,7 @@ class User:
         try:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT id, username, email, steam_id, description, profile_picture_url, availability FROM users WHERE email = %s",
+                    "SELECT id, username, email, steam_id, description, profile_picture_url, availability, is_admin FROM users WHERE email = %s",
                     (email,)
                 )
                 row = cur.fetchone()
@@ -202,7 +201,8 @@ class User:
                 "email": self.email,
                 "description": self.description,
                 "pfp_url": self.pfp_url,
-                "availability": Availability(bits=self.availability).to_dict()
+                "availability": Availability(bits=self.availability).to_dict(),
+                "is_admin": self.is_admin
                 }
     
     @staticmethod
