@@ -3,6 +3,7 @@ from flask_bcrypt import Bcrypt
 import psycopg2
 from flask import jsonify
 import os
+from psycopg2.extras import RealDictCursor
 
 jwt = JWTManager()
 bcrypt = Bcrypt()

@@ -29,7 +29,7 @@ export default function PUSchedule({schedule, scheduleModifier}) {
             const res = await fetch("/api/user/me", {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("access_token")}` },
-                body: JSON.stringify({ avaliability: sche }),
+                body: JSON.stringify({ availability: sche }),
             });
 
             if (!res.ok) {

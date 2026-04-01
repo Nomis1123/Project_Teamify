@@ -25,12 +25,10 @@ const Profile = () => {
         email: "",
         description: "",
         profileImageUrl: "",
-        // games: [{'title': 'lol', 'url': 'src/gameImages/lol.webp', 'role': 'Support', 'rank': 'Gold'}],
         games: [],
         schedule: defaultWeeklySchedule,
     });
     const [loading, setLoading] = useState(true);
-    // const [error, setError] = useState("");
 
     useEffect(() => {
         const loadMe = async () => {
@@ -55,10 +53,10 @@ const Profile = () => {
                     email: data.user.email ?? "",
                     description: data.user.description ?? "",
                     profile_picture: data.user.pfp_url ?? "",
-                    games: Array.isArray(data.user.games) ? data.games : [],
+                    games: Array.isArray(data.user.owned_games) ? data.user.owned_games : [],
                     schedule: days.reduce((acc, day) => {
                         // console.log("schedule:", day, data.schedule[day]);
-                        const d = data.user.schedule?.[day] ?? defaultDailySchedule;
+                        const d = data.user.availability?.[day] ?? defaultDailySchedule;
                         acc[day] = {
                             morning: Boolean(d.morning),
                             afternoon: Boolean(d.afternoon),
@@ -82,26 +80,6 @@ const Profile = () => {
     useEffect(() => {
         console.log("user state updated:", user.id);
     }, [user]);
-    // Test:
-    // useEffect(() => {
-    //     setUser({
-    //         uid: "user123",
-    //         username: "TestUser",
-    //         email: "testingemail@123.com"
-    //         description: "Hello I am a new user",
-    //         profileImageUrl: "",
-    //         games: [],
-    //         schedule: {
-    //         Monday: { morning: true, afternoon: false, night: true },
-    //         Tuesday: { morning: false, afternoon: false, night: false },
-    //         Wednesday: { morning: false, afternoon: true, night: false },
-    //         Thursday: { morning: true, afternoon: true, night: true },
-    //         Friday: { morning: false, afternoon: true, night: true },
-    //         Saturday: { morning: true, afternoon: false, night: false },
-    //         Sunday: { morning: false, afternoon: false, night: true },
-    //         },
-    //     });
-    // }, []);
 
     async function sendToken() {
         try {

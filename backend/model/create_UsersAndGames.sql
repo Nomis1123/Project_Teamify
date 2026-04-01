@@ -1,28 +1,11 @@
+
 TRUNCATE users, games, user_games RESTART IDENTITY CASCADE;
-
-
-
-CREATE OR REPLACE FUNCTION default_availability()
-RETURNS JSONB AS $$
-BEGIN
-    RETURN '{
-      "Monday": {"Morning": false, "Noon": false, "Evening": false},
-      "Tuesday": {"Morning": false, "Noon": false, "Evening": false},
-      "Wednesday": {"Morning": false, "Noon": false, "Evening": false},
-      "Thursday": {"Morning": false, "Noon": false, "Evening": false},
-      "Friday": {"Morning": false, "Noon": false, "Evening": false},
-      "Saturday": {"Morning": false, "Noon": false, "Evening": false},
-      "Sunday": {"Morning": false, "Noon": false, "Evening": false}
-    }'::jsonb;
-END;
-$$ LANGUAGE plpgsql IMMUTABLE;
-
 
 
 INSERT INTO games (title, genre, developer) VALUES
 ('Valorant', 'FPS', 'Riot Games'),
 ('PUBG', 'Battle Royale', 'Krafton'),
-('League', 'MOBA', 'Riot Games'),
+('League of Legends', 'MOBA', 'Riot Games'),
 ('Minecraft', 'Sandbox', 'Mojang'),
 ('Apex Legends', 'Battle Royale', 'Respawn');
 
@@ -30,7 +13,7 @@ INSERT INTO games (title, genre, developer) VALUES
 INSERT INTO users (
     username, email, password_hash, steam_id,
     description, is_verified, roles
-) VALUES
+) VALUES 
 ('LunaVibes', 'luna@test.com', '$2b$12$iyxGdsCmz0TqdyS9bkpGGuFN.GGDJ/Y8E2eDe8Y2t8/Zp4jqXLqEK', '76561197960435101', 'Late night sessions only.', true, 'DPS'),
 ('ShadowStep', 'shadow@test.com', '$2b$12$iyxGdsCmz0TqdyS9bkpGGuFN.GGDJ/Y8E2eDe8Y2t8/Zp4jqXLqEK', '76561197960435102', 'I thrive in the dark.', true, 'DPS'),
 ('AdminUser', 'king@test.com', '$2b$12$iyxGdsCmz0TqdyS9bkpGGuFN.GGDJ/Y8E2eDe8Y2t8/Zp4jqXLqEK', '76561197960435103', 'Work hard, play hard Saturday/Sunday.', true, 'Tank'),
@@ -60,72 +43,27 @@ UPDATE users SET is_admin = true WHERE username = 'AdminUser';
 
 -- LunaVibes and ShadowStep (all evenings true)
 UPDATE users
-SET availability = '{
-  "Monday": {"Morning": false, "Noon": false, "Evening": true},
-  "Tuesday": {"Morning": false, "Noon": false, "Evening": true},
-  "Wednesday": {"Morning": false, "Noon": false, "Evening": true},
-  "Thursday": {"Morning": false, "Noon": false, "Evening": true},
-  "Friday": {"Morning": false, "Noon": false, "Evening": true},
-  "Saturday": {"Morning": false, "Noon": false, "Evening": true},
-  "Sunday": {"Morning": false, "Noon": false, "Evening": true}
-}'::jsonb
+SET availability = 299593
 WHERE username IN ('LunaVibes', 'ShadowStep');
 
 -- WeekendKing and OfficeWorker95 (weekend full)
 UPDATE users
-SET availability = '{
-  "Monday": {"Morning": false, "Noon": false, "Evening": false},
-  "Tuesday": {"Morning": false, "Noon": false, "Evening": false},
-  "Wednesday": {"Morning": false, "Noon": false, "Evening": false},
-  "Thursday": {"Morning": false, "Noon": false, "Evening": false},
-  "Friday": {"Morning": false, "Noon": false, "Evening": false},
-  "Saturday": {"Morning": true, "Noon": true, "Evening": true},
-  "Sunday": {"Morning": true, "Noon": true, "Evening": true}
-}'::jsonb
+SET availability = 63
 WHERE username IN ('WeekendKing', 'OfficeWorker95');
 
 -- EarlyBird99 (weekdays mornings)
 UPDATE users
-SET availability = '{
-  "Monday": {"Morning": true, "Noon": false, "Evening": false},
-  "Tuesday": {"Morning": true, "Noon": false, "Evening": false},
-  "Wednesday": {"Morning": true, "Noon": false, "Evening": false},
-  "Thursday": {"Morning": true, "Noon": false, "Evening": false},
-  "Friday": {"Morning": true, "Noon": false, "Evening": false},
-  "Saturday": {"Morning": false, "Noon": false, "Evening": false},
-  "Sunday": {"Morning": false, "Noon": false, "Evening": false}
-}'::jsonb
+SET availability = 1198336
 WHERE username = 'EarlyBird99';
-
--- UniStudent (after lectures)
-UPDATE users
-SET availability = '{
-  "Monday": {"Morning": false, "Noon": true, "Evening": true},
-  "Tuesday": {"Morning": false, "Noon": false, "Evening": false},
-  "Wednesday": {"Morning": false, "Noon": true, "Evening": true},
-  "Thursday": {"Morning": false, "Noon": false, "Evening": false},
-  "Friday": {"Morning": false, "Noon": true, "Evening": false},
-  "Saturday": {"Morning": false, "Noon": false, "Evening": false},
-  "Sunday": {"Morning": false, "Noon": false, "Evening": false}
-}'::jsonb
-WHERE username = 'UniStudent';
 
 -- FullTimeGamer (always available)
 UPDATE users
-SET availability = '{
-  "Monday": {"Morning": true, "Noon": true, "Evening": true},
-  "Tuesday": {"Morning": true, "Noon": true, "Evening": true},
-  "Wednesday": {"Morning": true, "Noon": true, "Evening": true},
-  "Thursday": {"Morning": true, "Noon": true, "Evening": true},
-  "Friday": {"Morning": true, "Noon": true, "Evening": true},
-  "Saturday": {"Morning": true, "Noon": true, "Evening": true},
-  "Sunday": {"Morning": true, "Noon": true, "Evening": true}
-}'::jsonb
+SET availability = 2097151
 WHERE username = 'FullTimeGamer';
 
 
 -- First 5 users: Diverse games with new standardized ranks
-INSERT INTO user_games (user_id, game_id, current_rank) VALUES
+INSERT INTO user_games (user_id, game_id, current_rank) VALUES 
 (1, (SELECT id FROM games WHERE title = 'PUBG'), 'Bronze 2'),
 (2, (SELECT id FROM games WHERE title = 'PUBG'), 'Silver 4'),
 (3, (SELECT id FROM games WHERE title = 'League'), 'Gold 1'),

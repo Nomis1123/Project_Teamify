@@ -35,10 +35,13 @@ const Navbar = ( {user, isAdmin, setUser, setIsAdmin} ) => {
             </Link>
             <div className="nav-center-right">
                 <div className="nav-center">
-                    {isAdmin? 
+                    <Link to="/" className="home">
+                        Home
+                    </Link>
+                    {isAdmin?
                         <Link to="/adminPage" className="admin_page">
                             Admin Page
-                        </Link> : null 
+                        </Link> : null
                     }
                     <Link to="/profile" className="profile">
                         Profile
@@ -46,8 +49,8 @@ const Navbar = ( {user, isAdmin, setUser, setIsAdmin} ) => {
                     <Link to="/matchmaking" className="matchmaking">
                         Matchmaking
                     </Link>
-                    <Link to="/guides" className="guides">
-                        Guides
+                    <Link to="/chat" className="chat">
+                        Chat
                     </Link>
                     <Link to="/friends" className="friends">
                         Friends

@@ -14,6 +14,7 @@ import requests
 import json
 import uuid
 #from model.User import User
+from model.availability import Availability
 from model.user import User
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_jwt_extended import unset_jwt_cookies
@@ -21,6 +22,7 @@ from flask_jwt_extended import unset_jwt_cookies
 from controller.SteamService import get_owned_games
 from model.game import Game
 
+from psycopg2.extras import RealDictCursor
 # from werkzeug.utils import secure_filename
 
 """
@@ -162,13 +164,19 @@ def login():
 def steam_login():
     # Get userID
     user_id = get_jwt_identity()
+    print(user_id)
+
+    # Construct url for redirect - Flask will automatically append user_id as a query parameter
+    return_url = url_for("steam_verify", user_id=user_id, _external=True)
+    realm = request.host_url
 
     # Store info to link SteamID to UserID later
-    session["Account_Link_Steam"] = user_id
+    #session["Account_Link_Steam"] = user_id
 
     # Construct url for redirect
-    return_url = url_for("steam_verify", _external=True)
-    realm = request.host_url
+   # return_url = url_for("steam_verify", _external=True)
+   # realm = request.host_url
+
     params = {"openid.ns": "http://specs.openid.net/auth/2.0",
               "openid.mode": "checkid_setup",
               "openid.return_to": return_url,
@@ -184,7 +192,11 @@ def steam_login():
 # Steam redirects users here after logging in to Steam
 def steam_verify():
     # Get UserID stored before linking
-    user_id = session.get("Account_Link_Steam")
+
+    user_id = request.args.get("user_id")
+    #user_id = session.get("Account_Link_Steam")
+
+    print (user_id)
     if not user_id:
         return jsonify({"status": "Steam link session expired"}), 400
 
@@ -221,7 +233,8 @@ def steam_verify():
         user.update({"steam_id": steam_id})
     except Exception as e:
         pass # temp placeholder
-    session.pop("Account_Link_Steam", None)
+
+    #session.pop("Account_Link_Steam", None)
 
     # Redirect back to profile page
     return redirect("http://localhost:5173/profile")
@@ -283,10 +296,6 @@ def get_me():
     # Ask the token to get the id (The identity we set in login)
     user_id = get_jwt_identity() 
 
-    from flask_jwt_extended import get_jwt
-    raw = get_jwt()
-
-    print("SUB in token:", raw.get("sub"))
     print("Identity returned:", user_id)
 
     user = User.find_by_id(int(user_id)) 
@@ -297,7 +306,41 @@ def get_me():
     if not user:
         return jsonify({"status": "User not found."}), 404
 
-    return jsonify({"user": user.to_dict()}), 200
+    user_payload = user.to_dict()
+
+    # --- NEW: Fetch the user's owned games ---
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        # Use RealDictCursor so the frontend gets a clean JSON array of objects
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+
+        query = """
+            SELECT g.id, g.title, g.thumbnail_url, ug.current_rank
+            FROM games g
+            JOIN user_games ug ON g.id = ug.game_id
+            WHERE ug.user_id = %s;
+        """
+        cur.execute(query, (int(user_id),))
+        owned_games = cur.fetchall()
+
+        # Attach the list of games as a new field to our return payload
+        user_payload["owned_games"] = owned_games
+
+    except Exception as e:
+        print(f"Database error fetching owned games: {e}")
+        # If the query fails, we can just return an empty list so the app doesn't crash
+        user_payload["owned_games"] = []
+
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+    # Return the combined payload
+    return jsonify({"user": user_payload}), 200
 
 @jwt_required()
 def update_me():
@@ -327,6 +370,7 @@ def update_me():
 
     if not data:
         return jsonify({"status": "No data provided."}), 400
+    print (data)
 
 
     # these fields can not be null
@@ -384,6 +428,42 @@ def update_me():
         data.pop("new_email", None)
         data.pop("old_password", None)
         data.pop("new_password", None)
+
+        # convert the availability info from dict to bits
+        if "availability" in data:
+            print (data['availability'])
+            data['availability'] = Availability(availability_dict=data['availability']).bits
+            print (data['availability'])
+
+        # --- NEW CODE: Sync Owned Games ---
+        if "owned_games" in data:
+            # 1. Pop the list out of data so user.update() ignores it later
+            incoming_games = data.pop("owned_games")
+
+            # 2. Extract just the IDs into a Python Set
+            incoming_game_ids = set(int(game["id"]) for game in incoming_games if "id" in game)
+
+            with conn.cursor() as cur:
+                # 3. Fetch the user's current games from the database
+                cur.execute("SELECT game_id FROM user_games WHERE user_id = %s", (user.id,))
+                current_game_ids = set(row[0] for row in cur.fetchall())
+
+                # 4. Use Set Math to find the exact differences
+                games_to_add = incoming_game_ids - current_game_ids
+                games_to_remove = current_game_ids - incoming_game_ids
+
+                # 5. Remove the games they unchecked
+                if games_to_remove:
+                    cur.execute(
+                        "DELETE FROM user_games WHERE user_id = %s AND game_id = ANY(%s)",
+                        (user.id, list(games_to_remove))
+                    )
+
+                # 6. Insert the newly added games
+                if games_to_add:
+                    add_query = "INSERT INTO user_games (user_id, game_id) VALUES (%s, %s)"
+                    cur.executemany(add_query, [(user.id, gid) for gid in games_to_add])
+
 
         # if theres anything left to update
         if data:
@@ -559,4 +639,126 @@ def check_extension(filename):
     # Valid image extensions for now are "png", "jpg", and "jpeg" which may change later
     # File name must also contain a period . otherwise they aren't telling us the extension
     IMAGE_EXTENSIONS = {"png", "jpg", "jpeg"}
+
+
     return "." in filename and filename.rsplit(".", 1)[1].lower() in IMAGE_EXTENSIONS
+
+@jwt_required()
+def get_missing_games():
+
+    user_id = get_jwt_identity()
+
+    try:
+        user_id = int(get_jwt_identity())
+    except ValueError:
+        return jsonify({"status: error converting jwt identity to int"})
+
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+
+        # 2. Apply the RealDictCursor ONLY to this specific cursor
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+
+        query = """
+            SELECT g.id, g.title, g.thumbnail_url
+            FROM games g
+            WHERE NOT EXISTS (
+                SELECT 1 
+                FROM user_games ug 
+                WHERE ug.game_id = g.id 
+                AND ug.user_id = %s
+            )
+            ORDER BY g.title ASC;
+        """
+        cur.execute(query, (user_id,))
+        missing_games = cur.fetchall()
+
+        return jsonify(missing_games), 200
+
+    except Exception as e:
+        print(f"Database error: {e}")
+        return jsonify({"status": "Error: failed to fetch available games"}), 500
+
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+def get_all_games():
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        # Use RealDictCursor to return a list of dictionaries for JSON
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+
+        # Select just the fields you requested, ordered alphabetically
+        query = """
+            SELECT id, title, thumbnail_url 
+            FROM games 
+            ORDER BY title ASC;
+        """
+
+        cur.execute(query)
+        games = cur.fetchall()
+
+        return jsonify(games), 200
+
+    except Exception as e:
+        print(f"Database error fetching master game list: {e}")
+        return jsonify({"status": "Failed to fetch games"}), 500
+
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()
+
+def get_game_details(game_id):
+    conn = None
+    cur = None
+    try:
+        conn = get_db_connection()
+        # We don't need RealDictCursor here since we just want flat strings
+        cur = conn.cursor()
+
+        # 1. Fetch just the name, but still order by tier_level so they are sorted right
+        cur.execute("""
+            SELECT name 
+            FROM game_ranks 
+            WHERE game_id = %s 
+            ORDER BY tier_level ASC;
+        """, (game_id,))
+
+        # cur.fetchall() returns a list of tuples like: [('Bronze 5',), ('Bronze 4',)]
+        # This list comprehension extracts just the string into a flat list
+        ranks = [row[0] for row in cur.fetchall()]
+
+        # 2. Fetch just the name for roles
+        cur.execute("""
+            SELECT name 
+            FROM game_roles 
+            WHERE game_id = %s 
+            ORDER BY id ASC;
+        """, (game_id,))
+
+        roles = [row[0] for row in cur.fetchall()]
+
+        # 3. Combine and return
+        return jsonify({
+            "ranks": ranks,
+            "roles": roles
+        }), 200
+
+    except Exception as e:
+        print(f"Database error fetching game details for game {game_id}: {e}")
+        return jsonify({"status": "Failed to fetch game details"}), 500
+
+    finally:
+        if cur:
+            cur.close()
+        if conn:
+            conn.close()

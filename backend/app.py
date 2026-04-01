@@ -3,6 +3,16 @@ from controller.extensions import jwt
 from dotenv import load_dotenv
 
 from flask import Flask
+from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, sync_games, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image, get_missing_games, get_all_games, get_game_details
+from controller.Friend_controller import (
+    get_user_friends, accept_friend, send_friend_request,
+    reject_friend_request, remove_friend
+)
+from controller.MatchmakingController import get_matches, sort_matches
+
+from controller.ChatController import init_conversation, get_messages, register_chat_socket_events, get_all_friends_conversations
+from flask_socketio import SocketIO
+
 from controller.AdminController import update_game
 from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, sync_games, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image
 from controller.ChatController import init_conversation, get_messages
@@ -24,6 +34,13 @@ app = Flask(__name__)
 # set the secret key
 
 jwt.init_app(app)
+
+# inititialize socket for chatting
+socketio = SocketIO(app, cors_allowed_origins="*")
+
+# register the chat socket events
+register_chat_socket_events(socketio)
+
 #
 #"The configuration for cookie"
 #app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
@@ -77,6 +94,7 @@ app.add_url_rule('/api/user/me', view_func=update_me,  methods=['PATCH'])
 ## 5. Availability
 app.add_url_rule('/api/user/availability', view_func=getOrUpdate_availability1, methods=['GET','PUT'])
 app.add_url_rule('/api/user/filters', view_func=get_matches, methods=["POST"])
+app.add_url_rule('/api/user/sort', view_func=sort_matches, methods=["POST"])
 
 ## 6. Uploads
 app.add_url_rule('/uploads/<filename>', view_func=retrieve_image, methods=['GET'])
@@ -88,6 +106,17 @@ app.add_url_rule('/api/admin/games', view_func=update_game, methods=['PATCH'])
 ## 8. Return list of all games in db
 app.add_url_rule('/api/games', view_func=get_games, methods=['GET'])
 
+# Games
+
+# get the games a user does not have in their profile
+app.add_url_rule('/api/users/me/unowned', view_func=get_missing_games, methods=['GET'])
+
+# get a list of all games
+app.add_url_rule('/api/games', view_func=get_all_games, methods=['GET'])
+
+
+# get ranks and roles of a game
+app.add_url_rule('/api/games/<int:game_id>', view_func=get_game_details, methods=['GET'])
 
 # Chat
 
@@ -101,13 +130,26 @@ app.add_url_rule('/api/conversations/<int:conversation_id>/messages',
                  view_func=get_messages,
                  methods=['GET'])
 
+# get all conversations with friends
+app.add_url_rule('/api/conversations/friends',
+                 view_func=get_all_friends_conversations,
+                 methods=['GET'])
+
 # Get friends and requests
 app.add_url_rule('/api/friends', view_func=get_user_friends, methods=['GET'])
 
-# Accept or Decline a request
+# Accept a request
 app.add_url_rule('/api/friends/accept', view_func=accept_friend, methods=['POST'])
+# Send a friend request
+app.add_url_rule('/api/friends/request', view_func=send_friend_request, methods=['POST'])
+# Reject friend request
+app.add_url_rule('/api/friends/requests/<int:sender_id>', view_func=reject_friend_request, methods=['DELETE'])
 
+app.add_url_rule('/api/friends/<int:friend_id>', view_func=remove_friend, methods=['DELETE'])
 
 if __name__ == '__main__':
     # Start a local web server on Port 8000
-    app.run(debug=True, port=8000)
+    #app.run(debug=True, port=8000)
+
+    # replace app.run with socketio.run for chatting
+    socketio.run(app, debug=True, port=8000)

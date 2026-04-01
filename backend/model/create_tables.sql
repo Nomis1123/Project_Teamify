@@ -11,19 +11,15 @@ CREATE TABLE users (
     is_verified BOOLEAN DEFAULT FALSE,
     verification_token VARCHAR(255),
     roles VARCHAR(100) DEFAULT 'Any',
-    availability JSONB DEFAULT '{
-  "Monday": {"Morning": false, "Noon": false, "Evening": false},
-  "Tuesday": {"Morning": false, "Noon": false, "Evening": false},
-  "Wednesday": {"Morning": false, "Noon": false, "Evening": false},
-  "Thursday": {"Morning": false, "Noon": false, "Evening": false},
-  "Friday": {"Morning": false, "Noon": false, "Evening": false},
-  "Saturday": {"Morning": false, "Noon": false, "Evening": false},
-  "Sunday": {"Morning": false, "Noon": false, "Evening": false}
-}'::JSONB
+    availability INTEGER NOT NULL DEFAULT 0
 );
 ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE;
 
 
+ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE;
+
+
+DROP TABLE IF EXISTS friends CASCADE;
 CREATE TABLE friends (
     id SERIAL PRIMARY KEY,
     user_id_1 INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -36,6 +32,7 @@ CREATE TABLE friends (
     -- Ensure we don't have duplicate rows for the same pair (1-2 and 2-1)
     CONSTRAINT unique_friendship UNIQUE (user_id_1, user_id_2)
 );
+ALTER TABLE friends ADD COLUMN action_user_id INTEGER;
 
 -- Index for faster lookups when checking a specific user's friend list
 CREATE INDEX idx_friends_user_1 ON friends(user_id_1);
@@ -51,6 +48,8 @@ CREATE TABLE games(
     thumbnail_url TEXT, -- a string of thext that stores a link to an image file
     developer VARCHAR (100)
 );
+ALTER TABLE games ADD COLUMN icon_url TEXT;
+
 ALTER TABLE games ADD COLUMN icon_url TEXT;
 
 -- Join table: likes Users to Games (Many-to-Many)
@@ -80,29 +79,3 @@ CREATE TABLE parties (
     CONSTRAINT min_players CHECK (max_players > 0),
     CONSTRAINT positive_players CHECK (current_players >= 1)
 );
-
-
-CREATE OR REPLACE FUNCTION calculate_harmony_score(
-    user_availability JSONB,
-    target_availability JSONB
-)
-RETURNS FLOAT AS $$
-DECLARE
-    day TEXT;
-    slot TEXT;
-    score FLOAT := 0;
-BEGIN
-    FOR day IN SELECT jsonb_object_keys(target_availability)
-    LOOP
-        FOR slot IN SELECT jsonb_object_keys(target_availability->day)
-        LOOP
-            IF (user_availability->day->>slot)::boolean
-               AND (target_availability->day->>slot)::boolean THEN
-                score := score + 1;
-            END IF;
-        END LOOP;
-    END LOOP;
-
-    RETURN score;
-END;
-$$ LANGUAGE plpgsql IMMUTABLE;
