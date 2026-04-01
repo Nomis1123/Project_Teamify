@@ -109,3 +109,104 @@ class UserGame:
                     })
 
                 return results
+
+    @staticmethod
+    def get_filtered_users2(current_user_id, filters=None, offset=0):
+        filters = filters or {}
+        game_title = filters.get('game')
+        rank = filters.get('rank')
+        role_filter = filters.get('role')
+
+        params = []
+
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                # 1. Update the Main Query to JOIN the new rank and role tables
+                sql = """
+                    SELECT 
+                        u.id, 
+                        u.username, 
+                        u.profile_picture_url, 
+                        u.description, 
+                        COALESCE(
+                            jsonb_agg(
+                                jsonb_build_object(
+                                    'title', g.title, 
+                                    'rank', gr.name,
+                                    'role', gro.name
+                                )
+                            ) FILTER (WHERE g.id IS NOT NULL),
+                            '[]'
+                        ) AS user_games_list
+                    FROM users u
+                    LEFT JOIN user_games ug ON u.id = ug.user_id
+                    LEFT JOIN games g ON ug.game_id = g.id
+                    LEFT JOIN game_ranks gr ON ug.rank_id = gr.id
+                    LEFT JOIN game_roles gro ON ug.role_id = gro.id
+                    WHERE u.id != %s
+                """
+                params.append(current_user_id)
+
+                # 2. Unified Filtering Logic
+                # If any filter is applied, we enforce it using a single EXISTS block
+                if game_title or rank or role_filter:
+                    sql += """
+                        AND EXISTS (
+                            SELECT 1 FROM user_games ug2 
+                            JOIN games g2 ON ug2.game_id = g2.id
+                            LEFT JOIN game_ranks gr2 ON ug2.rank_id = gr2.id
+                            LEFT JOIN game_roles gro2 ON ug2.role_id = gro2.id
+                            WHERE ug2.user_id = u.id
+                    """
+                    if game_title:
+                        sql += " AND g2.title ILIKE %s"
+                        params.append(f"%{game_title}%")
+                    if rank:
+                        sql += " AND gr2.name ILIKE %s"
+                        params.append(f"%{rank}%")
+                    if role_filter:
+                        sql += " AND gro2.name ILIKE %s"
+                        params.append(f"%{role_filter}%")
+                    
+                    sql += " )" # Close the EXISTS clause
+
+                # 3. Grouping and Pagination (Removed u.roles since roles are now game-specific)
+                sql += " GROUP BY u.id, u.username, u.profile_picture_url, u.description"
+                sql += " ORDER BY u.id ASC"
+                sql += " LIMIT 10 OFFSET %s"
+                params.append(int(offset))
+
+                cur.execute(sql, tuple(params))
+                rows = cur.fetchall()
+
+                # 4. Process the Results for the Frontend
+                results = []
+                for r in rows:
+                    user_id, username, avatar, description, games_list = r
+
+                    display_game, display_rank, display_role = "N/A", "N/A", "N/A"
+                    
+                    if games_list:
+                        search_term = game_title.lower() if game_title else ""
+                        
+                        # Find the specific game they searched for to display prominently, 
+                        # or just default to the first game in their library
+                        matched_obj = next(
+                            (g for g in games_list if search_term in (g.get('title') or '').lower()), 
+                            games_list[0]
+                        )
+                        display_game = matched_obj.get('title') or "N/A"
+                        display_rank = matched_obj.get('rank') or "N/A"
+                        display_role = matched_obj.get('role') or "N/A"
+
+                    results.append({
+                        "id": user_id,
+                        "username": username,
+                        "avatar": avatar or f"https://api.dicebear.com/7.x/avataaars/svg?seed={username}",
+                        "description": description,
+                        "game": display_game,
+                        "rank": display_rank,
+                        "roles": display_role 
+                    })
+
+                return results

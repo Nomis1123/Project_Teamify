@@ -3,25 +3,58 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from model.UserGame import UserGame
 
 from model.user import User
-from model.availability import Availability
 
 @jwt_required()
 def get_matches():
+    # 1. Get the ID of the user making the request
     current_user_id = get_jwt_identity()
-
+    
+    # 2. Extract the JSON body sent by React
     data = request.get_json() or {}
-    print(data)
-    filters = data.get('filters', {}) if data else {}
-    offset = data.get('offset', 0)
+    
+    # 3. Pull out the specific pieces
+    filters = data.get("filters", {})
+    offset = data.get("offset", 0)
+    
     try:
-        users = UserGame.get_filtered_users(
-            current_user_id,
-            filters,
-            offset=offset,
+        # 4. Feed them into your updated function
+        results = UserGame.get_filtered_users(
+            current_user_id=int(current_user_id), 
+            filters=filters, 
+            offset=int(offset)
         )
-        return jsonify(users), 200
+        
+        return jsonify(results), 200
+        
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        print(f"Error fetching matches: {e}")
+        return jsonify({"status": "Failed to fetch matches"}), 500
+
+@jwt_required()
+def get_matches2():
+    # 1. Get the ID of the user making the request
+    current_user_id = get_jwt_identity()
+    
+    # 2. Extract the JSON body sent by React
+    data = request.get_json() or {}
+    
+    # 3. Pull out the specific pieces
+    filters = data.get("filters", {})
+    offset = data.get("offset", 0)
+    
+    try:
+        # 4. Feed them into your updated function
+        results = UserGame.get_filtered_users2(
+            current_user_id=int(current_user_id), 
+            filters=filters, 
+            offset=int(offset)
+        )
+        
+        return jsonify(results), 200
+        
+    except Exception as e:
+        print(f"Error fetching matches: {e}")
+        return jsonify({"status": "Failed to fetch matches"}), 500
 
 @jwt_required()
 def sort_matches():

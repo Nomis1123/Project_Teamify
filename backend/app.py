@@ -9,7 +9,7 @@ from controller.Friend_controller import (
     reject_friend_request, remove_friend, search_user
 )
 from controller.GamesController import get_games, retrieve_game_image
-from controller.MatchmakingController import get_matches, sort_matches
+from controller.MatchmakingController import get_matches, sort_matches, get_matches2
 
 from controller.ChatController import init_conversation, get_messages, register_chat_socket_events, get_all_friends_conversations
 from flask_socketio import SocketIO
@@ -96,9 +96,9 @@ app.add_url_rule('/api/user/me', view_func=update_me,  methods=['PATCH'])
 ## 5. Availability
 app.add_url_rule('/api/user/availability', view_func=getOrUpdate_availability1, methods=['GET','PUT'])
 app.add_url_rule('/api/user/filters', view_func=get_matches, methods=["POST"])
+app.add_url_rule('/api/user/filters2', view_func=get_matches2, methods=["POST"])
 app.add_url_rule('/api/user/sort', view_func=sort_matches, methods=["POST"])
 
-app.add_url_rule('/api/user/filters', view_func=get_matches, methods=["POST"])
 #
 ## 6. Uploads
 app.add_url_rule('/uploads/<filename>', view_func=retrieve_image, methods=['GET'])
