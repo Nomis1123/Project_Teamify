@@ -177,8 +177,8 @@ const Profile = () => {
                                 <div className='profile-game-image-text-container' key={index}>
                                     <img className='profile-game-image' src={game.thumbnail_url} alt={game.title} />
                                     <div className='profile-game-text'>{game.title}</div>
-                                    {game.rank && <span>Rank: {game.rank}</span>}
-                                    {game.role && <span>Role: {game.role}</span>}
+                                    {game.current_rank && <span>Rank: {game.current_rank}</span>}
+                                    {game.curr_role && <span>Role: {game.curr_role}</span>}
                                 </div>
                             )
                         )}

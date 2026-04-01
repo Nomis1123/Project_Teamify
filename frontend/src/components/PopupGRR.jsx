@@ -45,10 +45,10 @@ export default function PUGRR({games, gameModifier, which}) {
                 replacement['id'] = u[which]['id'];
 
                 if (selectedRank != '') {
-                    replacement['rank'] = selectedRank;
+                    replacement['current_rank'] = selectedRank;
                 }
                 if (selectedRole != '') {
-                    replacement['role'] = selectedRole;
+                    replacement['curr_role'] = selectedRole;
                 }
                 u[which] = replacement;
                 return u;
@@ -96,8 +96,8 @@ export default function PUGRR({games, gameModifier, which}) {
     return (
         <div className="element-grr">
             <button className="btn-grr btn-grr-image btn-grr-rr" onClick={() => {setOpen(true); handleGet();}}>
-                <span>Rank: {games[which]['rank']? games[which]['rank']:'-'}</span>
-                <span>Role: {games[which]['role']? games[which]['role']:'-'}</span>
+                <span>Rank: {games[which]['current_rank']? games[which]['current_rank']:'-'}</span>
+                <span>Role: {games[which]['curr_role']? games[which]['curr_role']:'-'}</span>
             </button>
             
 
