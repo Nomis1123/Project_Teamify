@@ -1,6 +1,7 @@
 import React from 'react'
 import { useEffect, useState } from "react";
 import "./AdminPage.css";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
     const [games, setGames] = useState([{id: 5, title: "Apex", icon_url: "http://media.steampowered.com/steamcommunity/public/images/apps/341800/1d0a322b0184faa755ad99af803dfd7e14add30f.jpg"}]);
@@ -15,6 +16,7 @@ const Profile = () => {
     const [successMsg, setSuccess] = useState("");
     const [isSaving, setIsSaving] = useState(false);
     const MAX_IMAGE_SIZE = 5*1024*1024;
+    const navigate = useNavigate();
 
     useEffect(() => {
         const loadMe = async () => {
@@ -35,6 +37,13 @@ const Profile = () => {
         };
 
         loadMe();
+    }, []);
+
+    useEffect(() => {
+        const isAdmin = localStorage.getItem("is_admin") === "true";
+        if (!isAdmin) {
+            navigate("/");
+        }
     }, []);
 
     async function handleSaveInfo() {

@@ -78,6 +78,7 @@ const Login = ( { setUser, setIsAdmin }) => {
             setIsAdmin(data.user.is_admin);
             localStorage.setItem("access_token", data.access_token);
             localStorage.setItem("refresh_token", data.refresh_token);
+            localStorage.setItem("is_admin", data.user.is_admin);
             return true;
         } catch (err) {
             setloginMsg("Login failed:", err);
