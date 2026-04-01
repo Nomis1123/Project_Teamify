@@ -4,8 +4,10 @@ import "./Profile.css";
 import { useNavigate } from "react-router-dom";
 import "../components/GameScheduleBar.css"
 import GameScheduleBar from "../components/GameScheduleBar";
+import useRequireAuth from "../components/RequireAuth.jsx";
 
 const Profile = () => {
+    useRequireAuth();
     const navigate = useNavigate();
     const days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
     const defaultDailySchedule = { morning: false, afternoon: false, night: false };
