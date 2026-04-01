@@ -5,15 +5,12 @@ import { useNavigate } from "react-router-dom";
 import ChatFriendsList from "../components/ChatFriendsList"
 import ChatWindow from '../components/ChatWindow';
 import { io } from "socket.io-client";
+import { useLocation } from "react-router-dom";
 
-const Chat = ({ target = null }) => {
-    //const [friends_list, setFriendsList] = useState([
-    //    {username: "bbb", userid: 2, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: 1, unread: ""},
-    //    {username: "ccc", userid: 3, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: 2, unread: ""},
-    //    {username: "ddd", userid: 4, pfp_url: "https://image.petmd.com/files/styles/863x625/public/2022-10/beagle-dog.jpg", conversation_id: 3, unread: ""},
-    //]);
 
-    // REPLACE WITH THIS: 
+const Chat = () => {
+    const location = useLocation();
+    const [currTarget, setCurrTarget] = useState(location.state?.target ?? null);
     const [friends_list, setFriendsList] = useState([]);
     const [convid_list, setConvidList] = useState([]);
 
@@ -22,7 +19,6 @@ const Chat = ({ target = null }) => {
     const [loading_fl, setLoadingFL] = useState(false);
     const [loading_ch, setLoadingCH] = useState(false);
     const [connected, setConnected] = useState(false);
-    const [currTarget, setCurrTarget] = useState(target);
 
     // WITH THIS:
     const [user, setUser] = useState(null);
@@ -185,11 +181,10 @@ const Chat = ({ target = null }) => {
             try {
                 setLoadingCH(true);
                 // Reset the unread message from this friend
-                if (currTarget != null) {
+                if (currTarget != null && friends_list.length > 0) {
                     const target_friend = friends_list.find((f) => f.userid === currTarget);
                     target_friend.unread = "";
                     // console.log("########## Successfully reset the unread message! ############")
-
                     setConversationID(target_friend.conversation_id);
                 };
                 
@@ -200,7 +195,7 @@ const Chat = ({ target = null }) => {
             }
         };
         loadMe();
-    }, [currTarget]);
+    }, [currTarget, convid_list]);
 
     // Get the conversation between current user and the target user
     useEffect(() => {

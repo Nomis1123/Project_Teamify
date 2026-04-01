@@ -181,7 +181,7 @@ const Friends = () => {
                             </div>
 
                             <div className="message-wrapper-friends">
-                                <Link to="/chat" className="message-button-friends" target={user.id}>
+                                <Link to="/chat" className="message-button-friends" state={{ target: user.id }}>
                                       Message
                                 </Link>
                             </div>
