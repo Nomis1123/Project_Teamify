@@ -89,8 +89,8 @@ export default function PUGame({games, gameModifier, which, isAdding}) {
         <div className="element-game">
             {which != null? 
                 <button className="btn-game btn-game-image" onClick={() => {setOpen(true); handleGet();}}>
-                    <img className="popup-game-image" src={games[which]['url']} alt={games[which]['title']} />
-                    <span>{games[which]['title']}</span>
+                    <img className="popup-game-image" src={games[which]['thumbnail_url']} alt={games[which]['title']} />
+                    <div className="popup-game-text">{games[which]['title']}</div>
                 </button> :
                 <button className="btn-game btn-game-image" onClick={() => {setOpen(true); handleGet();}}>
                     <img className="popup-game-image" src={"src/gameImages/select.webp"} alt={"Select Your Game"} />
