@@ -437,46 +437,66 @@ def update_me():
 
         # --- NEW CODE: Sync Owned Games ---
         if "owned_games" in data:
-            # 1. Pop the list out of data so user.update() ignores it later
+            # 1. Pop the list out of data so User.update_profile_by_id ignores it
             incoming_games = data.pop("owned_games")
 
             # 2. Extract just the IDs into a Python Set
             incoming_game_ids = set(int(game["id"]) for game in incoming_games if "id" in game)
 
-            with conn.cursor() as cur:
-                # 3. Fetch the user's current games from the database
-                cur.execute("SELECT game_id FROM user_games WHERE user_id = %s", (user.id,))
-                current_game_ids = set(row[0] for row in cur.fetchall())
+            with get_db_connection() as conn: # Ensure you have your connection!
+                with conn.cursor() as cur:
+                    # 3. Fetch the user's current games from the database
+                    cur.execute("SELECT game_id FROM user_games WHERE user_id = %s", (user_id,))
+                    current_game_ids = set(row[0] for row in cur.fetchall())
 
-                # 4. Remove the games they unchecked (Set Math)
-                games_to_remove = current_game_ids - incoming_game_ids
-                if games_to_remove:
-                    cur.execute(
-                        "DELETE FROM user_games WHERE user_id = %s AND game_id = ANY(%s)",
-                        (user.id, list(games_to_remove))
-                    )
+                    # 4. Remove the games they unchecked (Set Math)
+                    games_to_remove = current_game_ids - incoming_game_ids
+                    if games_to_remove:
+                        cur.execute(
+                            "DELETE FROM user_games WHERE user_id = %s AND game_id = ANY(%s)",
+                            (user_id, list(games_to_remove))
+                        )
 
-                # 5. UPSERT: Insert new games, OR update rank/role if they already exist
-                if incoming_games:
-                    upsert_query = """
-                        INSERT INTO user_games (user_id, game_id, current_rank, curr_role) 
-                        VALUES (%s, %s, %s, %s)
-                        ON CONFLICT (user_id, game_id) 
-                        DO UPDATE SET 
-                            current_rank = EXCLUDED.current_rank,
-                            curr_role = EXCLUDED.curr_role;
-                    """
-                    # Safely extract the data, defaulting to None if the frontend forgot to send it
-                    games_data = [
-                        (
-                            user.id, 
-                            int(g["id"]), 
-                            g.get("current_rank"), 
-                            g.get("curr_role")
-                        ) 
-                        for g in incoming_games if "id" in g
-                    ]
-                    cur.executemany(upsert_query, games_data)
+                    # 5. DUAL-WRITE UPSERT
+                    if incoming_games:
+                        upsert_query = """
+                            INSERT INTO user_games (
+                                user_id, game_id, 
+                                current_rank, curr_role,  -- The old legacy text columns
+                                rank_id, role_id          -- The new relational columns
+                            ) 
+                            VALUES (
+                                %s, %s, 
+                                %s, %s,
+                                (SELECT id FROM game_ranks WHERE name = %s AND game_id = %s LIMIT 1),
+                                (SELECT id FROM game_roles WHERE name = %s AND game_id = %s LIMIT 1)
+                            )
+                            ON CONFLICT (user_id, game_id) 
+                            DO UPDATE SET 
+                                current_rank = EXCLUDED.current_rank,
+                                curr_role = EXCLUDED.curr_role,
+                                rank_id = EXCLUDED.rank_id,
+                                role_id = EXCLUDED.role_id;
+                        """
+                        
+                        games_data = []
+                        for g in incoming_games:
+                            if "id" in g:
+                                game_id = int(g["id"])
+                                string_rank = g.get("current_rank")
+                                string_role = g.get("curr_role")
+                                
+                                games_data.append((
+                                    user_id, 
+                                    game_id, 
+                                    string_rank,        # For legacy current_rank
+                                    string_role,        # For legacy curr_role
+                                    string_rank, game_id, # For rank_id scalar subquery
+                                    string_role, game_id  # For role_id scalar subquery
+                                ))
+                                
+                        cur.executemany(upsert_query, games_data)
+                conn.commit()
 
         # if theres anything left to update
         if data:
