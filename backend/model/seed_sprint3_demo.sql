@@ -4,7 +4,7 @@ TRUNCATE users, games, user_games RESTART IDENTITY CASCADE;
 INSERT INTO games (title, genre, developer) VALUES 
 ('Valorant', 'FPS', 'Riot Games'),
 ('PUBG', 'Battle Royale', 'Krafton'),
-('League', 'MOBA', 'Riot Games'),
+('League of Legends', 'MOBA', 'Riot Games'),
 ('Minecraft', 'Sandbox', 'Mojang'),
 ('Apex Legends', 'Battle Royale', 'Respawn');
 
@@ -43,11 +43,6 @@ WHERE username IN ('OfficeWorker95');
 
 
 -- First 5 users: Diverse games with new standardized ranks
-INSERT INTO user_games (user_id, game_id, current_rank) VALUES 
-(1, (SELECT id FROM games WHERE title = 'PUBG'), 'Bronze 2'),
-(2, (SELECT id FROM games WHERE title = 'PUBG'), 'Silver 4'),
-(3, (SELECT id FROM games WHERE title = 'League'), 'Gold 1'),
-(4, (SELECT id FROM games WHERE title = 'Minecraft'), 'Gold 5');
 --(5, (SELECT id FROM games WHERE title = 'Apex Legends'), 'Platinum 3');
 
 -- Users 6-8: Valorant - Diamond

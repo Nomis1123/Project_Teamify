@@ -61,6 +61,7 @@ CREATE TABLE user_games(
     PRIMARY KEY (user_id, game_id)
 );
 
+ALTER TABLE user_games ADD COLUMN curr_role VARCHAR(50);
 
 -- class for games
 DROP TABLE IF EXISTS parties CASCADE;
