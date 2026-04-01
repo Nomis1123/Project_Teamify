@@ -317,7 +317,7 @@ def get_me():
         cur = conn.cursor(cursor_factory=RealDictCursor)
 
         query = """
-            SELECT g.id, g.title, g.thumbnail_url, ug.current_rank
+            SELECT g.id, g.title, g.thumbnail_url, ug.current_rank, ug.curr_role
             FROM games g
             JOIN user_games ug ON g.id = ug.game_id
             WHERE ug.user_id = %s;
@@ -448,22 +448,35 @@ def update_me():
                 cur.execute("SELECT game_id FROM user_games WHERE user_id = %s", (user.id,))
                 current_game_ids = set(row[0] for row in cur.fetchall())
 
-                # 4. Use Set Math to find the exact differences
-                games_to_add = incoming_game_ids - current_game_ids
+                # 4. Remove the games they unchecked (Set Math)
                 games_to_remove = current_game_ids - incoming_game_ids
-
-                # 5. Remove the games they unchecked
                 if games_to_remove:
                     cur.execute(
                         "DELETE FROM user_games WHERE user_id = %s AND game_id = ANY(%s)",
                         (user.id, list(games_to_remove))
                     )
 
-                # 6. Insert the newly added games
-                if games_to_add:
-                    add_query = "INSERT INTO user_games (user_id, game_id) VALUES (%s, %s)"
-                    cur.executemany(add_query, [(user.id, gid) for gid in games_to_add])
-
+                # 5. UPSERT: Insert new games, OR update rank/role if they already exist
+                if incoming_games:
+                    upsert_query = """
+                        INSERT INTO user_games (user_id, game_id, current_rank, curr_role) 
+                        VALUES (%s, %s, %s, %s)
+                        ON CONFLICT (user_id, game_id) 
+                        DO UPDATE SET 
+                            current_rank = EXCLUDED.current_rank,
+                            curr_role = EXCLUDED.curr_role;
+                    """
+                    # Safely extract the data, defaulting to None if the frontend forgot to send it
+                    games_data = [
+                        (
+                            user.id, 
+                            int(g["id"]), 
+                            g.get("current_rank"), 
+                            g.get("curr_role")
+                        ) 
+                        for g in incoming_games if "id" in g
+                    ]
+                    cur.executemany(upsert_query, games_data)
 
         # if theres anything left to update
         if data:
