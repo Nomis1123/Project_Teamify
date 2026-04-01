@@ -6,12 +6,20 @@ from flask import Flask
 from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, sync_games, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image, get_missing_games, get_all_games, get_game_details
 from controller.Friend_controller import (
     get_user_friends, accept_friend, send_friend_request, 
-    reject_friend_request, remove_friend
+    reject_friend_request, remove_friend, search_user
 )
+from controller.GamesController import get_games, retrieve_game_image
 from controller.MatchmakingController import get_matches, sort_matches
 
 from controller.ChatController import init_conversation, get_messages, register_chat_socket_events, get_all_friends_conversations
 from flask_socketio import SocketIO
+
+from controller.AdminController import update_game
+from controller.AuthenticationControllerOOP import register, login, steam_login, steam_verify, sync_games, get_me, update_me, logout, getOrUpdate_availability1, retrieve_image
+from controller.ChatController import init_conversation, get_messages
+from controller.Friend_controller import get_user_friends, accept_friend
+from controller.GamesController import get_games, retrieve_game_image
+from controller.MatchmakingController import get_matches
 
 #, login, auth_verify, logout, getOrUpdate_availability
 #from controller.AuthenticationController import logout
@@ -73,24 +81,34 @@ app.add_url_rule('/api/auth/login',view_func=login, methods=['POST'])
 #app.add_url_rule('/api/auth/verify/<token>', view_func=auth_verify, methods=['GET'])
 app.add_url_rule('/api/auth/steamlogin', view_func=steam_login, methods=['GET'])
 app.add_url_rule('/api/auth/steamverify', view_func=steam_verify, methods=['GET'])
-
+#
+#
 ## 2. Logout (Added to match Reference Sheet)
 app.add_url_rule('/api/auth/logout',  view_func=logout, methods=['POST'])
-
+#
 ## 3. User Info & Profile Update
 app.add_url_rule('/api/user/me',  view_func=get_me, methods=['GET'])
 app.add_url_rule('/api/user/me/sync', view_func=sync_games, methods=['POST'])
-
+#
 ## 4. Update User Profile (Added to match Reference Sheet)
 app.add_url_rule('/api/user/me', view_func=update_me,  methods=['PATCH'])
-
+#
 ## 5. Availability
 app.add_url_rule('/api/user/availability', view_func=getOrUpdate_availability1, methods=['GET','PUT'])
 app.add_url_rule('/api/user/filters', view_func=get_matches, methods=["POST"])
 app.add_url_rule('/api/user/sort', view_func=sort_matches, methods=["POST"])
 
+app.add_url_rule('/api/user/filters', view_func=get_matches, methods=["POST"])
+#
 ## 6. Uploads
 app.add_url_rule('/uploads/<filename>', view_func=retrieve_image, methods=['GET'])
+app.add_url_rule('/uploads/games/<filename>', view_func=retrieve_game_image, methods=['GET'])
+
+## 7. Admin
+app.add_url_rule('/api/admin/games', view_func=update_game, methods=['PATCH'])
+
+## 8. Return list of all games in db
+app.add_url_rule('/api/games', view_func=get_games, methods=['GET'])
 
 # Games
 
@@ -130,6 +148,10 @@ app.add_url_rule('/api/friends/accept', view_func=accept_friend, methods=['POST'
 app.add_url_rule('/api/friends/request', view_func=send_friend_request, methods=['POST'])
 # Reject friend request
 app.add_url_rule('/api/friends/requests/<int:sender_id>', view_func=reject_friend_request, methods=['DELETE'])
+
+# Search users
+app.add_url_rule('/api/friends/search', view_func=search_user, methods=['GET'])
+
 
 app.add_url_rule('/api/friends/<int:friend_id>', view_func=remove_friend, methods=['DELETE'])
 

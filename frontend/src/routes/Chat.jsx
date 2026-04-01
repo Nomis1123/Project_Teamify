@@ -6,9 +6,12 @@ import ChatFriendsList from "../components/ChatFriendsList"
 import ChatWindow from '../components/ChatWindow';
 import { io } from "socket.io-client";
 import { useLocation } from "react-router-dom";
+import useRequireAuth from "../components/RequireAuth.jsx";
 
 
 const Chat = () => {
+    useRequireAuth();
+
     const location = useLocation();
     const [currTarget, setCurrTarget] = useState(location.state?.target ?? null);
     const [friends_list, setFriendsList] = useState([]);

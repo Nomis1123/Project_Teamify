@@ -2,6 +2,7 @@ from flask import jsonify, redirect, request, url_for, session, current_app, sen
 from controller.extensions import bcrypt, get_db_connection
 from flask_jwt_extended import create_access_token, create_refresh_token, set_access_cookies
 
+import controller.extensions
 
 #from flask_jwt_extended import JWTManager
 
@@ -271,6 +272,7 @@ def sync_games():
     except Exception as e:
         conn.rollback()
         return jsonify({"status": {str(e)}}), 500
+
     finally:
         conn.close()
 
@@ -312,7 +314,7 @@ def get_me():
     try:
         conn = get_db_connection()
         # Use RealDictCursor so the frontend gets a clean JSON array of objects
-        cur = conn.cursor(cursor_factory=RealDictCursor) 
+        cur = conn.cursor(cursor_factory=RealDictCursor)
 
         query = """
             SELECT g.id, g.title, g.thumbnail_url, ug.current_rank
@@ -437,7 +439,7 @@ def update_me():
         if "owned_games" in data:
             # 1. Pop the list out of data so user.update() ignores it later
             incoming_games = data.pop("owned_games")
-            
+
             # 2. Extract just the IDs into a Python Set
             incoming_game_ids = set(int(game["id"]) for game in incoming_games if "id" in game)
 
@@ -607,7 +609,8 @@ def upload_image(image_file):
             image_file.save(filepath)
             # we may want separate directories in the future for different users for scalability
             public_url = f"http://138.197.132.126:8000/uploads/{filename}"
-            #public_url = f"http://138.197.132.126:8000/root/Project\ Teamify/backend/uploads/{filename}"
+            # use this for local dev testing:
+            # public_url = f"http://localhost:8000/uploads/{filename}"
             user.update({"profile_picture_url": public_url}, conn=conn)
             conn.commit()
             
@@ -657,7 +660,7 @@ def get_missing_games():
         conn = get_db_connection()
 
         # 2. Apply the RealDictCursor ONLY to this specific cursor
-        cur = conn.cursor(cursor_factory=RealDictCursor) 
+        cur = conn.cursor(cursor_factory=RealDictCursor)
 
         query = """
             SELECT g.id, g.title, g.thumbnail_url
@@ -676,7 +679,7 @@ def get_missing_games():
         return jsonify(missing_games), 200
 
     except Exception as e:
-        print(f"Database error: {e}") 
+        print(f"Database error: {e}")
         return jsonify({"status": "Error: failed to fetch available games"}), 500
 
     finally:
@@ -722,7 +725,7 @@ def get_game_details(game_id):
         conn = get_db_connection()
         # We don't need RealDictCursor here since we just want flat strings
         cur = conn.cursor()
-        
+
         # 1. Fetch just the name, but still order by tier_level so they are sorted right
         cur.execute("""
             SELECT name 
@@ -730,11 +733,11 @@ def get_game_details(game_id):
             WHERE game_id = %s 
             ORDER BY tier_level ASC;
         """, (game_id,))
-        
+
         # cur.fetchall() returns a list of tuples like: [('Bronze 5',), ('Bronze 4',)]
         # This list comprehension extracts just the string into a flat list
         ranks = [row[0] for row in cur.fetchall()]
-        
+
         # 2. Fetch just the name for roles
         cur.execute("""
             SELECT name 
@@ -742,9 +745,9 @@ def get_game_details(game_id):
             WHERE game_id = %s 
             ORDER BY id ASC;
         """, (game_id,))
-        
+
         roles = [row[0] for row in cur.fetchall()]
-        
+
         # 3. Combine and return
         return jsonify({
             "ranks": ranks,
@@ -754,7 +757,7 @@ def get_game_details(game_id):
     except Exception as e:
         print(f"Database error fetching game details for game {game_id}: {e}")
         return jsonify({"status": "Failed to fetch game details"}), 500
-        
+
     finally:
         if cur:
             cur.close()
