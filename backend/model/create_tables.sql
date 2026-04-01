@@ -13,7 +13,6 @@ CREATE TABLE users (
     roles VARCHAR(100) DEFAULT 'Any',
     availability INTEGER NOT NULL DEFAULT 0
 );
-ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE;
 
 
 ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE;
@@ -48,7 +47,6 @@ CREATE TABLE games(
     thumbnail_url TEXT, -- a string of thext that stores a link to an image file
     developer VARCHAR (100)
 );
-ALTER TABLE games ADD COLUMN icon_url TEXT;
 
 ALTER TABLE games ADD COLUMN icon_url TEXT;
 
