@@ -89,7 +89,7 @@ export default function PUGame({games, gameModifier, which, isAdding}) {
         <div className="element-game">
             {which != null? 
                 <button className="btn-game btn-game-image" onClick={() => {setOpen(true); handleGet();}}>
-                    <img className="popup-game-image" src={games[which]['thumbnail_url']} alt={games[which]['title']} />
+                    <img className="popup-game-image" src={games[which]['thumbnail_url']? games[which]['thumbnail_url'] : "http://138.197.132.126:8000/uploads/default_game_card.png"} alt={games[which]['title']} />
                     <div className="popup-game-text">{games[which]['title']}</div>
                 </button> :
                 <button className="btn-game btn-game-image" onClick={() => {setOpen(true); handleGet();}}>
@@ -105,16 +105,20 @@ export default function PUGame({games, gameModifier, which, isAdding}) {
                     {unselected.length > 0 && (
                         <div className="game-input-container">
                             {unselected.map(({ id, title, thumbnail_url }, index) => (
-                                <img
-                                    key={`${title}-${index}`}
-                                    className={`popup-game-image ${selectedIndex === index ? "popup-game-selected" : ""}`}
-                                    src={thumbnail_url}
-                                    alt={title}
-                                    onClick={() => {
-                                        setSelected({ id, title, thumbnail_url });
-                                        setSelectedIndex(index);
-                                    }}
-                                />
+                                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                    <img
+                                        key={`${title}-${index}`}
+                                        className={`popup-game-image ${selectedIndex === index ? "popup-game-selected" : ""}`}
+                                        src={thumbnail_url? thumbnail_url : "http://138.197.132.126:8000/uploads/default_game_card.png"}
+                                        alt={title}
+                                        onClick={() => {
+                                            setSelected({ id, title, thumbnail_url });
+                                            setSelectedIndex(index);
+                                        }}
+                                    />
+                                    <div className="popup-game-text">{title}</div>
+                                </div>
+                                
                             ))}
                         </div>
                     )}

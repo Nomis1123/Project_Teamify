@@ -175,7 +175,7 @@ const Profile = () => {
                         {user.games.length >= 1 && 
                             user.games.map((game, index) => (
                                 <div className='profile-game-image-text-container' key={index}>
-                                    <img className='profile-game-image' src={game.thumbnail_url} alt={game.title} />
+                                    <img className='profile-game-image' src={game.thumbnail_url? game.thumbnail_url : "http://138.197.132.126:8000/uploads/default_game_card.png"} alt={game.title} />
                                     <div className='profile-game-text'>{game.title}</div>
                                     {game.current_rank && <span>Rank: {game.current_rank}</span>}
                                     {game.curr_role && <span>Role: {game.curr_role}</span>}
