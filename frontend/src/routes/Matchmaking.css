@@ -38,18 +38,30 @@
 .filter-controls{ 
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
     flex-wrap: wrap; /* wrap on small screens to avoid breaking*/          
-    margin-top: 15px;
+    margin-top: 5px;
 }
 .filters span{
     font-size: 1.1rem;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .filterIcon{
     display: inline-block;
     width: 20px;
     height: 20px;
+}
+
+.sortIcon{
+    display: inline-block;
+    width: 17px;
+    height: 12px;
 }
 
 .filters select,
@@ -200,16 +212,16 @@
 .user-info {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 8px;
 }
 
-.region{
+.game-role{
     display: flex;
     align-items: center;
     gap: 5px;
 }
 
-.region img {
+.game-role img {
     display: inline-block; /* must keep img as inline-block */
     width: 18px;
     height: 18px;
@@ -262,4 +274,28 @@
     font-weight: 500;
 }
 
+.success-msg {
+  position: fixed;   /* float above content */
+  bottom: 20px;      
+  right: 20px;     
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  z-index: 1000;   
+}
 
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+.pagination button{
+    background: rgb(169, 84, 234);
+}

@@ -12,7 +12,6 @@ def get_db_connection():
         user=os.getenv("DB_USER", "postgres"),
         password=os.getenv("DB_PASSWORD")
     )
-    # This ensures the code looks in the 'public' schema where your tables likely are
     with conn.cursor() as cur:
         cur.execute("SET search_path TO public;")
     return conn
@@ -23,100 +22,191 @@ class UserGame:
         filters = filters or {}
         game_title = filters.get('game')
         rank = filters.get('rank')
-        apply_availability_filter = filters.get('availability') is not None
+        role_filter = filters.get('role')
 
         params = []
-        sql = """
-            SELECT 
-                u.id, 
-                u.username, 
-                u.profile_picture_url, 
-                u.description
-        """
 
         with get_db_connection() as conn:
             with conn.cursor() as cur:
-                if apply_availability_filter:
-                    # Fetch current user availability
-                    cur.execute("SELECT availability FROM users WHERE id = %s", (current_user_id,))
-                    res = cur.fetchone()
-                    curr_avail = json.dumps(res[0]) if res and res[0] else json.dumps({})
-                    
-                    sql += """, (SELECT count(*) 
-                                    FROM (SELECT jsonb_object_keys(COALESCE(u.availability, '{}'::jsonb)) as day) d
-                                    CROSS JOIN (VALUES ('Morning'), ('Noon'), ('Evening')) AS s(slot)
-                                    WHERE COALESCE((u.availability -> d.day ->> s.slot)::boolean, FALSE) = TRUE
-                                    AND COALESCE((%s::jsonb -> d.day ->> s.slot)::boolean, FALSE) = TRUE
-                                ) as harmony_score """
-                    params.append(curr_avail) 
-                else:
-                    sql += ", 0 as harmony_score "
-
-                sql += """
-                        , COALESCE(
+                sql = """
+                    SELECT 
+                        u.id, 
+                        u.username, 
+                        u.profile_picture_url, 
+                        u.description, 
+                        u.roles,
+                        COALESCE(
                             jsonb_agg(
                                 jsonb_build_object('title', g.title, 'rank', ug.current_rank)
-                            ) FILTER (WHERE g.id IS NOT NULL), '[]'
-                        ) as user_games_list
-                        FROM users u
-                        LEFT JOIN user_games ug ON u.id = ug.user_id 
-                        LEFT JOIN games g ON ug.game_id = g.id 
-                        WHERE u.id != %s AND u.is_verified = TRUE
+                            ) FILTER (WHERE g.id IS NOT NULL),
+                            '[]'
+                        ) AS user_games_list
+                    FROM users u
+                    LEFT JOIN user_games ug ON u.id = ug.user_id
+                    LEFT JOIN games g ON ug.game_id = g.id
+                    WHERE u.id != %s
                 """
                 params.append(current_user_id)
 
-                if game_title:
-                    sql += " AND g.title ILIKE %s "
+                if role_filter:
+                    sql += " AND u.roles ILIKE %s"
+                    params.append(f"%{role_filter}%")
+
+                if game_title and rank:
+                    sql += """
+                        AND EXISTS (
+                            SELECT 1 FROM user_games ug2 JOIN games g2 ON ug2.game_id = g2.id
+                            WHERE ug2.user_id = u.id AND g2.title ILIKE %s AND ug2.current_rank ILIKE %s
+                        )
+                    """
+                    params.extend([f"%{game_title}%", f"%{rank}%"])
+                elif game_title:
+                    sql += """
+                        AND EXISTS (
+                            SELECT 1 FROM user_games ug2 JOIN games g2 ON ug2.game_id = g2.id
+                            WHERE ug2.user_id = u.id AND g2.title ILIKE %s
+                        )
+                    """
                     params.append(f"%{game_title}%")
-                
-                if rank:
-                    sql += " AND ug.current_rank ILIKE %s " 
+                elif rank:
+                    sql += """
+                        AND EXISTS (
+                            SELECT 1 FROM user_games ug2 WHERE ug2.user_id = u.id AND ug2.current_rank ILIKE %s
+                        )
+                    """
                     params.append(f"%{rank}%")
-                
-                sql += " GROUP BY u.id, u.username, u.profile_picture_url, u.description "
 
-                if apply_availability_filter:
-                    sql += " ORDER BY harmony_score DESC "
-                else:
-                    sql += " ORDER BY u.id ASC "
-
-                try:
-                    clean_offset = int(offset)
-                except (ValueError, TypeError):
-                    clean_offset = 0
-
-                sql += " LIMIT 10 OFFSET %s;"
-                params.append(clean_offset)
+                sql += " GROUP BY u.id, u.username, u.profile_picture_url, u.description, u.roles"
+                sql += " ORDER BY u.id ASC"
+                sql += " LIMIT 10 OFFSET %s"
+                params.append(int(offset))
 
                 cur.execute(sql, tuple(params))
                 rows = cur.fetchall()
 
                 results = []
                 for r in rows:
-                    harmony_score = r[4] 
-                    games_list = r[5] or []
-                    
-                    display_game = "N/A"
-                    display_rank = "N/A" # Default rank
-                    
+                    user_id, username, avatar, description, user_roles, games_list = r
+
+                    display_game, display_rank = "N/A", "N/A"
                     if games_list:
-                        # Find the game object (contains both title and rank)
                         search_term = game_title.lower() if game_title else ""
                         matched_obj = next(
                             (g for g in games_list if search_term in g['title'].lower()), 
                             games_list[0]
                         )
                         display_game = matched_obj['title']
-                        display_rank = matched_obj['rank'] # Extract rank
+                        display_rank = matched_obj['rank']
 
                     results.append({
-                        "id": r[0],
-                        "username": r[1],
-                        "avatar": r[2] or f"https://api.dicebear.com/7.x/avataaars/svg?seed={r[1]}",
-                        "description": r[3],
-                        "match_percentage": f"{round((harmony_score / 21) * 100)}%" if apply_availability_filter else "0%",
-                        "game": display_game, 
-                        "rank": display_rank, # Added rank here
-                        "region": "NA"
+                        "id": user_id,
+                        "username": username,
+                        "avatar": avatar or f"https://api.dicebear.com/7.x/avataaars/svg?seed={username}",
+                        "description": description,
+                        "game": display_game,
+                        "rank": display_rank,
+                        "roles": user_roles 
                     })
+
+                return results
+
+    @staticmethod
+    def get_filtered_users2(current_user_id, filters=None, offset=0):
+        filters = filters or {}
+        game_title = filters.get('game')
+        rank = filters.get('rank')
+        role_filter = filters.get('role')
+
+        params = []
+
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                # 1. Update the Main Query to JOIN the new rank and role tables
+                sql = """
+                    SELECT 
+                        u.id, 
+                        u.username, 
+                        u.profile_picture_url, 
+                        u.description, 
+                        COALESCE(
+                            jsonb_agg(
+                                jsonb_build_object(
+                                    'title', g.title, 
+                                    'rank', gr.name,
+                                    'role', gro.name
+                                )
+                            ) FILTER (WHERE g.id IS NOT NULL),
+                            '[]'
+                        ) AS user_games_list
+                    FROM users u
+                    LEFT JOIN user_games ug ON u.id = ug.user_id
+                    LEFT JOIN games g ON ug.game_id = g.id
+                    LEFT JOIN game_ranks gr ON ug.rank_id = gr.id
+                    LEFT JOIN game_roles gro ON ug.role_id = gro.id
+                    WHERE u.id != %s
+                """
+                params.append(current_user_id)
+
+                # 2. Unified Filtering Logic
+                # If any filter is applied, we enforce it using a single EXISTS block
+                if game_title or rank or role_filter:
+                    sql += """
+                        AND EXISTS (
+                            SELECT 1 FROM user_games ug2 
+                            JOIN games g2 ON ug2.game_id = g2.id
+                            LEFT JOIN game_ranks gr2 ON ug2.rank_id = gr2.id
+                            LEFT JOIN game_roles gro2 ON ug2.role_id = gro2.id
+                            WHERE ug2.user_id = u.id
+                    """
+                    if game_title:
+                        sql += " AND g2.title ILIKE %s"
+                        params.append(f"%{game_title}%")
+                    if rank:
+                        sql += " AND gr2.name ILIKE %s"
+                        params.append(f"%{rank}%")
+                    if role_filter:
+                        sql += " AND gro2.name ILIKE %s"
+                        params.append(f"%{role_filter}%")
+                    
+                    sql += " )" # Close the EXISTS clause
+
+                # 3. Grouping and Pagination (Removed u.roles since roles are now game-specific)
+                sql += " GROUP BY u.id, u.username, u.profile_picture_url, u.description"
+                sql += " ORDER BY u.id ASC"
+                sql += " LIMIT 10 OFFSET %s"
+                params.append(int(offset))
+
+                cur.execute(sql, tuple(params))
+                rows = cur.fetchall()
+
+                # 4. Process the Results for the Frontend
+                results = []
+                for r in rows:
+                    user_id, username, avatar, description, games_list = r
+
+                    display_game, display_rank, display_role = "N/A", "N/A", "N/A"
+                    
+                    if games_list:
+                        search_term = game_title.lower() if game_title else ""
+                        
+                        # Find the specific game they searched for to display prominently, 
+                        # or just default to the first game in their library
+                        matched_obj = next(
+                            (g for g in games_list if search_term in (g.get('title') or '').lower()), 
+                            games_list[0]
+                        )
+                        display_game = matched_obj.get('title') or "N/A"
+                        display_rank = matched_obj.get('rank') or "N/A"
+                        display_role = matched_obj.get('role') or "N/A"
+
+                    results.append({
+                        "id": user_id,
+                        "username": username,
+                        "avatar": avatar or f"https://api.dicebear.com/7.x/avataaars/svg?seed={username}",
+                        "description": description,
+                        "game": display_game,
+                        "rank": display_rank,
+                        "roles": display_role 
+                    })
+
                 return results

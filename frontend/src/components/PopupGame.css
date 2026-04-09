@@ -1,0 +1,110 @@
+.element-game {
+  padding: 5px;
+}
+
+.btn-game {
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  flex: 0 0 auto;
+}
+
+.btn-game-change {
+  background: rgb(255, 255, 255, 0.2);
+  color: white;
+  width: 100%;
+  padding: 10px 14px;
+}
+
+.btn-game-image {
+  background: rgb(255, 255, 255, 0.2);
+  color: white;
+  width: 100%;
+  padding: 5px 5px;
+}
+
+.btn-game-change:hover {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid;
+  border-color: rgb(255, 255, 255);
+}
+
+.btn-game-save {
+  height: 50px;
+  width: 100px;
+  background: rgb(255, 255, 255, 0.2);
+  color: white;
+  margin-left: auto;
+}
+
+.btn-game-save:hover {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid;
+  border-color: rgb(255, 255, 255);
+}
+
+.input-game {
+  flex: 1;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 14px;
+  outline: none;
+}
+
+.input-game:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.popup-game-popup-width {
+  width: 610px;
+}
+
+.popup-game-body-height {
+  height: 430px;
+}
+
+.single-input-block-game {
+  height: 100px;
+}
+
+.game-input-container {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  overflow-y: auto;
+  gap: 8px;
+  width: 300px;
+  max-height: 400px;
+}
+
+.game-save-container {
+  flex: 0 0 auto;
+  height: 400px;
+  display: flex;  
+  align-items: center;  
+}
+
+.popup-game-image {
+  grid-area: profile_game_image;
+  width: 140px;
+  height: 180px;
+  min-width: 140px;
+  border-radius: 10%;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.2);
+}
+
+.popup-game-text {
+  width: 140px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+}
+
+.popup-game-selected {
+  border-color: rgb(80, 120, 255);
+  border-width: 3px;
+}

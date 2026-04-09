@@ -10,16 +10,33 @@ CREATE TABLE users (
     sub_class VARCHAR(50),
     is_verified BOOLEAN DEFAULT FALSE,
     verification_token VARCHAR(255),
-    availability JSONB DEFAULT '{
-  "Monday": {"Morning": false, "Noon": false, "Evening": false},
-  "Tuesday": {"Morning": false, "Noon": false, "Evening": false},
-  "Wednesday": {"Morning": false, "Noon": false, "Evening": false},
-  "Thursday": {"Morning": false, "Noon": false, "Evening": false},
-  "Friday": {"Morning": false, "Noon": false, "Evening": false},
-  "Saturday": {"Morning": false, "Noon": false, "Evening": false},
-  "Sunday": {"Morning": false, "Noon": false, "Evening": false}
-}'::JSONB
+    roles VARCHAR(100) DEFAULT 'Any',
+    availability INTEGER NOT NULL DEFAULT 0
 );
+
+
+ALTER TABLE users ADD COLUMN is_admin BOOLEAN DEFAULT FALSE;
+
+
+DROP TABLE IF EXISTS friends CASCADE;
+CREATE TABLE friends (
+    id SERIAL PRIMARY KEY,
+    user_id_1 INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id_2 INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    status VARCHAR(20) DEFAULT 'pending', -- 'pending', 'accepted', 'blocked'
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Ensure a user can't be friends with themselves
+    CONSTRAINT check_not_self CHECK (user_id_1 != user_id_2),
+    -- Ensure we don't have duplicate rows for the same pair (1-2 and 2-1)
+    CONSTRAINT unique_friendship UNIQUE (user_id_1, user_id_2)
+);
+ALTER TABLE friends ADD COLUMN action_user_id INTEGER;
+
+-- Index for faster lookups when checking a specific user's friend list
+CREATE INDEX idx_friends_user_1 ON friends(user_id_1);
+CREATE INDEX idx_friends_user_2 ON friends(user_id_2);
+
 
 -- Master list of available games
 DROP TABLE IF EXISTS games CASCADE;
@@ -30,6 +47,8 @@ CREATE TABLE games(
     thumbnail_url TEXT, -- a string of thext that stores a link to an image file
     developer VARCHAR (100)
 );
+
+ALTER TABLE games ADD COLUMN icon_url TEXT;
 
 -- Join table: likes Users to Games (Many-to-Many)
 DROP TABLE IF EXISTS user_games CASCADE;
@@ -42,6 +61,7 @@ CREATE TABLE user_games(
     PRIMARY KEY (user_id, game_id)
 );
 
+ALTER TABLE user_games ADD COLUMN curr_role VARCHAR(50);
 
 -- class for games
 DROP TABLE IF EXISTS parties CASCADE;

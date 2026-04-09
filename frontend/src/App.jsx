@@ -4,15 +4,20 @@ import { Routes, Route} from "react-router-dom"
 import Login from "./routes/Login"
 import Profile from "./routes/Profile"
 import ProfileEdit from './routes/ProfileEdit.jsx'
-import Register from './routes/Register.jsx'
 import { useState, useEffect } from "react"
+import Register from './routes/Register.jsx'
 import Matchmaking from './routes/Matchmaking.jsx'
+import Chat from './routes/Chat.jsx'
+import Friends from './routes/Friends.jsx'
+import AdminPage from './routes/AdminPage.jsx'
+import Home from './routes/Home.jsx'
 
 // npm run dev http://localhost:5173/ 
 
 function App() {  
 
-  const [user, setUser] = useState("")
+  const [user, setUser] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // restores the user login state if they have not logged out yet
   useEffect(() => {
@@ -43,13 +48,17 @@ function App() {
   return (
     <>
       <div className="body">
-          <Navbar user={user} setUser={setUser}/>
+          <Navbar user={user} isAdmin={isAdmin} setUser={setUser} setIsAdmin={setIsAdmin}/>
           <Routes>
-            <Route path="/login" element={<Login setUser={setUser}/>} />
+            <Route path="/login" element={<Login setUser={setUser} setIsAdmin={setIsAdmin}/>} />
             <Route path="/profile" element={<Profile/>} />
             <Route path="/profile_editing" element={<ProfileEdit/>} />
+            <Route path="/chat" element={<Chat/>} />
             <Route path="/register" element={<Register/>} />
             <Route path="/matchmaking" element={<Matchmaking/>} />
+            <Route path="/friends" element={<Friends/>} />
+            <Route path="/adminPage" element={<AdminPage/>} />
+            <Route path="/" element={<Home/>} />
           </Routes>
       </div>
     </>

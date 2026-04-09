@@ -58,3 +58,7 @@
   padding: 6px 15px;
   border-radius: 10px;
 }
+
+.admin_page {
+    white-space: nowrap;
+}
