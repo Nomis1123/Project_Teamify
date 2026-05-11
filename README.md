@@ -31,9 +31,34 @@ The platform is deployed via a fully automated CI/CD pipeline and engineered wit
 - Designed with complete keyboard navigability, high-contrast dark mode aesthetics, and purely visual feedback loops to ensure an equitable experience for users with motor, visual, or hearing impairments.
 
 
-<img width="958.5" height="462.5" alt="image" src="https://github.com/user-attachments/assets/01d68cd8-6c85-49ed-94b1-66bddfffd3fe" />
+<table width="100%">
+  <tr>
+    <td width="50%">
+      <img src="https://github.com/user-attachments/assets/546c30c6-e017-40a0-ae12-a598257215ef" alt="Feature 1" width="100%" />
+    </td>
+    <td width="50%">
+      <img src="https://github.com/user-attachments/assets/01d68cd8-6c85-49ed-94b1-66bddfffd3fe" alt="Feature 2" width="100%" />
+    </td>
+  </tr>
+  
+  <tr>
+    <td width="50%">
+      <img src="https://github.com/user-attachments/assets/42edbc2d-4dba-4e72-81ff-66cb8a1c74a3" alt="Feature 3" width="100%" />
+    </td>
+    <td width="50%">
+      <img src="https://github.com/user-attachments/assets/906a3179-2170-4570-97af-0f979abc1bbb" alt="Feature 4" width="100%" />
+    </td>
+  </tr>
 
-
+  <tr>
+    <td width="50%">
+      <img src="https://github.com/user-attachments/assets/64ae2cb3-fcae-4c4a-87ba-934cbb40ebfc" alt="Feature 5" width="100%" />
+    </td>
+    <td width="50%">
+      <img src="https://github.com/user-attachments/assets/b66e2186-c040-4931-875c-8b6d50cee4d0" alt="Feature 6" width="100%" />
+    </td>
+  </tr>
+</table>
 ## Installation
 
 Follow these steps to get Teamify running on your own machine.
