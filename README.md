@@ -33,3 +33,13 @@ The platform is deployed via a fully automated CI/CD pipeline and engineered wit
 
 <img width="958.5" height="462.5" alt="image" src="https://github.com/user-attachments/assets/01d68cd8-6c85-49ed-94b1-66bddfffd3fe" />
 
+
+## Installation
+
+Follow these steps to get Teamify running on your own machine.
+
+**Prequisites:**
+- Node.js & npm v16+
+- Python v3.8+
+- Git
+
