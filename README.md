@@ -59,7 +59,8 @@ The platform is deployed via a fully automated CI/CD pipeline and engineered wit
     </td>
   </tr>
 </table>
-## Installation
+
+# Installation
 
 Follow these steps to get Teamify running on your own machine.
 
