@@ -55,7 +55,7 @@ The platform is deployed via a fully automated CI/CD pipeline and engineered wit
       <img src="https://github.com/user-attachments/assets/64ae2cb3-fcae-4c4a-87ba-934cbb40ebfc" alt="Feature 5" width="100%" />
     </td>
     <td width="50%">
-      <img src="https://github.com/user-attachments/assets/b66e2186-c040-4931-875c-8b6d50cee4d0" alt="Feature 6" width="100%" />
+      <img src="https://github.com/user-attachments/assets/760da508-17c3-421e-9147-c179abac86e7" alt="Feature 6" width="100%" />
     </td>
   </tr>
 </table>
