@@ -31,5 +31,5 @@ The platform is deployed via a fully automated CI/CD pipeline and engineered wit
 - Designed with complete keyboard navigability, high-contrast dark mode aesthetics, and purely visual feedback loops to ensure an equitable experience for users with motor, visual, or hearing impairments.
 
 
+<img width="958.5" height="462.5" alt="image" src="https://github.com/user-attachments/assets/01d68cd8-6c85-49ed-94b1-66bddfffd3fe" />
 
-<img width="1902" height="994" alt="image" src="https://github.com/user-attachments/assets/2e8f81c3-52be-426a-9678-650a0ccd995e" />
