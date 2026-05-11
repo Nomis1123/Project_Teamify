@@ -5,7 +5,9 @@ backend/web-backend-dev
 
 .env
 .env.local
-.env.example
+
+# Vite cache
+frontend/.vite/
 
 # Python Virtual Environment
 .venv/

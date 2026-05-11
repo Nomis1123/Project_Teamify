@@ -64,7 +64,48 @@ The platform is deployed via a fully automated CI/CD pipeline and engineered wit
 Follow these steps to get Teamify running on your own machine.
 
 **Prequisites:**
-- Node.js & npm v16+
-- Python v3.8+
+- [Node.js & npm v16+](https://nodejs.org/)
+- [Python v3.8+](https://www.python.org/downloads/)
+- [PostgreSQL](https://www.postgresql.org/download/)
 - Git
+
+**1. Clone the repository**
+```bash
+git clone https://github.com/Nomis1123/Project_Teamify.git
+cd Project_Teamify
+```
+
+**2. Configure environment variables**
+
+Copy the example env file and fill in your values:
+```bash
+cp .env.example backend/.env
+```
+
+Open `backend/.env` and set your PostgreSQL credentials and a JWT secret key:
+```
+DB_HOST=localhost
+DB_NAME=teamify_db
+DB_USER=postgres
+DB_PASSWORD=your_postgres_password
+DB_PORT=5432
+JWT_SECRET_KEY=your_secret_key
+```
+
+Make sure the PostgreSQL database exists:
+```bash
+psql -U postgres -c "CREATE DATABASE teamify_db;"
+```
+
+**3. Run the setup script**
+```bash
+chmod +x setup.sh
+./setup.sh
+```
+
+This will install all dependencies and start both servers:
+- Backend (Flask): `http://localhost:8000`
+- Frontend (Vite): `http://localhost:5173`
+
+Press `Ctrl+C` to stop both servers.
 
