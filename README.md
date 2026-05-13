@@ -60,6 +60,17 @@ The platform is deployed via a fully automated CI/CD pipeline and engineered wit
   </tr>
 </table>
 
+## Technologies Used
+* **Frontend:** React, Vite, Tailwind/CSS
+* **Backend:** Python, Flask, Node.js, Socket.io
+* **Database:** PostgreSQL
+* **DevOps:** GitHub Actions, VPS, PM2
+
+## Architecture & DevOps
+* **System Architecture:** Deployed on a singular monolithic VPS host with decoupled client and server processes.
+* **CI/CD Pipeline:** Pushes to the `dev` branch automatically trigger a GitHub Actions workflow, pinging a webhook on the live VPS to pull the latest code and seamlessly restart the backend.
+* **Fault Tolerance:** Engineered with graceful UI error handling to prevent total frontend crashes during isolated database drops or third-party API rate-limiting.
+
 # Installation
 
 Follow these steps to get Teamify running on your own machine.
